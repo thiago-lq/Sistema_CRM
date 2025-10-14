@@ -31,7 +31,6 @@ export default function LoginBox() {
   }
   return (
     <div>
-      {/* 👇 Bar aparece fixa no topo */}
       <div className="fixed top-0 left-0 right-0 z-50">
         <Bar />
     </div>
