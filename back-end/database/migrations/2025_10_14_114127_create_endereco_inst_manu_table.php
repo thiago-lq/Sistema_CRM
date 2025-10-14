@@ -9,13 +9,13 @@ return new class extends Migration
     public function up()
     {
         DB::statement("
-            CREATE TABLE ENDERECO_INST_MANU('
+            CREATE TABLE ENDERECO_INST_MANU(
             COD_INST_MANU INT PRIMARY KEY,
             CIDADE VARCHAR(50) NOT NULL,
             CEP CHAR(8) NOT NULL,
             BAIRRO VARCHAR(50) NOT NULL,
             RUA_NUMERO VARCHAR(50) NOT NULL
-            ');
+            );
         ");
     }
 
