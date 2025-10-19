@@ -63,15 +63,16 @@ export default function Clientes() {
         <table className="min-w-full bg-white border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {clientes.map((cliente) => (
               <tr key={cliente.id}>
+                <td className="px-6 py-4 whitespace-nowrap">{cliente.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{cliente.nome}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{cliente.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{cliente.telefone}</td>

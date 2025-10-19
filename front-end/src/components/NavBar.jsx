@@ -3,6 +3,7 @@ import cliente from "../assets/icone_clientes.png";
 import pedidos from "../assets/icone_pedidos.png";
 import relatorios from "../assets/icone_relatorios.png";
 import logout from "../assets/icone_logout.png";
+import funcionarios from "../assets/icone_funcionarios.png"
 
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
@@ -11,6 +12,7 @@ import Inicio from "./Inicio";
 import Clientes from "./Clientes";
 import Relatorios from "./Relatorios";
 import Pedidos from "./Pedidos";
+import Funcionarios from "./Funcionarios";
 
 const LinkStyle =
   "flex flex-col items-center p-2 rounded-lg text-gray-700 hover:opacity-60 hover:cursor-pointer transition duration-150";
@@ -85,7 +87,10 @@ export default function NavBar() {
             <img src={relatorios} alt="relatorios" className="h-12 w-12" />
             <span className="text-xs mt-1 font-medium">RELATORIOS</span>
           </button>
-
+          <button onClick={() => setTab("funcionarios")} className={LinkStyle}>
+            <img src={funcionarios} alt="funcionarios" className="h-12 w-12" />
+            <span className="text-xs mt-1 font-medium">FUNCIONARIOS</span>
+          </button>
           <button onClick={() => navigate("/")} className={LinkStyle}>
             <img src={logout} alt="logout" className="h-12 w-12" />
             <span className="text-xs mt-1 font-medium">LOGOUT</span>
@@ -97,6 +102,7 @@ export default function NavBar() {
         {tab === "pedidos" && <Pedidos />}
         {tab === "clientes" && <Clientes />}
         {tab === "relatorios" && <Relatorios />}
+        {tab === "funcionarios" && <Funcionarios />}
       </div>
     </div>
   );

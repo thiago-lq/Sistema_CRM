@@ -31,7 +31,7 @@ export default function FormularioCadastro() {
     // Nota: O estilo da div principal foi simplificado, pois o estilo da caixa é controlado pelo Gerenciador.
     // Se quiser que o formulário ocupe mais espaço verticalmente, você adicionaria elementos aqui.
     // Se você já aumentou a largura no Gerenciador (max-w-lg -> max-w-3xl, etc.), este formulário irá se expandir.
-    <div className="bg-white h-120">
+    <div className="bg-white h-150">
       <h3 className="text-xl font-bold mb-6 text-gray-800 text-center mt-5">
         CADASTRAR NOVO PEDIDO
       </h3>
@@ -62,8 +62,8 @@ export default function FormularioCadastro() {
         {/* Campo de Input: Valor Total */}
         <div>
           <label
-          htmlFor="valor-total"
-          className="block text-sm font-medium text-gray-700 mb-1"
+            htmlFor="valor-total"
+            className="block text-sm font-medium text-gray-700 mb-1"
           >
             Valor Total (R$)
           </label>
@@ -77,20 +77,31 @@ export default function FormularioCadastro() {
           />
         </div>
         <div>
-          <label 
-          className="block text-sm font-medium text-gray-700 mb-1"
->
-          Cliente
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Cliente
           </label>
-          <input 
-          type="text"
-          id="cliente"
-          placeholder="Digite o Nome do Cliente"
-          className="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          <input
+            type="text"
+            id="cliente"
+            placeholder="Digite o Nome do Cliente"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Código do Cliente
+          </label>
+          <input
+            type="number"
+            placeholder="Digite o código do cliente"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            step="1" // só permite inteiros
+            min="0" // opcional, evita números negativos
+            onWheel={(e) => e.target.blur()} // evita mudar com scroll do mouse
           />
         </div>
         {/* Botão de Submissão */}
-        <div className="mt-30">
+        <div className="mt-15">
           <button
             type="submit"
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all mt-4"
