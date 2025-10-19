@@ -46,7 +46,7 @@ class ClienteController extends Controller
         } while (!empty($exists));
 
         try {
-            DB::insert("INSERT INTO CLIENTES (COD_CLIENTE, CPF_CLIENTE, EMAIL, NOME, DATA_NASCIMENTO) VALUES (?, ?, ?, ?, ?,)", 
+            DB::insert("INSERT INTO CLIENTES (COD_CLIENTE, CPF_CLIENTE, EMAIL, NOME, DATA_NASCIMENTO) VALUES (?, ?, ?, ?, ?)", 
             [$codCliente, $cpf, $email, $nome, $data_nascimento]);
             
             return response()->json(['message' => 'Cliente cadastrado com sucesso!', 'cod_cliente' => $codCliente], 201);
@@ -84,5 +84,4 @@ class ClienteController extends Controller
             return response()->json(['message' => 'Erro ao excluir o cliente', 'error' => $e->getMessage()], 500);
         }
     }
-
 }
