@@ -15,3 +15,10 @@ Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
 // Rotas de Funcionarios_CRM
 Route::get('/funcionarios_crm', [Funcionario_CrmController::class, 'index']);
 Route::get('/funcionarios_crm/{id}', [Funcionario_CrmController::class, 'show']);
+
+// Rotas de Endereços de Clientes
+Route::get('/enderecos_clientes', [Endereco_ClienteController::class, 'index']);
+Route::get('/enderecos_clientes/{id}', [Endereco_ClienteController::class, 'show']);
+Route::post('/enderecos_clientes', [Endereco_ClienteController::class, 'store']);
+Route::put('/enderecos_clientes/{id}', [Endereco_ClienteController::class, 'update']);
+Route::delete('/enderecos_clientes/{id}', [Endereco_ClienteController::class, 'destroy']);
