@@ -10,16 +10,18 @@ return new class extends Migration
     {
       DB::statement("
         CREATE TABLE TELEFONES_CLIENTES(
-          COD_CLIENTE INT PRIMARY KEY,
-          TELEFONE CHAR(11) NOT NULL,
+          COD_TELEFONE SERIAL NOT NULL,
+          COD_CLIENTE INT NOT NULL,
+          TELEFONE CHAR(11) UNIQUE NOT NULL,
           CREATED_AT TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
           UPDATED_AT TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (COD_CLIENTE) REFERENCES CLIENTES (COD_CLIENTE)
+          PRIMARY KEY (COD_TELEFONE, COD_CLIENTE),
+          FOREIGN KEY (COD_CLIENTE) REFERENCES CLIENTES (COD_CLIENTE) ON DELETE CASCADE
         );
       ");
 
       DB::statement("
-        CREATE OR REPLACE FUNCTION set_created_at()
+        CREATE OR REPLACE FUNCTION set_created_at_telefones_clientes()
         RETURNS TRIGGER AS \$\$
         BEGIN
           NEW.CREATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo';
@@ -30,14 +32,14 @@ return new class extends Migration
       ");
 
       DB::statement("
-        CREATE TRIGGER trigger_created_at
+        CREATE TRIGGER trigger_created_at_telefones_clientes
         BEFORE INSERT ON TELEFONES_CLIENTES
         FOR EACH ROW
-        EXECUTE FUNCTION set_created_at();
+        EXECUTE FUNCTION set_created_at_telefones_clientes();
       ");
 
       DB::statement("
-        CREATE OR REPLACE FUNCTION atualizar_updated_at()
+        CREATE OR REPLACE FUNCTION atualizar_updated_at_telefones_clientes()
         RETURNS TRIGGER AS \$\$
         BEGIN
           NEW.UPDATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo';
@@ -47,19 +49,19 @@ return new class extends Migration
       ");
 
       DB::statement("
-        CREATE TRIGGER trigger_updated_at
+        CREATE TRIGGER trigger_updated_at_telefones_clientes
         BEFORE UPDATE ON TELEFONES_CLIENTES
         FOR EACH ROW
-        EXECUTE FUNCTION atualizar_updated_at();
+        EXECUTE FUNCTION atualizar_updated_at_telefones_clientes();
       ");
     }
 
     public function down()
     {
-      DB::statement("DROP TRIGGER IF EXISTS trigger_created_at ON TELEFONES_CLIENTES;");
-      DB::statement("DROP FUNCTION IF EXISTS set_created_at;");
-      DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at ON TELEFONES_CLIENTES;");
-      DB::statement("DROP FUNCTION IF EXISTS atualizar_updated_at;");
+      DB::statement("DROP TRIGGER IF EXISTS trigger_created_at_telefones_clientes ON TELEFONES_CLIENTES;");
+      DB::statement("DROP FUNCTION IF EXISTS set_created_at_telefones_clientes;");
+      DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at_telefones_clientes ON TELEFONES_CLIENTES;");
+      DB::statement("DROP FUNCTION IF EXISTS atualizar_updated_at_telefones_clientes;");
 
       DB::statement("DROP TABLE IF EXISTS TELEFONES_CLIENTES;");
     }

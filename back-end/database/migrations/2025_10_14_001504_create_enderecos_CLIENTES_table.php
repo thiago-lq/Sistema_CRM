@@ -10,19 +10,21 @@ return new class extends Migration
     {
       DB::statement("
         CREATE TABLE ENDERECOS_CLIENTES(
-          COD_CLIENTE INT PRIMARY KEY,
-          CIDADE VARCHAR(50) NOT NULL,
+          COD_ENDERECO_CLIENTE SERIAL NOT NULL,
+          COD_CLIENTE INT NOT NULL,
+          CIDADE VARCHAR(100) NOT NULL,
           CEP CHAR(8) NOT NULL,
-          BAIRRO VARCHAR(50) NOT NULL,
+          BAIRRO VARCHAR(100) NOT NULL,
           RUA_NUMERO VARCHAR(50) NOT NULL,
           CREATED_AT TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
           UPDATED_AT TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (COD_CLIENTE) REFERENCES CLIENTES (COD_CLIENTE)
+          PRIMARY KEY (COD_ENDERECO_CLIENTE, COD_CLIENTE),
+          FOREIGN KEY (COD_CLIENTE) REFERENCES CLIENTES (COD_CLIENTE) ON DELETE CASCADE
         );
       ");
 
       DB::statement("
-        CREATE OR REPLACE FUNCTION set_created_at()
+        CREATE OR REPLACE FUNCTION set_created_at_enderecos_clientes()
         RETURNS TRIGGER AS \$\$
         BEGIN
           NEW.CREATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo';
@@ -33,14 +35,14 @@ return new class extends Migration
       ");
 
       DB::statement("
-        CREATE TRIGGER trigger_created_at
+        CREATE TRIGGER trigger_created_at_enderecos_clientes
         BEFORE INSERT ON ENDERECOS_CLIENTES
         FOR EACH ROW
-        EXECUTE FUNCTION set_created_at();
+        EXECUTE FUNCTION set_created_at_enderecos_clientes();
       ");
 
       DB::statement("
-        CREATE OR REPLACE FUNCTION atualizar_updated_at()
+        CREATE OR REPLACE FUNCTION atualizar_updated_at_enderecos_clientes()
         RETURNS TRIGGER AS \$\$
         BEGIN
           NEW.UPDATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo';
@@ -50,20 +52,20 @@ return new class extends Migration
       ");
 
       DB::statement("
-        CREATE TRIGGER trigger_updated_at
+        CREATE TRIGGER trigger_updated_at_enderecos_clientes
         BEFORE UPDATE ON ENDERECOS_CLIENTES
         FOR EACH ROW
-        EXECUTE FUNCTION atualizar_updated_at();
+        EXECUTE FUNCTION atualizar_updated_at_enderecos_clientes();
       ");
     }
 
  
     public function down()
     {
-      DB::statement("DROP TRIGGER IF EXISTS trigger_created_at ON ENDERECOS_CLIENTES;");
-      DB::statement("DROP FUNCTION IF EXISTS set_created_at;");
-      DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at ON ENDERECOS_CLIENTES;");
-      DB::statement("DROP FUNCTION IF EXISTS atualizar_updated_at;");
+      DB::statement("DROP TRIGGER IF EXISTS trigger_created_at_enderecos_clientes ON ENDERECOS_CLIENTES;");
+      DB::statement("DROP FUNCTION IF EXISTS set_created_at_enderecos_clientes;");
+      DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at_enderecos_clientes ON ENDERECOS_CLIENTES;");
+      DB::statement("DROP FUNCTION IF EXISTS atualizar_updated_at_enderecos_clientes;");
 
       DB::statement("DROP TABLE IF EXISTS ENDERECOS_CLIENTES;"); 
     }

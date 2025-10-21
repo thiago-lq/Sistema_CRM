@@ -11,10 +11,12 @@ return new class extends Migration
         DB::statement("
             CREATE TABLE ENDERECO_INST_MANU(
             COD_INST_MANU INT PRIMARY KEY,
-            CIDADE VARCHAR(50) NOT NULL,
+            COD_PEDIDO INT NOT NULL,
+            CIDADE VARCHAR(100) NOT NULL,
             CEP CHAR(8) NOT NULL,
-            BAIRRO VARCHAR(50) NOT NULL,
-            RUA_NUMERO VARCHAR(50) NOT NULL
+            BAIRRO VARCHAR(100) NOT NULL,
+            RUA_NUMERO VARCHAR(100) NOT NULL
+            FOREIGN KEY (COD_PEDIDO) REFERENCES PEDIDOS(COD_PEDIDO) ON DELETE CASCADE
             );
         ");
     }

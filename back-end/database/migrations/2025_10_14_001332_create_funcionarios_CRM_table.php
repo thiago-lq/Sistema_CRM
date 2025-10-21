@@ -19,7 +19,7 @@ return new class extends Migration
       ");
 
       DB::statement("
-        CREATE OR REPLACE FUNCTION set_created_at()
+        CREATE OR REPLACE FUNCTION set_created_at_funcionarios_CRM()
         RETURNS TRIGGER AS \$\$
         BEGIN
           NEW.CREATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo';
@@ -30,14 +30,14 @@ return new class extends Migration
       ");
 
       DB::statement("
-        CREATE TRIGGER trigger_created_at
+        CREATE TRIGGER trigger_created_at_funcionarios_CRM
         BEFORE INSERT ON FUNCIONARIOS_CRM
         FOR EACH ROW
-        EXECUTE FUNCTION set_created_at();
+        EXECUTE FUNCTION set_created_at_funcionarios_CRM();
       ");
 
       DB::statement("
-        CREATE OR REPLACE FUNCTION atualizar_updated_at()
+        CREATE OR REPLACE FUNCTION atualizar_updated_at_funcionarios_CRM()
         RETURNS TRIGGER AS \$\$
         BEGIN
           NEW.UPDATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo';
@@ -47,19 +47,19 @@ return new class extends Migration
       ");
 
       DB::statement("
-        CREATE TRIGGER trigger_updated_at
+        CREATE TRIGGER trigger_updated_at_funcionarios_CRM
         BEFORE UPDATE ON FUNCIONARIOS_CRM
         FOR EACH ROW
-        EXECUTE FUNCTION atualizar_updated_at();
+        EXECUTE FUNCTION atualizar_updated_at_funcionarios_CRM();
       ");
     }
    
     public function down()
     {
-      DB::statement("DROP TRIGGER IF EXISTS trigger_created_at ON FUNCIONARIOS_CRM;");
-      DB::statement("DROP FUNCTION IF EXISTS set_created_at;");
-      DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at ON FUNCIONARIOS_CRM;");
-      DB::statement("DROP FUNCTION IF EXISTS atualizar_updated_at;");
+      DB::statement("DROP TRIGGER IF EXISTS trigger_created_at_funcionarios_CRM ON FUNCIONARIOS_CRM;");
+      DB::statement("DROP FUNCTION IF EXISTS set_created_at_funcionarios_CRM;");
+      DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at_funcionarios_CRM ON FUNCIONARIOS_CRM;");
+      DB::statement("DROP FUNCTION IF EXISTS atualizar_updated_at_funcionarios_CRM;");
 
       DB::statement("DROP TABLE IF EXISTS FUNCIONARIOS_CRM;");
     }

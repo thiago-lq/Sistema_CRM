@@ -18,12 +18,12 @@ class PagamentosClientesController extends Controller
     }
 
     public function show($id1, $id2) {
-        $pagamentos = DB::select("SELECT * FROM PAGAMENTOS_CLIENTES WHERE COD_CLIENTE = ? AND COD_PAGAMENTO = ?", [$id1, $id2]);
+        $pagamentos = DB::select("SELECT * FROM PAGAMENTOS_CLIENTES WHERE COD_CLIENTE = ? COD_PEDIDO = ?", [$id1, $id2]);
 
         if ($pagamentos) {
             return response()->json($pagamentos, 200);
         } else {
-            return response()->json(['message' => 'Pagemento não encontrado'], 404);
+            return response()->json(['message' => 'Pagamento não encontrado'], 404);
         }
     }
 }

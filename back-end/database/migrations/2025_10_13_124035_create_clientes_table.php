@@ -21,7 +21,7 @@ return new class extends Migration
         ");
 
         DB::statement("
-          CREATE OR REPLACE FUNCTION set_created_at()
+          CREATE OR REPLACE FUNCTION set_created_at_clientes()
           RETURNS TRIGGER AS \$\$
           BEGIN
             NEW.CREATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo';
@@ -32,14 +32,14 @@ return new class extends Migration
         ");
 
         DB::statement("
-          CREATE TRIGGER trigger_created_at
+          CREATE TRIGGER trigger_created_at_clientes
           BEFORE INSERT ON CLIENTES
           FOR EACH ROW
-          EXECUTE FUNCTION set_created_at();
+          EXECUTE FUNCTION set_created_at_clientes();
         ");
 
         DB::statement("
-          CREATE OR REPLACE FUNCTION atualizar_updated_at()
+          CREATE OR REPLACE FUNCTION atualizar_updated_at_clientes()
           RETURNS TRIGGER AS \$\$
           BEGIN
             NEW.UPDATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo';
@@ -49,19 +49,19 @@ return new class extends Migration
         ");
 
         DB::statement("
-          CREATE TRIGGER trigger_updated_at
+          CREATE TRIGGER trigger_updated_at_clientes
           BEFORE UPDATE ON CLIENTES
           FOR EACH ROW
-          EXECUTE FUNCTION atualizar_updated_at();
+          EXECUTE FUNCTION atualizar_updated_at_clientes();
         ");
     }
 
     public function down()
     {
-        DB::statement("DROP TRIGGER IF EXISTS trigger_created_at ON CLIENTES;");
-        DB::statement("DROP FUNCTION IF EXISTS set_created_at;");
-        DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at ON CLIENTES;");
-        DB::statement("DROP FUNCTION IF EXISTS atualizar_updated_at;");
+        DB::statement("DROP TRIGGER IF EXISTS trigger_created_at_clientes ON CLIENTES;");
+        DB::statement("DROP FUNCTION IF EXISTS set_created_at_clientes;");
+        DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at_clientes ON CLIENTES;");
+        DB::statement("DROP FUNCTION IF EXISTS atualizar_updated_at_clientes;");
 
         DB::statement("DROP TABLE IF EXISTS CLIENTES;");
     }
