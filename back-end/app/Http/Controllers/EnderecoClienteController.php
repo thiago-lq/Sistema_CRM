@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Endereco_ClienteController extends Controller
 {
@@ -31,11 +32,11 @@ class Endereco_ClienteController extends Controller
         $cidade = $request->input('cidade');
         $cep = $request->input('cep');
         $bairro = $request->input('bairro');
-        $rua_numero = $request->input('rua_numero');
+        $ruaNumero = $request->input('rua_numero');
 
         try {
             DB::insert("INSERT INTO ENDERECOS_CLIENTES (COD_CLIENTE, CIDADE, CEP, BAIRRO, RUA_NUMERO) VALUES (?, ?, ?, ?, ?)",
-            [$cod_cliente, $cidade, $cep, $bairro, $rua_numero]);
+            [$cod_cliente, $cidade, $cep, $bairro, $ruaNumero]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erro ao cadastrar o endereço', 'error' => $e->getMessage()], 500);
         }
@@ -45,11 +46,11 @@ class Endereco_ClienteController extends Controller
         $cidade = $request->input('cidade');
         $cep = $request->input('cep');
         $bairro = $request->input('bairro');
-        $rua_numero = $request->input('rua_numero');
+        $ruaNumero = $request->input('rua_numero');
         
         try {
             DB::update("UPDATE ENDERECOS_CLIENTES SET CIDADE = ?, CEP = ?, BAIRRO = ?, RUA_NUMERO = ? WHERE COD_CLIENTE = ?",
-            [$cidade, $cep, $bairro, $rua_numero, $id]);
+            [$cidade, $cep, $bairro, $ruaNumero, $id]);
 
             return response()->json(['message' => 'Endereço atualizado com sucesso!'], 201);
         } catch (\Exception $e) {

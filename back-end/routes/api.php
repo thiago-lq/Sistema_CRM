@@ -22,3 +22,35 @@ Route::get('/enderecos_clientes/{id}', [Endereco_ClienteController::class, 'show
 Route::post('/enderecos_clientes', [Endereco_ClienteController::class, 'store']);
 Route::put('/enderecos_clientes/{id}', [Endereco_ClienteController::class, 'update']);
 Route::delete('/enderecos_clientes/{id}', [Endereco_ClienteController::class, 'destroy']);
+
+// Rotas de Pedidos
+Route::get('/pedidos', [PedidoController::class, 'index']);
+Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
+Route::post('/pedidos', [PedidoController::class, 'store']);
+Route::put('/pedidos/{id}', [PedidoController::class, 'update']);
+Route::delete('/pedidos/{id}', [PedidoController::class, 'destroy']);
+
+// Rotas de endereços ou manutenções (PEDIDOS)
+Route::get('/enderecos_inst_manu', [EnderecoInstManuController::class, 'index']);
+Route::get('/enderecos_inst_manu/{id}', [EnderecoInstManuController::class, 'show']);
+Route::post('/enderecos_inst_manu', [EnderecoInstManuController::class, 'store']);
+Route::put('/enderecos_inst_manu/{id}', [EnderecoInstManuController::class, 'update']);
+Route::delete('/enderecos_inst_manu/{id}', [EnderecoInstManuController::class, 'destroy']);
+
+// Rotas de Telefones de Clientes
+Route::get('/telefones_clientes', [TelefoneClienteController::class, 'index']);
+Route::get('/telefones_clientes/{id}', [TelefoneClienteController::class, 'show']);
+Route::post('/telefones_clientes', [TelefoneClienteController::class, 'store']);
+Route::put('/telefones_clientes/{id}', [TelefoneClienteController::class, 'update']);
+Route::delete('/telefones_clientes/{id}', [TelefoneClienteController::class, 'destroy']);
+
+// Rotas de Pagamentos de Clientes
+Route::get('/pagamentos_clientes', [PagamentosClientesController::class, 'index']);
+Route::get('/pagamentos_clientes/{id1}/{id2}', [PagamentosClientesController::class, 'show']);
+
+// Rotas de Relatórios
+Route::get('/relatorios', [RelatorioController::class, 'index']);
+Route::get('/relatorios/{id}', [RelatorioController::class, 'show']);
+Route::post('/relatorios', [RelatorioController::class, 'store']);
+Route::put('/relatorios/{id}', [RelatorioController::class, 'update']);
+Route::delete('/relatorios/{id}', [RelatorioController::class, 'destroy']);

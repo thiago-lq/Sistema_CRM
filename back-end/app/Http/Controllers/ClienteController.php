@@ -38,7 +38,7 @@ class ClienteController extends Controller
         $cpf = $request->input('cpf_cliente');
         $email = $request->input('email');
         $nome = $request->input('nome');
-        $data_nascimento = $request->input('data_nascimento');
+        $dataNascimento = $request->input('data_nascimento');
 
         do {
             $codCliente = rand(1, 999999);
@@ -47,7 +47,7 @@ class ClienteController extends Controller
 
         try {
             DB::insert("INSERT INTO CLIENTES (COD_CLIENTE, CPF_CLIENTE, EMAIL, NOME, DATA_NASCIMENTO) VALUES (?, ?, ?, ?, ?)", 
-            [$codCliente, $cpf, $email, $nome, $data_nascimento]);
+            [$codCliente, $cpf, $email, $nome, $dataNascimento]);
             
             return response()->json(['message' => 'Cliente cadastrado com sucesso!', 'cod_cliente' => $codCliente], 201);
         } catch (\Exception $e) {
@@ -59,11 +59,11 @@ class ClienteController extends Controller
         $cpf = $request->input('cpf_cliente');
         $email = $request->input('email');
         $nome = $request->input('nome');
-        $data_nascimento = $request->input('data_nascimento');
+        $dataNascimento = $request->input('data_nascimento');
 
         try {
             DB::update("UPDATE CLIENTES SET CPF_CLIENTE = ?, EMAIL = ?, NOME = ?, DATA_NASCIMENTO = ? WHERE COD_CLIENTE = ?",
-            [$cpf, $email, $nome, $data_nascimento, $id]);
+            [$cpf, $email, $nome, $dataNascimento, $id]);
 
             return response()->json(['message' => 'Cliente atualizado com sucesso!'], 201);
         } catch (\Exception $e) {

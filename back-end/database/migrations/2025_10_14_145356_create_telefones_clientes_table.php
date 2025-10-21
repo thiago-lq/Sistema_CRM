@@ -5,16 +5,13 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
- 
+  
     public function up()
     {
       DB::statement("
-        CREATE TABLE ENDERECOS_CLIENTES(
+        CREATE TABLE TELEFONES_CLIENTES(
           COD_CLIENTE INT PRIMARY KEY,
-          CIDADE VARCHAR(50) NOT NULL,
-          CEP CHAR(8) NOT NULL,
-          BAIRRO VARCHAR(50) NOT NULL,
-          RUA_NUMERO VARCHAR(50) NOT NULL,
+          TELEFONE CHAR(11) NOT NULL,
           CREATED_AT TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
           UPDATED_AT TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (COD_CLIENTE) REFERENCES CLIENTES (COD_CLIENTE)
@@ -34,7 +31,7 @@ return new class extends Migration
 
       DB::statement("
         CREATE TRIGGER trigger_created_at
-        BEFORE INSERT ON ENDERECOS_CLIENTES
+        BEFORE INSERT ON TELEFONES_CLIENTES
         FOR EACH ROW
         EXECUTE FUNCTION set_created_at();
       ");
@@ -51,20 +48,19 @@ return new class extends Migration
 
       DB::statement("
         CREATE TRIGGER trigger_updated_at
-        BEFORE UPDATE ON ENDERECOS_CLIENTES
+        BEFORE UPDATE ON TELEFONES_CLIENTES
         FOR EACH ROW
         EXECUTE FUNCTION atualizar_updated_at();
       ");
     }
 
- 
     public function down()
     {
-      DB::statement("DROP TRIGGER IF EXISTS trigger_created_at ON ENDERECOS_CLIENTES;");
+      DB::statement("DROP TRIGGER IF EXISTS trigger_created_at ON TELEFONES_CLIENTES;");
       DB::statement("DROP FUNCTION IF EXISTS set_created_at;");
-      DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at ON ENDERECOS_CLIENTES;");
+      DB::statement("DROP TRIGGER IF EXISTS trigger_updated_at ON TELEFONES_CLIENTES;");
       DB::statement("DROP FUNCTION IF EXISTS atualizar_updated_at;");
 
-      DB::statement("DROP TABLE IF EXISTS ENDERECOS_CLIENTES;"); 
+      DB::statement("DROP TABLE IF EXISTS TELEFONES_CLIENTES;");
     }
 };
