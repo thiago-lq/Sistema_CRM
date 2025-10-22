@@ -1,71 +1,5 @@
-// src/components/CadastroClientes.jsx
-import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
-
-export default function CadastroClientes({
-  initialData = null,
-  onCadastroSucesso,
-}) {
-  const [form, setForm] = useState({
-    nome: "",
-    email: "",
-    telefone: "",
-    cpf: "",
-    rua: "",
-    bairro: "",
-    cep: "",
-    cidade: "",
-    codigo: "",
-  });
-
-  useEffect(() => {
-    if (initialData) {
-      setForm({ ...initialData });
-    }
-  }, [initialData]);
-
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // validação simples
-    if (!form.nome || !form.email) {
-      alert("Nome e Email são obrigatórios.");
-      return;
-    }
-
-    const clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
-
-    if (form.id) {
-      // edição
-      const atualizados = clientes.map((c) =>
-        c.id === form.id ? { ...form } : c
-      );
-      localStorage.setItem("clientes", JSON.stringify(atualizados));
-      if (onCadastroSucesso) onCadastroSucesso({ ...form });
-      alert("Cliente atualizado com sucesso.");
-    } else {
-      // novo
-      const novo = { ...form, id: Date.now().toString() };
-      clientes.push(novo);
-      localStorage.setItem("clientes", JSON.stringify(clientes));
-      if (onCadastroSucesso) onCadastroSucesso(novo);
-      alert("Cliente cadastrado com sucesso.");
-      setForm({
-        nome: "",
-        email: "",
-        telefone: "",
-        cpf: "",
-        rua: "",
-        bairro: "",
-        cep: "",
-        cidade: "",
-        codigo: "",
-      });
-    }
-  };
-
+export default function CadastroClientes() {
+  
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">
@@ -163,7 +97,3 @@ export default function CadastroClientes({
     </div>
   );
 }
-CadastroClientes.propTypes = {
-  initialData: PropTypes.object,
-  onCadastroSucesso: PropTypes.func,
-};
