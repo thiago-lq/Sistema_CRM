@@ -15,7 +15,7 @@ return new class extends Migration
             CIDADE VARCHAR(100) NOT NULL,
             CEP CHAR(8) NOT NULL,
             BAIRRO VARCHAR(100) NOT NULL,
-            RUA_NUMERO VARCHAR(100) NOT NULL
+            RUA_NUMERO VARCHAR(100) NOT NULL,
             FOREIGN KEY (COD_PEDIDO) REFERENCES PEDIDOS(COD_PEDIDO) ON DELETE CASCADE
             );
         ");

@@ -93,7 +93,7 @@ class ClienteController extends Controller
         $ruaNumero = $request->input('rua_numero');
 
         $request->validate([
-            'cpf' => 'required|size:11|unique:CLIENTES,CPF_CLIENTE',
+            'cpf' => 'required|size:11|unique:clientes,cpf_cliente',
             'email' => 'required|email|max:100',
             'nome' => 'required|string|max:100',
             'data_nascimento' => 'required|date',
@@ -103,7 +103,6 @@ class ClienteController extends Controller
             'bairro' => 'required|string|max:100',
             'rua_numero' => 'required|string|max:100',
         ]);
-
         do {
             $codCliente = random_int(1, 999999);
             $exists = DB::select("SELECT 1 FROM CLIENTES WHERE COD_CLIENTE = ?", [$codCliente]);
@@ -144,7 +143,7 @@ class ClienteController extends Controller
         $ruaNumero = $request->input('rua_numero');
 
         $request->validate([
-            'cpf' => 'required|size:11|unique:CLIENTES,CPF_CLIENTE,' . $id . ',COD_CLIENTE',
+            'cpf' => 'required|size:11|unique:clientes,cpf_cliente,' . $id . ',cod_cliente',
             'email' => 'required|email|max:100',
             'nome' => 'required|string|max:100',
             'data_nascimento' => 'required|date',

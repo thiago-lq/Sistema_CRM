@@ -57,7 +57,7 @@ export default function ListaClientes({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {clientes.length > 0 ? (
+            {clientes?.length > 0 ? (
               clientes.map((item) => (
                 <tr
                   key={item.cod_cliente}
@@ -73,7 +73,7 @@ export default function ListaClientes({
                     {item.email}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-700">
-                    {item.telefone}
+                    {item.telefones[0]}
                   </td>
                   <td className="py-3 px-4 text-center flex justify-center gap-2">
                     <button
@@ -86,13 +86,16 @@ export default function ListaClientes({
                       Ver
                     </button>
                     <button
-                      onClick={() => handleEditar(item)}
+                      onClick={() => {handleEditar(item)
+                        setClienteSelecionado(item);
+                        setModo("editar");
+                      }}
                       className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-3 py-1 rounded-lg transition hover:cursor-pointer"
                     >
                       Editar
                     </button>
                     <button
-                      onClick={() => handleExcluir(item.id)}
+                      onClick={() => handleExcluir(item.cod_cliente)}
                       className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1 rounded-lg transition hover:cursor-pointer"
                     >
                       Excluir
