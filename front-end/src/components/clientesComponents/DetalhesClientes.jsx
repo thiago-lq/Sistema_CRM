@@ -41,7 +41,7 @@ export default function DetalhesClientes({ clienteSelecionado, setModo }) {
             <strong>Bairro:</strong> {clienteSelecionado["endereço"][0].bairro}
           </p>
           <p>
-            <strong>Rua:</strong>{clienteSelecionado["endereço"][0].rua_numero}
+            <strong>Rua:</strong> {clienteSelecionado["endereço"][0].rua_numero}
           </p>
         </div>
       </div>

@@ -19,6 +19,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
               value={form.nome}
               onChange={handleChange}
               className="w-full p-2 border rounded"
+              required
             />
           </div>
           <div>
@@ -29,6 +30,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
               value={form.email}
               onChange={handleChange}
               className="w-full p-2 border rounded"
+              required
             />
           </div>
           <div>
@@ -39,6 +41,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
               value={form.telefones}
               onChange={handleChange}
               className="w-full p-2 border rounded"
+              required
             />
           </div>
           <div>
@@ -49,6 +52,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
               value={form.cpf}
               onChange={handleChange}
               className="w-full p-2 border rounded"
+              required
             />
           </div>
           <div>
@@ -61,6 +65,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
               value={form.rua_numero}
               onChange={handleChange}
               className="w-full p-2 border rounded"
+              required
             />
           </div>
           <div>
@@ -71,6 +76,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
               value={form.bairro}
               onChange={handleChange}
               className="w-full p-2 border rounded"
+              required
             />
           </div>
           <div>
@@ -81,6 +87,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
               value={form.cep}
               onChange={handleChange}
               className="w-full p-2 border rounded"
+              required
             />
           </div>
           <div>
@@ -91,6 +98,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
               value={form.cidade}
               onChange={handleChange}
               className="w-full p-2 border rounded"
+              required
             />
           </div>
           <div className="flex items-center justify-center">
@@ -102,6 +110,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
                   value={form.data_nascimento}
                   onChange={handleChange}
                   className="p-2 border rounded max-w"
+                  required
                 />
             </div>
           </div>

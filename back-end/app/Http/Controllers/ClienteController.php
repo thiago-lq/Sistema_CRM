@@ -154,18 +154,22 @@ class ClienteController extends Controller
             'rua_numero' => 'required|string|max:100',
         ]);
 
+        if (!is_array($telefones)) {
+            $telefones = [$telefones];
+        }
+
         DB::beginTransaction();
 
         try {
             DB::update("UPDATE CLIENTES SET CPF_CLIENTE = ?, EMAIL = ?, NOME = ?, DATA_NASCIMENTO = ? WHERE COD_CLIENTE = ?",
             [$cpf, $email, $nome, $dataNascimento, $id]);
 
-            DB::update("UPDATE ENDERECO_CLIENTES SET CIDADE = ?, CEP = ?, BAIRRO = ?, RUA_NUMERO = ? WHERE COD_CLIENTE = ?",
+            DB::update("UPDATE ENDERECOS_CLIENTES SET CIDADE = ?, CEP = ?, BAIRRO = ?, RUA_NUMERO = ? WHERE COD_CLIENTE = ?",
             [$cidade, $cep, $bairro, $ruaNumero, $id]);
 
             DB::delete("DELETE FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
             foreach($telefones as $telefone) {
-                DB::insert("INSERT INTO TELEFONES_CLIENTES (COD_CLIENTE, TELEFONE) VALUES (?, ?)", [$id, $telefone['telefone']]);
+                DB::insert("INSERT INTO TELEFONES_CLIENTES (COD_CLIENTE, TELEFONE) VALUES (?, ?)", [$id, $telefone]);
             }
 
             DB::commit();

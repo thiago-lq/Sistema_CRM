@@ -86,10 +86,7 @@ export default function ListaClientes({
                       Ver
                     </button>
                     <button
-                      onClick={() => {handleEditar(item)
-                        setClienteSelecionado(item);
-                        setModo("editar");
-                      }}
+                      onClick={() => {handleEditar(item)}}
                       className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-3 py-1 rounded-lg transition hover:cursor-pointer"
                     >
                       Editar

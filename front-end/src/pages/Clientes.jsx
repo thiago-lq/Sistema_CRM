@@ -1,12 +1,20 @@
 import { useState, useEffect } from "react";
-import { CadastroClientes, DetalhesClientes, ListaClientes } from "../components/clientesComponents";
+import {
+  CadastroClientes,
+  DetalhesClientes,
+  ListaClientes,
+  EditarClientes,
+} from "../components/clientesComponents";
 import { clientesIndex } from "../services/clientesIndex";
 import { clientesStore } from "../services/clientesStore";
 import { clientesShow } from "../services/clientesShow";
+import { clientesUpdate } from "../services/clientesUpdate";
+import { clientesDelete } from "../services/clientesDelete";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
+  const [clienteEditar, setClienteEditar] = useState(null);
   const [modo, setModo] = useState("lista");
   const [termoBusca, setTermoBusca] = useState("");
   const [form, setForm] = useState({
@@ -20,26 +28,26 @@ export default function Clientes() {
     cep: "",
     cidade: "",
   });
-  
+
   // --- Carregar dados ---
   useEffect(() => {
-  const timeout = setTimeout(() => {
-    async function carregarClientes() {
-      if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
-        // é número
-        const dados = await clientesShow(Number(termoBusca));
-        setClientes(dados?.cod_cliente ? [dados] : []);
-      } else {
-        // é texto
-        const dados = await clientesIndex({ nome: termoBusca });
-        setClientes(dados);
+    const timeout = setTimeout(() => {
+      async function carregarClientes() {
+        if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
+          // é número
+          const dados = await clientesShow(Number(termoBusca));
+          setClientes(dados?.cod_cliente ? [dados] : []);
+        } else {
+          // é texto
+          const dados = await clientesIndex({ nome: termoBusca });
+          setClientes(dados);
+        }
       }
-    }
-    carregarClientes();
-  }, 500);
+      carregarClientes();
+    }, 500);
 
-  return () => clearTimeout(timeout);
-}, [termoBusca]);
+    return () => clearTimeout(timeout);
+  }, [termoBusca]);
 
   const handleChange = (e) => {
     setForm({
@@ -57,29 +65,67 @@ export default function Clientes() {
       console.error("Erro ao cadastrar:", err);
       alert("Erro ao cadastrar cliente!");
     }
-
-  }
+  };
 
   // --- Iniciar edição ---
-  const handleEditar = (c) => {
-    setClienteSelecionado(c);
+  const handleEditar = (cliente) => {
+    setClienteEditar(cliente);
     setModo("editar");
+  };
+
+  const handleSubmitEditar = async (e) => {
+    e.preventDefault();
+    const dadosEditar = {
+      cod_cliente: clienteEditar.cod_cliente,
+      nome: clienteEditar.nome,
+      email: clienteEditar.email,
+      telefones: clienteEditar.telefones,
+      cpf: clienteEditar.cpf_cliente,
+      data_nascimento: clienteEditar.data_nascimento,
+      rua_numero: clienteEditar.endereço[0]?.rua_numero,
+      bairro: clienteEditar.endereço[0]?.bairro,
+      cep: clienteEditar.endereço[0]?.cep,
+      cidade: clienteEditar.endereço[0]?.cidade,
+    };
+    try {
+      await clientesUpdate(dadosEditar); // função que faz POST pro backend
+      alert("Cliente editado com sucesso!");
+    } catch (err) {
+      console.error("Erro ao editar:", err);
+      alert("Erro ao editar cliente!");
+    }
   };
 
   // --- Excluir cliente ---
   const handleExcluir = (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este cliente?")) return;
+    clientesDelete(id);
   };
 
-  const propsLista = {termoBusca, setTermoBusca, setClienteSelecionado, setModo, clientes, handleEditar, handleExcluir,};
-  const propsDetalhes = {setModo, clienteSelecionado};
-  const propsCadastro = {handleChange, handleSubmit, form, setModo};
+  const propsLista = {
+    termoBusca,
+    setTermoBusca,
+    setClienteSelecionado,
+    setModo,
+    clientes,
+    handleEditar,
+    handleExcluir,
+  };
+  const propsDetalhes = { setModo, clienteSelecionado };
+  const propsCadastro = { handleChange, handleSubmit, form, setModo };
+  const propsEditar = {
+    handleSubmitEditar,
+    setModo,
+    clienteEditar,
+    setClienteEditar,
+  };
 
   return (
     <div className="px-10 pt-13 pb-5 m-3 bg-white rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.50)] mt-40">
-      {modo === "lista" && (<ListaClientes {...propsLista} />)}
-      {modo === "cadastro" && (<CadastroClientes {...propsCadastro}/>)}
-      {modo === "detalhes" && (<DetalhesClientes {...propsDetalhes}/>)}
+      {modo === "lista" && <ListaClientes {...propsLista} />}
+      {modo === "cadastro" && <CadastroClientes {...propsCadastro} />}
+      {modo === "detalhes" && <DetalhesClientes {...propsDetalhes} />}
+      {modo === "editar" && <EditarClientes {...propsEditar} />}
     </div>
   );
 }
