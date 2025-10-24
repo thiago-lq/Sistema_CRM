@@ -12,6 +12,7 @@ import { clientesUpdate } from "../services/clientesUpdate";
 import { clientesDelete } from "../services/clientesDelete";
 
 export default function Clientes() {
+  const [telefones, setTelefones] = useState(1);
   const [clientes, setClientes] = useState([]);
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
   const [clienteEditar, setClienteEditar] = useState(null);
@@ -31,6 +32,9 @@ export default function Clientes() {
   const [loading, setLoading] = useState(false);
   
 
+  const adicionarTelefone = () => {
+    setTelefones([]);
+  };
   // --- Carregar dados ---
   useEffect(() => {
     const timeout = setTimeout(() => {
