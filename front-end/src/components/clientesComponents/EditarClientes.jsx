@@ -7,11 +7,14 @@ export default function EditarClientes({
   return (
     <div>
       <button
-        onClick={() => setModo("lista")}
-        className="mb-6 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition hover:cursor-pointer"
-      >
-        ⬅ Voltar
+          onClick={() => setModo("lista")}
+          className=" bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition hover:cursor-pointer"
+        >
+          ⬅ Voltar
       </button>
+      <div className="flex flex-col justify-between mb-10 items-center w-full">
+        <p className="font-semibold text-3xl ">Editar Cliente</p>
+      </div>
       <form onSubmit={handleSubmitEditar} className="space-y-4">
         <div className="grid grid-cols-3 gap-4 px-35">
           <div>
@@ -123,7 +126,7 @@ export default function EditarClientes({
           </div>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-10 mb-5 items-center">
           <button
             type="submit"
             className="bg-black text-white px-6 py-2 rounded-2xl hover:cursor-pointer"

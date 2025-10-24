@@ -28,23 +28,28 @@ export default function Clientes() {
     cep: "",
     cidade: "",
   });
+  const [loading, setLoading] = useState(false);
+  
 
   // --- Carregar dados ---
   useEffect(() => {
     const timeout = setTimeout(() => {
+      setLoading(true);
       async function carregarClientes() {
         if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
           // é número
           const dados = await clientesShow(Number(termoBusca));
+          setLoading(false);
           setClientes(dados?.cod_cliente ? [dados] : []);
         } else {
           // é texto
           const dados = await clientesIndex({ nome: termoBusca });
+          setLoading(false);
           setClientes(dados);
         }
       }
       carregarClientes();
-    }, 500);
+    }, 1000);
 
     return () => clearTimeout(timeout);
   }, [termoBusca]);
@@ -61,10 +66,22 @@ export default function Clientes() {
     try {
       await clientesStore(form); // função que faz POST pro backend
       alert("Cliente cadastrado com sucesso!");
+      setForm({
+      nome: "",
+      email: "",
+      telefones: "",
+      cpf: "",
+      data_nascimento: "",
+      rua_numero: "",
+      bairro: "",
+      cep: "",
+      cidade: "",
+    });
     } catch (err) {
       console.error("Erro ao cadastrar:", err);
       alert("Erro ao cadastrar cliente!");
     }
+
   };
 
   // --- Iniciar edição ---
@@ -102,6 +119,22 @@ export default function Clientes() {
     clientesDelete(id);
   };
 
+  const handleRecarregar = async () => {
+    setLoading(true);
+    if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
+        // é número
+        const dados = await clientesShow(Number(termoBusca));
+        setLoading(false);
+        setClientes(dados?.cod_cliente ? [dados] : []);
+      } else {
+        // é texto
+        const dados = await clientesIndex({ nome: termoBusca });
+        setLoading(false);
+        setClientes(dados);
+      }
+    
+    };
+
   const propsLista = {
     termoBusca,
     setTermoBusca,
@@ -110,6 +143,8 @@ export default function Clientes() {
     clientes,
     handleEditar,
     handleExcluir,
+    handleRecarregar,
+    loading,
   };
   const propsDetalhes = { setModo, clienteSelecionado };
   const propsCadastro = { handleChange, handleSubmit, form, setModo };
@@ -121,7 +156,7 @@ export default function Clientes() {
   };
 
   return (
-    <div className="px-10 pt-13 pb-5 m-3 bg-white rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.50)] mt-40">
+    <div className="px-10 pt-13 pb-5 m-3 bg-white rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.50)] mt-40">  
       {modo === "lista" && <ListaClientes {...propsLista} />}
       {modo === "cadastro" && <CadastroClientes {...propsCadastro} />}
       {modo === "detalhes" && <DetalhesClientes {...propsDetalhes} />}

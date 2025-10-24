@@ -7,6 +7,9 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
       >
         ⬅ Voltar
       </button>
+      <div className="flex flex-col justify-between mb-10 items-center w-full">
+        <p className="font-semibold text-3xl ">Cadastrar Cliente</p>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-3 gap-4 px-35">
           <div>
@@ -116,7 +119,7 @@ export default function CadastroClientes({handleSubmit, handleChange, form, setM
           </div>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-10 mb-5 items-center">
           <button
             type="submit"
             className="bg-black text-white px-6 py-2 rounded-2xl hover:cursor-pointer"

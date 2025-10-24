@@ -6,6 +6,8 @@ export default function ListaClientes({
   clientes,
   handleEditar,
   handleExcluir,
+  handleRecarregar,
+  loading,
 }) {
   return (
     <div>
@@ -15,6 +17,7 @@ export default function ListaClientes({
           Clientes
         </h2>
         <div className="flex gap-4">
+          <button onClick={handleRecarregar}>Recarregar</button>
           <div className="relative w-full sm:w-64">
             <input
               type="text"
@@ -37,9 +40,9 @@ export default function ListaClientes({
       </div>
 
       {/* Tabela */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden">
-          <thead className="bg-indigo-600 text-white">
+      <div className="overflow-auto max-h-100 border border-gray-200 rounded-lg">
+        <table className="min-w-full border-collapse">
+          <thead className="bg-indigo-600 text-white sticky top-0 z-10">
             <tr>
               <th className="py-3 px-4 text-left text-sm font-semibold">ID</th>
               <th className="py-3 px-4 text-left text-sm font-semibold">
@@ -57,7 +60,19 @@ export default function ListaClientes({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {clientes?.length > 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="5" className="py-10 text-center">
+                  <div className="flex justify-center">
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
+                      alt="Carregando..."
+                      className="w-60 h-40"
+                    />
+                  </div>
+                </td>
+              </tr>
+            ) : clientes?.length > 0 ? (
               clientes.map((item) => (
                 <tr
                   key={item.cod_cliente}
@@ -86,7 +101,9 @@ export default function ListaClientes({
                       Ver
                     </button>
                     <button
-                      onClick={() => {handleEditar(item)}}
+                      onClick={() => {
+                        handleEditar(item);
+                      }}
                       className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-3 py-1 rounded-lg transition hover:cursor-pointer"
                     >
                       Editar
