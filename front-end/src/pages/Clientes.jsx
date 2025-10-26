@@ -32,7 +32,7 @@ export default function Clientes() {
   const [loading, setLoading] = useState(false);
   
 
-  const adicionarTelefone = () => {
+  const adicionarTelefones = () => {
     setTelefones([]);
   };
   // --- Carregar dados ---
