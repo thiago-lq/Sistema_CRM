@@ -1,3 +1,5 @@
+import recarregar from "../../assets/recarregar.jpg";
+
 export default function ListaClientes({
   termoBusca,
   setTermoBusca,
@@ -11,14 +13,16 @@ export default function ListaClientes({
 }) {
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap">
-        <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-          <span className="text-indigo-600 text-4xl">👤</span>
+      <div className="flex flex-row items-center justify-between mb-8">
+        <h2 className="text-4xl font-bold text-gray-800 flex items-center gap-3">
           Clientes
         </h2>
-        <div className="flex gap-4">
-          <button onClick={handleRecarregar}>Recarregar</button>
-          <div className="relative w-full sm:w-64">
+        <div className="flex gap-4 items-center">
+          <button onClick={handleRecarregar}>
+            <img src={recarregar} alt="Recarregar" 
+                 className="h-10 w-10 hover:opacity-50 hover:cursor-pointer transition-all duration-300"/>
+          </button>
+          <div className="relative w-64">
             <input
               type="text"
               placeholder="Pesquisar cliente..."

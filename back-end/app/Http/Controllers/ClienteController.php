@@ -38,7 +38,7 @@ class ClienteController extends Controller
                     'nome' => $row->nome,
                     'data_nascimento' => $row->data_nascimento,
                     'telefones' => [],
-                    'endereço' => [],
+                    'enderecos' => [],
                 ];
             }
             if (isset($row->telefone) && $row->telefone && !in_array($row->telefone, $clientes[$id]['telefones'])) {
@@ -52,8 +52,8 @@ class ClienteController extends Controller
                     'bairro' => $row->bairro,
                     'rua_numero' => $row->rua_numero,
                 ];
-                if (!in_array($endereco, $clientes[$id]['endereço'])) {
-                    $clientes[$id]['endereço'][] = $endereco;
+                if (!in_array($endereco, $clientes[$id]['enderecos'])) {
+                    $clientes[$id]['enderecos'][] = $endereco;
                 }
             }
         }
@@ -87,21 +87,22 @@ class ClienteController extends Controller
         $nome = $request->input('nome');
         $dataNascimento = $request->input('data_nascimento');
         $telefones = $request->input('telefones');
-        $cidade = $request->input('cidade');
-        $cep = $request->input('cep');
-        $bairro = $request->input('bairro');
-        $ruaNumero = $request->input('rua_numero');
+        $enderecos = $request->input('enderecos', []);
+
+        if (!empty($telefones) && is_string($telefones[0] ?? null)) {
+            $telefones = array_map(fn($t) => ['telefone' => $t], $telefones);
+        }
 
         $request->validate([
             'cpf' => 'required|size:11|unique:clientes,cpf_cliente',
             'email' => 'required|email|max:100',
             'nome' => 'required|string|max:100',
             'data_nascimento' => 'required|date',
-            'telefones.*' => 'required|string|size:11',
-            'cidade' => 'required|string|max:100',
-            'cep' => 'required|size:8',
-            'bairro' => 'required|string|max:100',
-            'rua_numero' => 'required|string|max:100',
+            'telefones.*.telefone' => 'required|string|size:11',
+            'enderecos.*.cidade' => 'required|string|max:100',
+            'enderecos.*.cep' => 'required|size:8',
+            'enderecos.*.bairro' => 'required|string|max:100',
+            'enderecos.*.rua_numero' => 'required|string|max:100',
         ]);
         do {
             $codCliente = random_int(1, 999999);
@@ -114,12 +115,13 @@ class ClienteController extends Controller
             DB::insert("INSERT INTO CLIENTES (COD_CLIENTE, CPF_CLIENTE, EMAIL, NOME, DATA_NASCIMENTO) VALUES (?, ?, ?, ?, ?)", 
             [$codCliente, $cpf, $email, $nome, $dataNascimento]);
 
-            DB::insert("INSERT INTO ENDERECOS_CLIENTES (COD_CLIENTE, CIDADE, CEP, BAIRRO, RUA_NUMERO) VALUES (?, ?, ?, ?, ?)",
-            [$codCliente, $cidade, $cep, $bairro, $ruaNumero]);
-
-            $telefones = is_array($telefones) ? $telefones : [$telefones];
-            foreach ($telefones as $telefone) {
-                DB::insert("INSERT INTO TELEFONES_CLIENTES (COD_CLIENTE, TELEFONE) VALUES (?, ?)", [$codCliente, $telefone]);
+            foreach ($enderecos as $end) {
+                DB::insert("INSERT INTO ENDERECOS_CLIENTES (COD_CLIENTE, CIDADE, CEP, BAIRRO, RUA_NUMERO) VALUES (?, ?, ?, ?, ?)",
+                [$codCliente, $end['cidade'], $end['cep'], $end['bairro'], $end['rua_numero']]);
+            }
+            
+            foreach ($telefones as $t) {
+                DB::insert("INSERT INTO TELEFONES_CLIENTES (COD_CLIENTE, TELEFONE) VALUES (?, ?)", [$codCliente, $t['telefone']]);
             }
 
             DB::commit();
@@ -137,26 +139,23 @@ class ClienteController extends Controller
         $nome = $request->input('nome');
         $dataNascimento = $request->input('data_nascimento');
         $telefones = $request->input('telefones');
-        $cidade = $request->input('cidade');
-        $cep = $request->input('cep');
-        $bairro = $request->input('bairro');
-        $ruaNumero = $request->input('rua_numero');
+        $enderecos = $request->input('enderecos', []);
+
+        if (!empty($telefones) && is_string($telefones[0] ?? null)) {
+            $telefones = array_map(fn($t) => ['telefone' => $t], $telefones);
+        }
 
         $request->validate([
             'cpf' => 'required|size:11|unique:clientes,cpf_cliente,' . $id . ',cod_cliente',
             'email' => 'required|email|max:100',
             'nome' => 'required|string|max:100',
             'data_nascimento' => 'required|date',
-            'telefones.*' => 'required|string|size:11',
-            'cidade' => 'required|string|max:100',
-            'cep' => 'required|size:8',
-            'bairro' => 'required|string|max:100',
-            'rua_numero' => 'required|string|max:100',
+            'telefones.*.telefone' => 'required|string|size:11',
+            'enderecos.*.cidade' => 'required|string|max:100',
+            'enderecos.*.cep' => 'required|size:8',
+            'enderecos.*.bairro' => 'required|string|max:100',
+            'enderecos.*.rua_numero' => 'required|string|max:100',
         ]);
-
-        if (!is_array($telefones)) {
-            $telefones = [$telefones];
-        }
 
         DB::beginTransaction();
 
@@ -164,12 +163,15 @@ class ClienteController extends Controller
             DB::update("UPDATE CLIENTES SET CPF_CLIENTE = ?, EMAIL = ?, NOME = ?, DATA_NASCIMENTO = ? WHERE COD_CLIENTE = ?",
             [$cpf, $email, $nome, $dataNascimento, $id]);
 
-            DB::update("UPDATE ENDERECOS_CLIENTES SET CIDADE = ?, CEP = ?, BAIRRO = ?, RUA_NUMERO = ? WHERE COD_CLIENTE = ?",
-            [$cidade, $cep, $bairro, $ruaNumero, $id]);
+            DB::delete("DELETE FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
+            foreach($enderecos as $end) {
+                DB::insert("INSERT INTO ENDERECOS_CLIENTES (COD_CLIENTE, CIDADE, CEP, BAIRRO, RUA_NUMERO) VALUES (?, ?, ?, ?, ?)",
+                [$id, $end['cidade'], $end['cep'], $end['bairro'], $end['rua_numero']]);
+            }
 
             DB::delete("DELETE FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
-            foreach($telefones as $telefone) {
-                DB::insert("INSERT INTO TELEFONES_CLIENTES (COD_CLIENTE, TELEFONE) VALUES (?, ?)", [$id, $telefone]);
+            foreach($telefones as $t) {
+                DB::insert("INSERT INTO TELEFONES_CLIENTES (COD_CLIENTE, TELEFONE) VALUES (?, ?)", [$id, $t['telefone']]);
             }
 
             DB::commit();

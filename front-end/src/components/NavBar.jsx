@@ -13,7 +13,7 @@ import Relatorios from "./Relatorios";
 import Pedidos from "./Pedidos";
 
 const LinkStyle =
-  "flex flex-col items-center p-2 rounded-lg text-gray-700 hover:opacity-60 hover:cursor-pointer transition duration-150";
+  "flex flex-col items-center p-2 rounded-lg text-gray-700 hover:opacity-60 hover:cursor-pointer transition-all duration-300";
 
 export default function NavBar() {
   const [tab, setTab] = useState("inicio");
@@ -56,13 +56,13 @@ export default function NavBar() {
     <div>
       <nav
         className={`fixed top-0 left-0 right-0 bg-white shadow-md flex items-center justify-around px-0 py-4 z-50
-         transitio-transform duration-300 ${
+         transition-transform duration-300 ${
            showNavbar ? "translate-y-0" : "-translate-y-full"
          }`}
       >
         <div className="flex items-center space-x-3 mr-auto pl-10">
           <button
-            className="flex items-center text-gray-700 hover:opacity-60 hover:cursor-pointer transition duration-150 p-0"
+            className="flex items-center text-gray-700 hover:opacity-60 hover:cursor-pointer transition-all duration-300 p-0"
             onClick={() => setTab("inicio")}
           >
             <img src={empresa} alt="empresa" className="h-12 w-12" />
