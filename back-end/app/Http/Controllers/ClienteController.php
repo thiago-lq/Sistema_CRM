@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 class ClienteController extends Controller
 {
+
+    // Controlador que busca os todos os clientes, ou busca um cliente específico pelo nome
+
     public function index(Request $request) {
         
         $nome = $request->query('nome');
@@ -60,6 +63,8 @@ class ClienteController extends Controller
         return response()->json(array_values($clientes), 200);
     }
 
+    // Controlador que busca um cliente pelo seu ID
+
     public function show($id) {
         $cliente = DB::select("SELECT * FROM CLIENTES WHERE COD_CLIENTE = ?", [$id]);
         if (!$cliente) {
@@ -80,6 +85,8 @@ class ClienteController extends Controller
 
         return response()->json($cliente, 200);
     }
+
+    // Controlador que cadastra um cliente
 
     public function store(Request $request) {
         $cpf = $request->input('cpf');
@@ -133,6 +140,8 @@ class ClienteController extends Controller
         }
     }
 
+    // Controlador que atualiza os dados de um cliente
+
     public function update(Request $request, $id) {
         $cpf = $request->input('cpf');
         $email = $request->input('email');
@@ -182,6 +191,8 @@ class ClienteController extends Controller
             return response()->json(['message' => 'Erro ao atualizar o cliente', 'error' => $e->getMessage()], 500);
         }
     }
+
+    // Controlador que exclui um cliente
 
     public function destroy($id) {
         

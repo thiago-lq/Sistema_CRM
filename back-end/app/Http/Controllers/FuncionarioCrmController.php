@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 class Funcionario_CrmController extends Controller
 {
+
+    // Controlador que busca os todos os funcionarios, ou busca um funcionario específico pelo nome
+
     public function index(Request $request) {
         $nome = $request->query('nome');
 
@@ -22,6 +25,8 @@ class Funcionario_CrmController extends Controller
             return response()->json(['message' => 'Nenhum funcionario encontrado'], 404);
         }
     }
+
+    // Controlador que busca um funcionario pelo seu ID
 
     public function show($id) {
         $funcionarios = DB::select("SELECT * FROM FUNCIONARIOS_CRM WHERE COD_FUNCIONARIO = ?", [$id]);
