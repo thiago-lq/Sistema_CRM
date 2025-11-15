@@ -123,7 +123,7 @@ export default function Clientes() {
           setClientes(dados?.cod_cliente ? [dados] : []);
         } else {
           // é texto
-          const dados = await clientesIndex({ nome: termoBusca });
+          const dados = await clientesIndex({ cpf: termoBusca });
           setLoading(false);
           setClientes(dados);
         }
@@ -230,7 +230,7 @@ export default function Clientes() {
       setClientes(dados?.cod_cliente ? [dados] : []);
     } else {
       // é texto
-      const dados = await clientesIndex({ nome: termoBusca });
+      const dados = await clientesIndex({ cpf: termoBusca });
       setLoading(false);
       setClientes(dados);
     }
