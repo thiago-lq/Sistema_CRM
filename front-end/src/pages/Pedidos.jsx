@@ -1,5 +1,10 @@
-import { useState, useEffect } from 'react';
-import { PedidosCadastro, DetalhesPedidos, ListaPedidos, EditarPedidos } from '../components/pedidosComponents';
+import { useState, useEffect } from "react";
+import {
+  PedidosCadastro,
+  DetalhesPedidos,
+  ListaPedidos,
+  EditarPedidos,
+} from "../components/pedidosComponents";
 
 import { pedidosIndex } from "../services/pedidosIndex";
 import { pedidosStore } from "../services/pedidosStore";
@@ -11,26 +16,28 @@ export default function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
   const [pedidoEditar, setPedidoEditar] = useState(null);
-  const [abaAtiva, setAbaAtiva] = useState('lista');
+  const [abaAtiva, setAbaAtiva] = useState("lista");
   const [loading, setLoading] = useState(false);
   const [termoBusca, setTermoBusca] = useState("");
+  const [descricao, setDescricao] = useState("");
 
   const [form, setForm] = useState({
     codCliente: "",
     codEnderecoCliente: "",
     codFuncionario: "",
-    pedidoTipos: [],          // multiplos
-    codProdutos: [],          // multiplos
-    quantidade: [],           // paralela aos produtos
+    pedidoTipos: [], // multiplos
+    codProdutos: [], // multiplos
+    quantidade: [], // paralela aos produtos
     descricao: "",
     valorTotal: "",
+    prazo: "",
 
     enderecoInstManu: {
       cidade: "",
       cep: "",
       bairro: "",
       rua_numero: "",
-    }
+    },
   });
 
   // Carregar dados
@@ -71,9 +78,40 @@ export default function Pedidos() {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({...prev, [name]: value}));
-  }
+    const { name, value: rawValue, checked } = e.target;
+    const value = name === "codProdutos" ? Number(rawValue) : rawValue;
+
+    // Checkbox múltiplo
+    if (name === "pedidoTipos") {
+      setForm(
+        (prev) =>
+          checked
+            ? { ...prev, [name]: [...prev[name], value] } // adiciona
+            : { ...prev, [name]: prev[name].filter((v) => v !== value) } // remove
+      );
+      return;
+    }
+    if (name === "codProdutos") {
+      setForm(
+        (prev) =>
+          checked
+            ? { ...prev, [name]: [...prev[name], value] } // adiciona
+            : { ...prev, [name]: prev[name].filter((v) => v !== value) } // remove
+      );
+      return;
+    }
+
+    // Textarea descrição (limite de 500 caracteres)
+    if (name === "descricao") {
+      if (value.length <= 500) {
+        setForm((prev) => ({ ...prev, descricao: value }));
+      }
+      return;
+    }
+
+    // Inputs normais
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,14 +128,14 @@ export default function Pedidos() {
         quantidade: [],
         descricao: "",
         valorTotal: "",
+        prazo: "",
         enderecoInstManu: {
           cidade: "",
           cep: "",
           bairro: "",
           rua_numero: "",
-        }
+        },
       });
-
     } catch (err) {
       console.error("Erro ao cadastrar:", err);
       alert("Erro ao cadastrar pedido!");
@@ -110,12 +148,13 @@ export default function Pedidos() {
       pedidoTipos: pedido.pedido_tipos || [],
       codProdutos: pedido.cod_produtos || [],
       quantidade: pedido.quantidade || [],
+      prazo: pedido.prazo || "",
       enderecoInstManu: {
         cidade: pedido.cidade || "",
         cep: pedido.cep || "",
         bairro: pedido.bairro || "",
         rua_numero: pedido.rua_numero || "",
-      }
+      },
     };
 
     setPedidoEditar(pedidoFormatado);
@@ -143,15 +182,15 @@ export default function Pedidos() {
     pedidosDelete(id);
   };
 
-
-  const tabClasses = (tabName) => 
+  const tabClasses = (tabName) =>
     `py-2 px-4 text-center cursor-pointer font-medium transition-colors duration-200 
-    ${abaAtiva === tabName 
-        ? 'border-b-4 border-indigo-600 text-indigo-700 bg-white' 
-        : 'border-b-2 border-gray-300 text-gray-500 hover:text-indigo-600 hover:bg-gray-50' // Otimizei hover:bg-white-50 para hover:bg-gray-50
+    ${
+      abaAtiva === tabName
+        ? "border-b-4 border-indigo-600 text-indigo-700 bg-white"
+        : "border-b-2 border-gray-300 text-gray-500 hover:text-indigo-600 hover:bg-gray-50" // Otimizei hover:bg-white-50 para hover:bg-gray-50
     }`;
 
-    const propsLista = {
+  const propsLista = {
     termoBusca,
     setTermoBusca,
     pedidos,
@@ -162,11 +201,13 @@ export default function Pedidos() {
     loading,
     handleRecarregar,
   };
-    const propsCadastro = {
+  const propsCadastro = {
     form,
     handleChange,
     handleSubmit,
     setAbaAtiva,
+    descricao,
+    setDescricao,
   };
 
   const propsEditar = {
@@ -184,28 +225,26 @@ export default function Pedidos() {
 
   return (
     // Otimização: A div externa está responsável pelo fundo e margem
-    <div className="p-10 m-6 bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.15)] max-w-full mx-auto mt-30">
-      
+    <div className=" bg-white">
       {/* LINHA CHAVE (1): Altere a classe max-w-lg (que limita a largura total do conteúdo) para um valor maior como max-w-3xl, max-w-4xl, ou até max-w-full se quiser que ele use toda a largura disponível.
-      */}
-      <div className="max-w-2/3 mx-auto bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
-        
+       */}
+      <div className="max-w-2/3 mx-auto bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30">
         <h1 className="text-3xl font-extrabold p-4 text-center text-gray-800">
           Gerenciamento de Pedidos
         </h1>
 
         {/* CONTROLES DE ABAS */}
         <div className="flex border-b border-gray-200 ">
-          <div 
-            className={tabClasses('lista')} 
-            onClick={() => setAbaAtiva('lista')}
+          <div
+            className={tabClasses("lista")}
+            onClick={() => setAbaAtiva("lista")}
             style={{ flex: 1 }}
           >
             Pedidos Cadastrados
           </div>
-          <div 
-            className={tabClasses('cadastro')} 
-            onClick={() => setAbaAtiva('cadastro')}
+          <div
+            className={tabClasses("cadastro")}
+            onClick={() => setAbaAtiva("cadastro")}
             style={{ flex: 1 }}
           >
             Cadastrar Novo
@@ -219,7 +258,6 @@ export default function Pedidos() {
           {abaAtiva === "editar" && <EditarPedidos {...propsEditar} />}
           {abaAtiva === "detalhes" && <DetalhesPedidos {...propsDetalhes} />}
         </div>
-        
       </div>
     </div>
   );

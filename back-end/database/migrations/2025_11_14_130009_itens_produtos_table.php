@@ -15,7 +15,7 @@ return new class extends Migration
             PRIMARY KEY (COD_PEDIDO, COD_PRODUTO),
             FOREIGN KEY (COD_PEDIDO) REFERENCES PEDIDOS(COD_PEDIDO) ON DELETE CASCADE,
             FOREIGN KEY (COD_PRODUTO) REFERENCES PRODUTOS(COD_PRODUTO) ON DELETE CASCADE
-            )
+            );
         ");
     }
 

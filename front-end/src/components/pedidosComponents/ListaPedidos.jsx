@@ -13,11 +13,7 @@ export default function ListaPedidos({
 }) {
   return (
     <div className="bg-white mt-3">
-      <h3 className="text-xl font-bold mb-4 text-gray-800 text-center">
-        Lista de Pedidos
-      </h3>
-      <div className="space-y-3 h-96 border border-dashed border-gray-300 flex items-center justify-center text-gray-500">
-        <div>
+      <div className="flex justify-end gap-3 m-3">
           <button onClick={handleRecarregar}>
             <img
               src={recarregar}
@@ -35,7 +31,8 @@ export default function ListaPedidos({
             />
           </div>
         </div>
-        <div className="overflow-auto max-h-100 border border-gray-200 rounded-lg">
+      <div className="space-y-3 h-90 border border-dashed border-gray-300 flex text-gray-500">
+        <div className="overflow-auto max-h-100 border border-gray-200 w-full">
           <table className="min-w-full border-collapse">
             <thead>
               <tr>

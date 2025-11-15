@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProdutoController extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
         $produtos = DB::select("SELECT * FROM PRODUTOS");
 
         if (!$produtos) {

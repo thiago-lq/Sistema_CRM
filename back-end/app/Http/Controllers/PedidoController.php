@@ -70,6 +70,7 @@ class PedidoController extends Controller
         $quantidade = $request->input('quantidade');
         $descricao = $request->input('descricao');
         $valorTotal = $request->input('valor_total');
+        $prazo = $request->input('prazo');
 
         $request->validate([
             'cod_cliente' => 'required|integer|exists:CLIENTES,COD_CLIENTE',
@@ -83,6 +84,7 @@ class PedidoController extends Controller
             'quantidade.*' => 'integer|min:1',
             'descricao' => 'required|string|max:500',
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
+            'prazo' => 'required|date',
         ]);
 
         $codProdutos = array_map('intval', $request->input('cod_produtos'));
@@ -110,7 +112,8 @@ class PedidoController extends Controller
 
         try {
             DB::insert("INSERT INTO PEDIDOS (COD_PEDIDO, COD_CLIENTE, COD_ENDERECO_CLIENTE, COD_FUNCIONARIO, DESCRICAO, 
-            VALOR_TOTAL) VALUES (?, ?, ?, ?, ?, ?)", [$codPedido, $codCliente, $codEnderecoCliente, $codFuncionario, $descricao, $valorTotal]);
+            VALOR_TOTAL, PRAZO) VALUES (?, ?, ?, ?, ?, ?, ?)", [$codPedido, $codCliente, $codEnderecoCliente, $codFuncionario, 
+            $descricao, $valorTotal, $prazo]);
             if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
                 DB::insert("INSERT INTO ENDERECOS_INST_MANU (COD_PEDIDO, CIDADE, CEP, BAIRRO, RUA_NUMERO)
                 VALUES (?, ?, ?, ?, ?)", [$codPedido, $cidade, $cep, $bairro, $ruaNumero]);
@@ -141,6 +144,7 @@ class PedidoController extends Controller
         $quantidade = $request->input('quantidade');
         $descricao = $request->input('descricao');
         $valorTotal = $request->input('valor_total');
+        $prazo = $request->input('prazo');
         
         $request->validate([
             'cod_cliente' => 'required|integer|exists:CLIENTES,COD_CLIENTE',
@@ -153,6 +157,7 @@ class PedidoController extends Controller
             'quantidade' => 'required_if:pedido_tipos,PRODUTO|array',
             'quantidade.*' => 'integer|min:1',
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
+            'prazo' => 'required|date',
         ]);
 
         $codProdutos = array_map('intval', $request->input('cod_produtos'));
@@ -175,7 +180,7 @@ class PedidoController extends Controller
 
         try {
             DB::update("UPDATE PEDIDOS SET COD_CLIENTE = ?, COD_ENDERECO_CLIENTE = ?, COD_FUNCIONARIO = ?, DESCRICAO = ?, 
-            VALOR_TOTAL = ? WHERE COD_PEDIDO = ?", [$codCliente, $codEnderecoCliente, $codFuncionario, $descricao, $valorTotal, $id]);
+            VALOR_TOTAL = ?, PRAZO = ? WHERE COD_PEDIDO = ?", [$codCliente, $codEnderecoCliente, $codFuncionario, $descricao, $valorTotal, $prazo, $id]);
 
             if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
                 DB::delete("DELETE FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);

@@ -9,10 +9,10 @@ return new class extends Migration
     {
         DB::statement("
             CREATE TABLE PRODUTOS (
-            COD_PRODUTO INT PRIMARY KEY,
-            NOME_PRODUTO VARCHAR(50) NOT NULL,
-            VALOR_UNITARIO DECIMAL(7,2) NOT NULL,
-            )
+                COD_PRODUTO INT PRIMARY KEY,
+                NOME_PRODUTO VARCHAR(50) NOT NULL,
+                VALOR_UNITARIO DECIMAL(7,2) NOT NULL
+            );
         ");
     }
 

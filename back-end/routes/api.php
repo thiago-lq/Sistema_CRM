@@ -4,6 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\Funcionario_CrmController;
+use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\PagamentosClientesController;
+use App\Http\Controllers\RelatorioController;
+use App\Http\Controllers\ProdutoController;
 
 // Rotas de Clientes e telefones de clientes
 Route::get('/clientes', [ClienteController::class, 'index']);
@@ -33,3 +37,6 @@ Route::get('/relatorios/{id}', [RelatorioController::class, 'show']);
 Route::post('/relatorios', [RelatorioController::class, 'store']);
 Route::put('/relatorios/{id}', [RelatorioController::class, 'update']);
 Route::delete('/relatorios/{id}', [RelatorioController::class, 'destroy']);
+
+// Rotas de Produtos
+Route::get('/produtos', [ProdutoController::class, 'index']);
