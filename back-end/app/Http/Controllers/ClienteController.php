@@ -14,7 +14,7 @@ class ClienteController extends Controller
         
         $cpf = $request->query('cpf');
 
-        if ($nome) {
+        if ($cpf) {
             $result = DB::select("SELECT c.*, t.TELEFONE, e.CIDADE, e.CEP, e.BAIRRO, e.RUA_NUMERO FROM CLIENTES c 
             LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
             LEFT JOIN ENDERECOS_CLIENTES e ON c.COD_CLIENTE = e.COD_CLIENTE

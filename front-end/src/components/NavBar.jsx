@@ -10,7 +10,7 @@ import { useState, useEffect, useRef } from "react";
 import Inicio from "../pages/Inicio";
 import Clientes from "../pages/Clientes";
 import Relatorios from "./Relatorios";
-import Pedidos from "./Pedidos";
+import Pedidos from "../pages/Pedidos";
 
 const LinkStyle =
   "flex flex-col items-center p-2 rounded-lg text-gray-700 hover:opacity-60 hover:cursor-pointer transition-all duration-300";

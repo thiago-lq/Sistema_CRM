@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  CadastroClientes,
-  DetalhesClientes,
-  ListaClientes,
-  EditarClientes,
-} from "../components/clientesComponents";
+import { CadastroClientes, DetalhesClientes, ListaClientes, EditarClientes, } from "../components/clientesComponents";
 import { clientesIndex } from "../services/clientesIndex";
 import { clientesStore } from "../services/clientesStore";
 import { clientesShow } from "../services/clientesShow";
@@ -17,7 +12,8 @@ export default function Clientes() {
   const [clienteEditar, setClienteEditar] = useState(null);
   const [modo, setModo] = useState("lista");
   const [termoBusca, setTermoBusca] = useState("");
-
+  const [loading, setLoading] = useState(false);
+  
   const [form, setForm] = useState({
     nome: "",
     email: "",
@@ -27,7 +23,6 @@ export default function Clientes() {
     enderecos: [{ rua_numero: "", bairro: "", cep: "", cidade: "" }],
   });
 
-  const [loading, setLoading] = useState(false);
   const maxCamposTelefone = 3;
   const minCamposTelefone = 1;
   const maxCamposEndereco = 3;
@@ -121,9 +116,13 @@ export default function Clientes() {
           const dados = await clientesShow(Number(termoBusca));
           setLoading(false);
           setClientes(dados?.cod_cliente ? [dados] : []);
-        } else {
+        } else if (termoBusca.trim().length > 0) {
           // é texto
           const dados = await clientesIndex({ cpf: termoBusca });
+          setLoading(false);
+          setClientes(dados);
+        } else {
+          const dados = await clientesIndex();
           setLoading(false);
           setClientes(dados);
         }
@@ -134,6 +133,25 @@ export default function Clientes() {
     return () => clearTimeout(timeout);
   }, [termoBusca]);
 
+  const handleRecarregar = async () => {
+    setLoading(true);
+    if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
+      // é número
+      const dados = await clientesShow(Number(termoBusca));
+      setLoading(false);
+      setClientes(dados?.cod_cliente ? [dados] : []);
+    } else if (termoBusca.trim().length > 0) {
+      // é texto
+      const dados = await clientesIndex({ cpf: termoBusca });
+      setLoading(false);
+      setClientes(dados);
+    } else {
+      const dados = await clientesIndex();
+      setLoading(false);
+      setClientes(dados);
+    }
+  };
+
   const handleChange = (e, index = null, campoArray = null) => {
     const { name, value } = e.target;
 
@@ -143,18 +161,6 @@ export default function Clientes() {
       setForm((prev) => ({ ...prev, [campoArray]: novosCampos }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleChangeEditar = (e, index = null, campoArray = null) => {
-    const { name, value } = e.target;
-
-    if (index !== null && campoArray) {
-      const novosCampos = [...clienteEditar[campoArray]];
-      novosCampos[index][name] = value;
-      setClienteEditar((prev) => ({ ...prev, [campoArray]: novosCampos }));
-    } else {
-      setClienteEditar((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -215,25 +221,22 @@ export default function Clientes() {
     }
   };
 
+   const handleChangeEditar = (e, index = null, campoArray = null) => {
+    const { name, value } = e.target;
+
+    if (index !== null && campoArray) {
+      const novosCampos = [...clienteEditar[campoArray]];
+      novosCampos[index][name] = value;
+      setClienteEditar((prev) => ({ ...prev, [campoArray]: novosCampos }));
+    } else {
+      setClienteEditar((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
   // --- Excluir cliente ---
   const handleExcluir = (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este cliente?")) return;
     clientesDelete(id);
-  };
-
-  const handleRecarregar = async () => {
-    setLoading(true);
-    if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
-      // é número
-      const dados = await clientesShow(Number(termoBusca));
-      setLoading(false);
-      setClientes(dados?.cod_cliente ? [dados] : []);
-    } else {
-      // é texto
-      const dados = await clientesIndex({ cpf: termoBusca });
-      setLoading(false);
-      setClientes(dados);
-    }
   };
 
   const propsLista = {

@@ -2,7 +2,6 @@ import api from "./api";
 
 export async function clientesStore(dados = {}) {
     try {
-        console.log(dados);
         const response = await api.post('/api/clientes', dados);
         return response.data;
     } catch (err) {

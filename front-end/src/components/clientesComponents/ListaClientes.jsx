@@ -19,8 +19,11 @@ export default function ListaClientes({
         </h2>
         <div className="flex gap-4 items-center">
           <button onClick={handleRecarregar}>
-            <img src={recarregar} alt="Recarregar" 
-                 className="h-10 w-10 hover:opacity-50 hover:cursor-pointer transition-all duration-300"/>
+            <img
+              src={recarregar}
+              alt="Recarregar"
+              className="h-10 w-10 hover:opacity-50 hover:cursor-pointer transition-all duration-300"
+            />
           </button>
           <div className="relative w-64">
             <input
@@ -48,17 +51,34 @@ export default function ListaClientes({
         <table className="min-w-full border-collapse">
           <thead className="bg-indigo-600 text-white sticky top-0 z-10">
             <tr>
-              <th className="py-3 px-4 text-left text-sm font-semibold">ID</th>
-              <th className="py-3 px-4 text-left text-sm font-semibold">
+              <th
+                scope="col"
+                className="py-3 px-4 text-left text-sm font-semibold"
+              >
+                ID
+              </th>
+              <th
+                scope="col"
+                className="py-3 px-4 text-left text-sm font-semibold"
+              >
                 Nome
               </th>
-              <th className="py-3 px-4 text-left text-sm font-semibold">
+              <th
+                scope="col"
+                className="py-3 px-4 text-left text-sm font-semibold"
+              >
                 Email
               </th>
-              <th className="py-3 px-4 text-left text-sm font-semibold">
+              <th
+                scope="col"
+                className="py-3 px-4 text-left text-sm font-semibold"
+              >
                 Telefone
               </th>
-              <th className="py-3 px-4 text-center text-sm font-semibold">
+              <th
+                scope="col"
+                className="py-3 px-4 text-center text-sm font-semibold"
+              >
                 Ações
               </th>
             </tr>
@@ -127,7 +147,7 @@ export default function ListaClientes({
                   colSpan="5"
                   className="py-4 text-center text-gray-500 italic"
                 >
-                  Nenhum cliente encontrado.
+                  Nenhum cliente encontrado
                 </td>
               </tr>
             )}

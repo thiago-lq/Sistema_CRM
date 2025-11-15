@@ -28,21 +28,21 @@ export default function CadastroClientes({
         <div className="grid grid-cols-4 gap-5 px-30">
           <div>
             <label className="block text-sm font-medium mb-1">
-              Nome do Cliente
+              Código do Cliente
             </label>
             <input
-              type="text"
-              name="nome"
-              value={form.nome}
+              type="number"
+              name="cod_cliente"
+              value={form.codCliente}
               onChange={handleChange}
               className="w-full p-2 border rounded"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-medium mb-1"></label>
             <input
-              type="email"
+              type=""
               name="email"
               value={form.email}
               onChange={handleChange}

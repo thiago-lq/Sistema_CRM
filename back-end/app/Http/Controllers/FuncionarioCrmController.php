@@ -11,18 +11,13 @@ class Funcionario_CrmController extends Controller
     // Controlador que busca os todos os funcionarios, ou busca um funcionario específico pelo nome
 
     public function index(Request $request) {
-        $nome = $request->query('nome');
+        
+        $funciorarios = DB::select("SELECT * FROM FUNCIONARIOS_CRM");
 
-        if ($nome) {
-            $funcionarios = DB::select("SELECT * FROM FUNCIONARIOS_CRM WHERE NOME ILIKE ?", ["%$nome%"]);
-        } else {
-            $funciorarios = DB::select("SELECT * FROM FUNCIONARIOS_CRM");
-        }
-
-        if ($funcionarios) {
-            return response()-json($funcionarios, 200);
-        } else {
+        if (!$funcionarios) {
             return response()->json(['message' => 'Nenhum funcionario encontrado'], 404);
+        } else {
+            return response()->json($funcionarios, 200);
         }
     }
 
@@ -31,10 +26,10 @@ class Funcionario_CrmController extends Controller
     public function show($id) {
         $funcionarios = DB::select("SELECT * FROM FUNCIONARIOS_CRM WHERE COD_FUNCIONARIO = ?", [$id]);
 
-        if ($funcionarios) {
-            return response()->json($funcionarios, 200);
-        } else {
+        if (!$funcionarios) {
             return response()->json(['message' => 'Funcionario não encontrado'], 404);
+        } else {
+            return response()->json($funcionarios, 200);
         }
     }
 }
