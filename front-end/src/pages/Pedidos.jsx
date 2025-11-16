@@ -12,6 +12,8 @@ import { pedidosShow } from "../services/pedidosShow";
 import { pedidosUpdate } from "../services/pedidosUpdate";
 import { pedidosDelete } from "../services/pedidosDelete";
 
+import { produtosIndex } from "../services/produtosIndex";
+
 export default function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
@@ -20,6 +22,7 @@ export default function Pedidos() {
   const [loading, setLoading] = useState(false);
   const [termoBusca, setTermoBusca] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [produtos, setProdutos] = useState([]);
 
   const [form, setForm] = useState({
     codCliente: "",
@@ -30,6 +33,7 @@ export default function Pedidos() {
     quantidade: {}, // paralela aos produtos
     descricao: "",
     valorTotal: "",
+    valor_adicional: 0,
     prazo: "",
 
     enderecoInstManu: {
@@ -78,61 +82,71 @@ export default function Pedidos() {
   };
 
   const handleChange = (e) => {
-  const { name, value: rawValue, checked, dataset } = e.target;
-  const value = name === "codProdutos" ? Number(rawValue) : rawValue;
+    const { name, value: rawValue, checked, dataset } = e.target;
+    const value = name === "codProdutos" ? Number(rawValue) : rawValue;
 
-  // Checkbox múltiplo pedidoTipos
-  if (name === "pedidoTipos") {
-    setForm(prev =>
-      checked
-        ? { ...prev, [name]: [...prev[name], value] } // adiciona
-        : { ...prev, [name]: prev[name].filter((v) => v !== value) } // remove
-    );
-    return;
-  }
-
-  // Checkbox múltiplo codProdutos
-  if (name === "codProdutos") {
-    setForm(prev =>
-      checked
-        ? { 
-            ...prev, 
-            codProdutos: [...prev.codProdutos, value],
-            quantidade: { ...prev.quantidade, [value]: 1 } // inicializa quantidade
-          }
-        : { 
-            ...prev, 
-            codProdutos: prev.codProdutos.filter((v) => v !== value),
-            quantidade: Object.fromEntries(
-              Object.entries(prev.quantidade).filter(([k]) => Number(k) !== value)
-            )
-          }
-    );
-    return;
-  }
-
-  // Input de quantidade (passando cod_produto no data-cod)
-  if (name === "quantidade") {
-    const codProduto = Number(dataset.cod);
-    setForm(prev => ({
-      ...prev,
-      quantidade: { ...prev.quantidade, [codProduto]: Number(rawValue) }
-    }));
-    return;
-  }
-
-  // Textarea descrição (limite de 500 caracteres)
-  if (name === "descricao") {
-    if (value.length <= 500) {
-      setForm(prev => ({ ...prev, descricao: value }));
+    // Checkbox múltiplo pedidoTipos
+    if (name === "pedidoTipos") {
+      setForm(
+        (prev) =>
+          checked
+            ? { ...prev, [name]: [...prev[name], value] } // adiciona
+            : { ...prev, [name]: prev[name].filter((v) => v !== value) } // remove
+      );
+      return;
     }
-    return;
-  }
 
-  // Inputs normais
-  setForm(prev => ({ ...prev, [name]: value }));
-};
+    // Checkbox múltiplo codProdutos
+    if (name === "codProdutos") {
+      setForm((prev) =>
+        checked
+          ? {
+              ...prev,
+              codProdutos: [...prev.codProdutos, value],
+              quantidade: { ...prev.quantidade, [value]: 1 }, // inicializa quantidade
+            }
+          : {
+              ...prev,
+              codProdutos: prev.codProdutos.filter((v) => v !== value),
+              quantidade: Object.fromEntries(
+                Object.entries(prev.quantidade).filter(
+                  ([k]) => Number(k) !== value
+                )
+              ),
+            }
+      );
+      return;
+    }
 
+    // Input de quantidade (passando cod_produto no data-cod)
+    if (name === "quantidade") {
+      const codProduto = Number(dataset.cod);
+      const valorQuantidade = Number(rawValue);
+
+      // Garantir que a quantidade seja pelo menos 1
+      if (valorQuantidade < 1) return;
+
+      setForm((prev) => ({
+        ...prev,
+        quantidade: {
+          ...prev.quantidade,
+          [codProduto]: valorQuantidade,
+        },
+      }));
+      return;
+    }
+
+    // Textarea descrição (limite de 500 caracteres)
+    if (name === "descricao") {
+      if (value.length <= 500) {
+        setForm((prev) => ({ ...prev, descricao: value }));
+      }
+      return;
+    }
+
+    // Inputs normais
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -146,9 +160,10 @@ export default function Pedidos() {
         codFuncionario: "",
         pedidoTipos: [],
         codProdutos: [],
-        quantidade: [],
+        quantidade: {},
         descricao: "",
         valorTotal: "",
+        valor_adicional: 0,
         prazo: "",
         enderecoInstManu: {
           cidade: "",
@@ -203,6 +218,29 @@ export default function Pedidos() {
     pedidosDelete(id);
   };
 
+  useEffect(() => {
+    const carregarProdutos = async () => {
+      const dados = await produtosIndex();
+      setProdutos(dados);
+    };
+    carregarProdutos();
+  }, []);
+
+  // Cálculo mais eficiente
+  useEffect(() => {
+    let total = parseFloat(form.valor_adicional) || 0;
+
+    form.codProdutos.forEach((codProduto) => {
+      const produto = produtos.find((p) => p.cod_produto === codProduto);
+      if (produto) {
+        const quantidade = form.quantidade[codProduto] || 1;
+        total += produto.valor_unitario * quantidade;
+      }
+    });
+
+    setForm((prev) => ({ ...prev, valorTotal: total.toFixed(2) }));
+  }, [form.codProdutos, form.quantidade, form.valor_adicional, produtos]);
+
   const tabClasses = (tabName) =>
     `py-2 px-4 text-center cursor-pointer font-medium transition-colors duration-200 
     ${
@@ -229,6 +267,7 @@ export default function Pedidos() {
     setAbaAtiva,
     descricao,
     setDescricao,
+    produtos,
   };
 
   const propsEditar = {

@@ -70,6 +70,7 @@ class PedidoController extends Controller
         $quantidade = $request->input('quantidade');
         $descricao = $request->input('descricao');
         $valorTotal = $request->input('valor_total');
+        $valorAdicional = $request->input('valor_adicional', 0);
         $prazo = $request->input('prazo');
 
         $request->validate([
@@ -84,6 +85,7 @@ class PedidoController extends Controller
             'quantidade.*' => 'integer|min:1',
             'descricao' => 'required|string|max:500',
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
+            'valor_adicional' => 'nullable|numeric|min:0',
             'prazo' => 'required|date',
         ]);
 
@@ -112,16 +114,18 @@ class PedidoController extends Controller
 
         try {
             DB::insert("INSERT INTO PEDIDOS (COD_PEDIDO, COD_CLIENTE, COD_ENDERECO_CLIENTE, COD_FUNCIONARIO, DESCRICAO, 
-            VALOR_TOTAL, PRAZO) VALUES (?, ?, ?, ?, ?, ?, ?)", [$codPedido, $codCliente, $codEnderecoCliente, $codFuncionario, 
-            $descricao, $valorTotal, $prazo]);
+            VALOR_TOTAL, VALOR_ADICIONAL, PRAZO) VALUES (?, ?, ?, ?, ?, ?, ? , ?)", [$codPedido, $codCliente, $codEnderecoCliente, 
+            $codFuncionario, $descricao, $valorTotal, $valorAdicional, $prazo]);
             if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
                 DB::insert("INSERT INTO ENDERECOS_INST_MANU (COD_PEDIDO, CIDADE, CEP, BAIRRO, RUA_NUMERO)
                 VALUES (?, ?, ?, ?, ?)", [$codPedido, $cidade, $cep, $bairro, $ruaNumero]);
             }
             if (in_array('PRODUTO', $pedidoTipos)) {
             foreach ($codProdutos as $codProduto) {
+                $quantidadeProduto = $quantidade[$codProduto] ?? 1;
+
                 DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE) VALUES (?, ?, ?)", [$codPedido, 
-                $codProduto, $quantidade]);
+                $codProduto, $quantidadeProduto]);
                 }
             }
             foreach ($pedidoTipos as $pedidoTipo) {
@@ -144,6 +148,7 @@ class PedidoController extends Controller
         $quantidade = $request->input('quantidade');
         $descricao = $request->input('descricao');
         $valorTotal = $request->input('valor_total');
+        $valorAdicional = $request->input('valor_adicional', 0);
         $prazo = $request->input('prazo');
         
         $request->validate([
@@ -157,6 +162,7 @@ class PedidoController extends Controller
             'quantidade' => 'required_if:pedido_tipos,PRODUTO|array',
             'quantidade.*' => 'integer|min:1',
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
+            'valor_adicional' => 'nullable|numeric|min:0',
             'prazo' => 'required|date',
         ]);
 
@@ -180,7 +186,8 @@ class PedidoController extends Controller
 
         try {
             DB::update("UPDATE PEDIDOS SET COD_CLIENTE = ?, COD_ENDERECO_CLIENTE = ?, COD_FUNCIONARIO = ?, DESCRICAO = ?, 
-            VALOR_TOTAL = ?, PRAZO = ? WHERE COD_PEDIDO = ?", [$codCliente, $codEnderecoCliente, $codFuncionario, $descricao, $valorTotal, $prazo, $id]);
+            VALOR_TOTAL = ?, VALOR_ADICIONAL = ?, PRAZO = ? WHERE COD_PEDIDO = ?", [$codCliente, $codEnderecoCliente, 
+            $codFuncionario, $descricao, $valorTotal, $valorAdicional, $prazo, $id]);
 
             if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
                 DB::delete("DELETE FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);
@@ -191,8 +198,9 @@ class PedidoController extends Controller
             if (in_array('PRODUTO', $pedidoTipos)) {
                 DB::delete("DELETE FROM ITENS_PRODUTOS WHERE COD_PEDIDO = ?", [$id]);
                 foreach ($codProdutos as $codProduto) {
+                    $quantidadeProduto = $quantidade[$codProduto] ?? 1;
                     DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE) VALUES (?, ?, ?)", [$id, 
-                    $codProduto, $quantidade]);
+                    $codProduto, $quantidadeProduto]);
                 }
             }
             DB::delete("DELETE FROM PEDIDOS_TIPOS WHERE COD_PEDIDO = ?", [$id]);

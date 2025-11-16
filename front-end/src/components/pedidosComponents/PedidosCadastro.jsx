@@ -1,22 +1,13 @@
 import { useState, useEffect } from "react";
-import { produtosIndex } from "../../services/produtosIndex";
 import { clientesShow } from "../../services/clientesShow";
 
 export default function FormularioCadastro({
   handleSubmit,
   handleChange,
   form,
+  produtos,
 }) {
-  const [produtos, setProdutos] = useState([]);
   const [cliente, setCliente] = useState({});
-
-  useEffect(() => {
-    const fetchProdutos = async () => {
-      const dadosProdutos = await produtosIndex();
-      setProdutos(dadosProdutos);
-    };
-    fetchProdutos();
-  }, []);
 
   useEffect(() => {
     if (!form.codCliente) {
@@ -87,6 +78,7 @@ export default function FormularioCadastro({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Código do Cliente
           </label>
+          <div className="flex justify-between">
           <input
             type="number"
             name="codCliente"
@@ -97,8 +89,14 @@ export default function FormularioCadastro({
                        focus:ring-indigo-500 focus:border-indigo-500
                        appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
+          {cliente && cliente.cpf_cliente && (
+            <label className="text-lg text-gray-700 mx-10">
+              CPF: {cliente.cpf_cliente}
+            </label>
+          )}
+          </div>
         </div>
-          
+
         {cliente && cliente.enderecos && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -133,7 +131,7 @@ export default function FormularioCadastro({
             </label>
             <div className="grid grid-cols-3 gap-5">
               {produtos.map((p) => (
-                <div key={p.cod_produto} className="flex gap-5">
+                <div key={p.cod_produto} className="flex gap-5 items-center">
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -143,8 +141,9 @@ export default function FormularioCadastro({
                       onChange={handleChange}
                       className="w-4 h-4"
                     />
-                    {p.nome_produto}
+                    {p.nome_produto} - R$ {p.valor_unitario}
                   </label>
+
                   {form.codProdutos.includes(p.cod_produto) && (
                     <input
                       type="number"
@@ -157,7 +156,7 @@ export default function FormularioCadastro({
                       required
                       onKeyDown={(e) => e.preventDefault()}
                       className="w-15 p-2 border border-gray-300 rounded-md 
-                             focus:ring-indigo-500 focus:border-indigo-500"
+                     focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   )}
                 </div>
@@ -221,38 +220,34 @@ export default function FormularioCadastro({
         {/* Valor adicional */}
         <div className="flex justify-between">
           <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Valor Adicional (R$)
-          </label>
-          <input
-            type="number"
-            name="valor_adicional"
-            onChange={handleChange}
-            placeholder="Valor Adicional (R$)"
-            min="0"
-            step="0.01"
-            required
-            className="w-75 p-2 border border-gray-300 rounded-md 
-                       focus:ring-indigo-500 focus:border-indigo-500"
-          />
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Valor Adicional (R$)
+            </label>
+            <input
+              type="number"
+              name="valor_adicional"
+              onChange={handleChange}
+              placeholder="Valor Adicional (R$)"
+              value={form.valor_adicional}
+              min="0"
+              step="0.01"
+              className="w-75 p-2 border border-gray-300 rounded-md 
+                 focus:ring-indigo-500 focus:border-indigo-500"
+            />
           </div>
           <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Valor Total (R$)
-          </label>
-          <input
-            type="number"
-            name="valor_total"
-            value={form.valor_total}
-            onChange={handleChange}
-            placeholder="Valor Adicional (R$)"
-            min="0"
-            step="0.01"
-            required
-            className="w-75 p-2 border border-gray-300 rounded-md 
-                       focus:ring-indigo-500 focus:border-indigo-500"
-            disabled
-          />
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Valor Total (R$)
+            </label>
+            <input
+              type="number"
+              name="valorTotal"
+              value={form.valorTotal || "0.00"}
+              className="w-75 p-2 border border-gray-300 rounded-md 
+                 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-100"
+              disabled
+              readOnly
+            />
           </div>
         </div>
 
