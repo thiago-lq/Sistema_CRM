@@ -45,24 +45,40 @@ export default function FormularioCadastro({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tipo de Pedido
           </label>
-          <div className="flex gap-10">
-            {[
-              { value: "INSTALACAO", label: "Instalação" },
-              { value: "MANUTENCAO", label: "Manutenção" },
-              { value: "PRODUTO", label: "Venda de Produto" },
-            ].map((item) => (
-              <label key={item.value} className="flex items-center gap-2">
+          <div className="flex justify-between">
+            <div className="flex gap-10">
+              {[
+                { value: "INSTALACAO", label: "Instalação" },
+                { value: "MANUTENCAO", label: "Manutenção" },
+                { value: "PRODUTO", label: "Venda de Produto" },
+              ].map((item) => (
+                <label key={item.value} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="pedidoTipos"
+                    value={item.value}
+                    checked={form.pedidoTipos.includes(item.value)}
+                    onChange={handleChange}
+                    className="w-4 h-4"
+                  />
+                  {item.label}
+                </label>
+              ))}
+            </div>
+            {/* Prazo */}
+            <div className="flex items-center justify-center mx-25">
+              <div className="relative">
+                <label className="block text-sm font-medium mb-1">Prazo</label>
                 <input
-                  type="checkbox"
-                  name="pedidoTipos"
-                  value={item.value}
-                  checked={form.pedidoTipos.includes(item.value)}
+                  type="date"
+                  name="prazo"
+                  value={form.prazo}
                   onChange={handleChange}
-                  className="w-4 h-4"
+                  className="p-2 border rounded w-max"
+                  required
                 />
-                {item.label}
-              </label>
-            ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -77,12 +93,12 @@ export default function FormularioCadastro({
             placeholder="Digite o código do cliente"
             value={form.codCliente}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md 
+            className="w-75 p-2 border border-gray-300 rounded-md
                        focus:ring-indigo-500 focus:border-indigo-500
                        appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
         </div>
-
+          
         {cliente && cliente.enderecos && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -116,11 +132,9 @@ export default function FormularioCadastro({
               Produtos (Seleção múltipla)
             </label>
             <div className="grid grid-cols-3 gap-5">
-                {produtos.map((p) => (
-                  <label
-                    key={p.cod_produto}
-                    className="flex items-center gap-2"
-                  >
+              {produtos.map((p) => (
+                <div key={p.cod_produto} className="flex gap-5">
+                  <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       name="codProdutos"
@@ -131,28 +145,115 @@ export default function FormularioCadastro({
                     />
                     {p.nome_produto}
                   </label>
-                ))}
-              </div>
+                  {form.codProdutos.includes(p.cod_produto) && (
+                    <input
+                      type="number"
+                      name="quantidade"
+                      data-cod={p.cod_produto}
+                      value={form.quantidade[p.cod_produto]}
+                      onChange={handleChange}
+                      min="1"
+                      step="1"
+                      required
+                      onKeyDown={(e) => e.preventDefault()}
+                      className="w-15 p-2 border border-gray-300 rounded-md 
+                             focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Endereço de Instalação ou Manutenção */}
+        {(form.pedidoTipos.includes("INSTALACAO") ||
+          form.pedidoTipos.includes("MANUTENCAO")) && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Endereço de Serviço
+            </label>
+            <div className="grid grid-cols-4 gap-5">
+              <input
+                type="text"
+                name="rua_numero"
+                placeholder="Rua e número"
+                value={form.enderecoInstManu.rua_numero}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md 
+                         focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+              <input
+                type="text"
+                name="bairro"
+                placeholder="Bairro"
+                value={form.enderecoInstManu.bairro}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md 
+                         focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+              <input
+                type="text"
+                name="cep"
+                placeholder="CEP"
+                value={form.enderecoInstManu.cep}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md 
+                         focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+              <input
+                type="text"
+                name="cidade"
+                placeholder="Cidade"
+                value={form.enderecoInstManu.cidade}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md 
+                         focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+            </div>
           </div>
         )}
 
         {/* Valor adicional */}
-        <div>
+        <div className="flex justify-between">
+          <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Valor Adicional (R$)
           </label>
           <input
             type="number"
             name="valor_adicional"
-            value={form.valor_adicional}
             onChange={handleChange}
             placeholder="Valor Adicional (R$)"
             min="0"
             step="0.01"
             required
-            className="w-full p-2 border border-gray-300 rounded-md 
+            className="w-75 p-2 border border-gray-300 rounded-md 
                        focus:ring-indigo-500 focus:border-indigo-500"
           />
+          </div>
+          <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Valor Total (R$)
+          </label>
+          <input
+            type="number"
+            name="valor_total"
+            value={form.valor_total}
+            onChange={handleChange}
+            placeholder="Valor Adicional (R$)"
+            min="0"
+            step="0.01"
+            required
+            className="w-75 p-2 border border-gray-300 rounded-md 
+                       focus:ring-indigo-500 focus:border-indigo-500"
+            disabled
+          />
+          </div>
         </div>
 
         {/* Descrição */}

@@ -27,7 +27,7 @@ export default function Pedidos() {
     codFuncionario: "",
     pedidoTipos: [], // multiplos
     codProdutos: [], // multiplos
-    quantidade: [], // paralela aos produtos
+    quantidade: {}, // paralela aos produtos
     descricao: "",
     valorTotal: "",
     prazo: "",
@@ -78,40 +78,61 @@ export default function Pedidos() {
   };
 
   const handleChange = (e) => {
-    const { name, value: rawValue, checked } = e.target;
-    const value = name === "codProdutos" ? Number(rawValue) : rawValue;
+  const { name, value: rawValue, checked, dataset } = e.target;
+  const value = name === "codProdutos" ? Number(rawValue) : rawValue;
 
-    // Checkbox múltiplo
-    if (name === "pedidoTipos") {
-      setForm(
-        (prev) =>
-          checked
-            ? { ...prev, [name]: [...prev[name], value] } // adiciona
-            : { ...prev, [name]: prev[name].filter((v) => v !== value) } // remove
-      );
-      return;
-    }
-    if (name === "codProdutos") {
-      setForm(
-        (prev) =>
-          checked
-            ? { ...prev, [name]: [...prev[name], value] } // adiciona
-            : { ...prev, [name]: prev[name].filter((v) => v !== value) } // remove
-      );
-      return;
-    }
+  // Checkbox múltiplo pedidoTipos
+  if (name === "pedidoTipos") {
+    setForm(prev =>
+      checked
+        ? { ...prev, [name]: [...prev[name], value] } // adiciona
+        : { ...prev, [name]: prev[name].filter((v) => v !== value) } // remove
+    );
+    return;
+  }
 
-    // Textarea descrição (limite de 500 caracteres)
-    if (name === "descricao") {
-      if (value.length <= 500) {
-        setForm((prev) => ({ ...prev, descricao: value }));
-      }
-      return;
-    }
+  // Checkbox múltiplo codProdutos
+  if (name === "codProdutos") {
+    setForm(prev =>
+      checked
+        ? { 
+            ...prev, 
+            codProdutos: [...prev.codProdutos, value],
+            quantidade: { ...prev.quantidade, [value]: 1 } // inicializa quantidade
+          }
+        : { 
+            ...prev, 
+            codProdutos: prev.codProdutos.filter((v) => v !== value),
+            quantidade: Object.fromEntries(
+              Object.entries(prev.quantidade).filter(([k]) => Number(k) !== value)
+            )
+          }
+    );
+    return;
+  }
 
-    // Inputs normais
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  // Input de quantidade (passando cod_produto no data-cod)
+  if (name === "quantidade") {
+    const codProduto = Number(dataset.cod);
+    setForm(prev => ({
+      ...prev,
+      quantidade: { ...prev.quantidade, [codProduto]: Number(rawValue) }
+    }));
+    return;
+  }
+
+  // Textarea descrição (limite de 500 caracteres)
+  if (name === "descricao") {
+    if (value.length <= 500) {
+      setForm(prev => ({ ...prev, descricao: value }));
+    }
+    return;
+  }
+
+  // Inputs normais
+  setForm(prev => ({ ...prev, [name]: value }));
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
