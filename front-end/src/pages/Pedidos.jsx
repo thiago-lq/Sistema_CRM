@@ -17,7 +17,6 @@ import { produtosIndex } from "../services/produtosIndex";
 export default function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
-  const [pedidoEditar, setPedidoEditar] = useState(null);
   const [abaAtiva, setAbaAtiva] = useState("lista");
   const [loading, setLoading] = useState(false);
   const [termoBusca, setTermoBusca] = useState("");
@@ -243,41 +242,6 @@ export default function Pedidos() {
     }
   };
 
-  const handleEditar = (pedido) => {
-    const pedidoFormatado = {
-      ...pedido,
-      pedidoTipos: pedido.pedido_tipos || [],
-      codProdutos: pedido.cod_produtos || [],
-      quantidade: pedido.quantidade || [],
-      prazo: pedido.prazo || "",
-      enderecoInstManu: {
-        cidade: pedido.cidade || "",
-        cep: pedido.cep || "",
-        bairro: pedido.bairro || "",
-        rua_numero: pedido.rua_numero || "",
-      },
-    };
-
-    setPedidoEditar(pedidoFormatado);
-    setAbaAtiva("editar");
-  };
-
-  const handleChangeEditar = (e) => {
-    const { name, value } = e.target;
-    setPedidoEditar((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmitEditar = async (e) => {
-    e.preventDefault();
-    try {
-      await pedidosUpdate(pedidoEditar);
-      alert("Pedido editado com sucesso!");
-    } catch (err) {
-      console.error("Erro ao editar:", err);
-      alert("Erro ao editar pedido!");
-    }
-  };
-
   const handleExcluir = (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este pedido?")) return;
     pedidosDelete(id);
@@ -320,7 +284,6 @@ export default function Pedidos() {
     pedidos,
     setAbaAtiva,
     setPedidoSelecionado,
-    handleEditar,
     handleExcluir,
     loading,
     handleRecarregar,
@@ -336,12 +299,7 @@ export default function Pedidos() {
   };
 
   const propsEditar = {
-    pedidoEditar,
-    setPedidoEditar,
-    handleSubmitEditar,
-    handleChangeEditar,
-    setAbaAtiva,
-  };
+};
 
   const propsDetalhes = {
     pedidoSelecionado,
