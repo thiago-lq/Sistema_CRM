@@ -77,6 +77,7 @@ class ClienteController extends Controller
         $cliente = $cliente[0];
         $cliente->telefones = array_map(fn($t) => $t->telefone, $telefones);
         $cliente->enderecos = array_map(fn($e) => [
+            'cod_endereco_cliente' => $e->cod_endereco_cliente,
             'cidade' => $e->cidade,
             'cep' => $e->cep,
             'bairro' => $e->bairro,

@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { clientesShow } from "../../services/clientesShow";
 
-
-
 export default function FormularioCadastro({
   handleSubmit,
   handleChange,
@@ -100,7 +98,6 @@ export default function FormularioCadastro({
         </div>
 
         {cliente &&
-          cliente.endereco &&
           form.pedidoTipos.includes("PRODUTO") && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -117,7 +114,7 @@ export default function FormularioCadastro({
                 <option disabled value="">
                   Selecione um endereço
                 </option>
-                {cliente.endereco?.map((e) => (
+                {cliente.enderecos?.map((e) => (
                   <option
                     key={e.cod_endereco_cliente}
                     value={e.cod_endereco_cliente}

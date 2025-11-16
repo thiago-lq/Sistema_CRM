@@ -43,7 +43,4 @@ Route::middleware('auth.funcionario')->group(function() {
 
     // Rotas de Produtos
     Route::get('/produtos', [ProdutoController::class, 'index']);
-
-    // Rotas de Endereços de Clientes
-    Route::get('/endereco_clientes/{id}', [EnderecoClienteController::class, 'show']);
 });
