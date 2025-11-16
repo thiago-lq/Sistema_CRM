@@ -29,7 +29,6 @@ export default function ListaPedidos({
   // Função para mostrar os tipos de pedido
   const renderizarTipos = (tipos) => {
     if (!tipos) return "-";
-    console.log(tipos);
 
     const tiposArray = tipos.split(", ");
     return (

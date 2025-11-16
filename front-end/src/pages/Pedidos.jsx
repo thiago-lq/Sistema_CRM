@@ -204,8 +204,6 @@ export default function Pedidos() {
           : {}),
       };
 
-      console.log("Dados formatados para enviar:", dadosParaEnviar);
-
       await pedidosStore(dadosParaEnviar);
       alert("Pedido cadastrado com sucesso!");
 
