@@ -9,20 +9,53 @@ class PedidoController extends Controller
 {
     // Controlador que busca todos os pedidos
     public function index() {
-        $pedido = DB::select("SELECT p.*, e.CIDADE, e.CEP, e.BAIRRO, e.RUA_NUMERO, ec.CIDADE, ec.CEP, ec.BAIRRO, ec.RUA_NUMERO,
-        i.COD_PRODUTO, i.QUANTIDADE, ip.NOME_PRODUTO, ip.VALOR_UNITARIO, pt.NOME_TIPO, pc.STATUS, pc.DATA_HORA_PAGAMENTO, 
-        f.NOME_FUNCIONARIO FROM PEDIDOS p LEFT JOIN ENDERECOS_INST_MANU e ON p.COD_PEDIDO = e.COD_PEDIDO 
-        LEFT JOIN ENDERECOS_CLIENTES ec ON p.COD_ENDERECO_CLIENTE = ec.COD_ENDERECO_CLIENTE LEFT JOIN ITENS_PRODUTOS i 
-        ON p.COD_PEDIDO = i.COD_PEDIDO LEFT JOIN PRODUTOS ip ON i.COD_PRODUTO = ip.COD_PRODUTO LEFT JOIN PEDIDOS_TIPOS pt 
-        ON p.COD_PEDIDO = pt.COD_PEDIDO LEFT JOIN PAGAMENTOS_CLIENTES pc ON pc.COD_PEDIDO = p.COD_PEDIDO LEFT JOIN FUNCIONARIOS_CRM 
-        ON f.COD_FUNCIONARIO = p.COD_FUNCIONARIO ORDER BY p.COD_PEDIDO");
+    $pedido = DB::select("
+    SELECT 
+        p.*,
+        p.VALOR_TOTAL AS valor_total, -- <- agora vem do banco CERTINHO
+        e.CIDADE AS INST_CIDADE,
+        e.CEP AS INST_CEP,
+        e.BAIRRO AS INST_BAIRRO,
+        e.RUA_NUMERO AS INST_RUA,
 
-        if (!$pedido) {
-            return response()->json(['message' => 'Nenhum pedido encontrado'], 404);
-        }
+        ec.CIDADE AS CLI_CIDADE,
+        ec.CEP AS CLI_CEP,
+        ec.BAIRRO AS CLI_BAIRRO,
+        ec.RUA_NUMERO AS CLI_RUA,
 
-        return response()->json($pedido, 200);
-    }
+        STRING_AGG(pt.NOME_TIPO, ', ') AS tipos_pedido,
+
+        pc.STATUS AS status_pagamento,
+
+        p.CREATED_AT AS created_at,
+
+        f.NOME_FUNCIONARIO AS funcionario_nome
+
+    FROM PEDIDOS p
+    LEFT JOIN ENDERECOS_INST_MANU e ON p.COD_PEDIDO = e.COD_PEDIDO 
+    LEFT JOIN ENDERECOS_CLIENTES ec ON p.COD_ENDERECO_CLIENTE = ec.COD_ENDERECO_CLIENTE 
+    LEFT JOIN ITENS_PRODUTOS i ON p.COD_PEDIDO = i.COD_PEDIDO 
+    LEFT JOIN PRODUTOS ip ON i.COD_PRODUTO = ip.COD_PRODUTO 
+    LEFT JOIN PEDIDOS_TIPOS pt ON p.COD_PEDIDO = pt.COD_PEDIDO 
+    LEFT JOIN PAGAMENTOS_CLIENTES pc ON pc.COD_PEDIDO = p.COD_PEDIDO
+    LEFT JOIN FUNCIONARIOS_CRM f ON f.COD_FUNCIONARIO = p.COD_FUNCIONARIO
+
+    GROUP BY 
+        p.COD_PEDIDO,
+        p.VALOR_TOTAL,
+        e.CIDADE, e.CEP, e.BAIRRO, e.RUA_NUMERO,
+        ec.CIDADE, ec.CEP, ec.BAIRRO, ec.RUA_NUMERO,
+        pc.STATUS,
+        p.CREATED_AT,
+        f.NOME_FUNCIONARIO
+
+    ORDER BY p.COD_PEDIDO
+");
+
+    return response()->json($pedido);
+}
+
+
 
     // Controlador que busca um pedido pelo seu ID
     public function show($id) {
