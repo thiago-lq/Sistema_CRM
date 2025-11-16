@@ -89,7 +89,7 @@ export default function FormularioCadastro({
                        focus:ring-indigo-500 focus:border-indigo-500
                        appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
-          {cliente && cliente.cpf_cliente && (
+          {cliente && cliente.cpf_cliente &&  (
             <label className="text-lg text-gray-700 mx-10">
               CPF: {cliente.cpf_cliente}
             </label>
@@ -97,10 +97,10 @@ export default function FormularioCadastro({
           </div>
         </div>
 
-        {cliente && cliente.enderecos && (
+        {cliente && cliente.enderecos && form.pedidoTipos.includes("PRODUTO") &&(
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Endereço do Cliente
+              Endereço de Entrega
             </label>
             <select
               name="codEnderecoCliente"

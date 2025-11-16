@@ -62,10 +62,10 @@ class PedidoController extends Controller
 
     // Controlador que cadastra um pedido
     public function store(Request $request) {
+        $funcionario = $request->attributes->get('funcionario');
         $codCliente = $request->input('cod_cliente');
         $codProdutos = $request->input('cod_produtos');
         $codEnderecoCliente = $request->input('cod_endereco_cliente');
-        $codFuncionario = $request->input('cod_funcionario');
         $pedidoTipos = $request->input('pedido_tipos');
         $quantidade = $request->input('quantidade');
         $descricao = $request->input('descricao');
@@ -80,7 +80,6 @@ class PedidoController extends Controller
             'cod_endereco_cliente' => 'required|integer|exists:ENDERECOS_CLIENTES,COD_ENDERECO_CLIENTE',
             'pedido_tipos' => 'required|array',
             'pedido_tipos.*' => 'required|string|in:INSTALACAO,MANUTENCAO,PRODUTO',
-            'cod_funcionario' => 'required|integer|exists:FUNCIONARIOS_CRM,COD_FUNCIONARIO',
             'quantidade' => 'required_if:pedido_tipos,PRODUTO|array',
             'quantidade.*' => 'integer|min:1',
             'descricao' => 'required|string|max:500',
@@ -88,6 +87,8 @@ class PedidoController extends Controller
             'valor_adicional' => 'nullable|numeric|min:0',
             'prazo' => 'required|date',
         ]);
+
+        $codFuncionario = $funcionario->cod_funcionario;
 
         $codProdutos = array_map('intval', $request->input('cod_produtos'));
 
@@ -140,10 +141,10 @@ class PedidoController extends Controller
     }
 
     public function update(Request $request, $id) {
+        $funcionario = $request->attributes->get('funcionario');
         $codCliente = $request->input('cod_cliente');
         $codProdutos = $request->input('cod_produtos');
         $codEnderecoCliente = $request->input('cod_endereco_cliente');
-        $codFuncionario = $request->input('cod_funcionario');
         $pedidoTipos = $request->input('pedido_tipos');
         $quantidade = $request->input('quantidade');
         $descricao = $request->input('descricao');
@@ -156,7 +157,6 @@ class PedidoController extends Controller
             'cod_produtos' => 'required_if:pedido_tipos,PRODUTO|array',
             'cod_produtos.*' => 'integer|exists:PRODUTOS,COD_PRODUTO',
             'cod_endereco_cliente' => 'required|integer|exists:ENDERECOS_CLIENTES,COD_ENDERECO_CLIENTE',
-            'cod_funcionario' => 'required|integer|exists:FUNCIONARIOS_CRM,COD_FUNCIONARIO',
             'pedido_tipos' => 'required|array',
             'pedido_tipos.*' => 'required|string|in:INSTALACAO,MANUTENCAO,PRODUTO',
             'quantidade' => 'required_if:pedido_tipos,PRODUTO|array',
@@ -166,6 +166,7 @@ class PedidoController extends Controller
             'prazo' => 'required|date',
         ]);
 
+        $codFuncionario = $funcionario->cod_funcionario;
         $codProdutos = array_map('intval', $request->input('cod_produtos'));
 
         if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {

@@ -27,7 +27,6 @@ export default function Pedidos() {
   const [form, setForm] = useState({
     codCliente: "",
     codEnderecoCliente: "",
-    codFuncionario: "",
     pedidoTipos: [], // multiplos
     codProdutos: [], // multiplos
     quantidade: {}, // paralela aos produtos
@@ -157,7 +156,6 @@ export default function Pedidos() {
       setForm({
         codCliente: "",
         codEnderecoCliente: "",
-        codFuncionario: "",
         pedidoTipos: [],
         codProdutos: [],
         quantidade: {},
