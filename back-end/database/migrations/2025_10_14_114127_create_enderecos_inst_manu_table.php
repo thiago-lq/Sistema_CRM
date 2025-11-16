@@ -9,8 +9,8 @@ return new class extends Migration
     public function up()
     {
         DB::statement("
-            CREATE TABLE ENDERECO_INST_MANU(
-            COD_INST_MANU INT PRIMARY KEY,
+            CREATE TABLE ENDERECOS_INST_MANU(
+            COD_INST_MANU SERIAL PRIMARY KEY,
             COD_PEDIDO INT NOT NULL,
             CIDADE VARCHAR(100) NOT NULL,
             CEP CHAR(8) NOT NULL,
@@ -23,6 +23,6 @@ return new class extends Migration
 
     public function down()
     {
-         DB::statement("DROP TABLE IF EXISTS ENDERECO_INST_MANU");
+         DB::statement("DROP TABLE IF EXISTS ENDERECOS_INST_MANU");
     }
 };

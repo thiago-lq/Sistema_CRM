@@ -63,6 +63,7 @@ class PedidoController extends Controller
     // Controlador que cadastra um pedido
     public function store(Request $request) {
         $funcionario = $request->attributes->get('funcionario');
+        $codFuncionario = $funcionario->cod_funcionario; // ← Agora vem do middleware
         $codCliente = $request->input('cod_cliente');
         $codProdutos = $request->input('cod_produtos');
         $codEnderecoCliente = $request->input('cod_endereco_cliente');
@@ -74,21 +75,19 @@ class PedidoController extends Controller
         $prazo = $request->input('prazo');
 
         $request->validate([
-            'cod_cliente' => 'required|integer|exists:CLIENTES,COD_CLIENTE',
-            'cod_produtos' => 'required_if:pedido_tipos,PRODUTO|array',
-            'cod_produtos.*' => 'integer|exists:PRODUTOS,COD_PRODUTO',
-            'cod_endereco_cliente' => 'required|integer|exists:ENDERECOS_CLIENTES,COD_ENDERECO_CLIENTE',
+            'cod_cliente' => 'required|integer|exists:clientes,cod_cliente',
+            'cod_produtos' => 'required_if:pedido_tipos.*,PRODUTO|array',
+            'cod_produtos.*' => 'integer|exists:produtos,cod_produto',
+            'cod_endereco_cliente' => 'nullable|required_if:pedido_tipos.*,PRODUTO|integer|exists:enderecos_clientes,cod_endereco_cliente',
             'pedido_tipos' => 'required|array',
             'pedido_tipos.*' => 'required|string|in:INSTALACAO,MANUTENCAO,PRODUTO',
-            'quantidade' => 'required_if:pedido_tipos,PRODUTO|array',
+            'quantidade' => 'required_if:pedido_tipos.*,PRODUTO|array',
             'quantidade.*' => 'integer|min:1',
             'descricao' => 'required|string|max:500',
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
             'valor_adicional' => 'nullable|numeric|min:0',
             'prazo' => 'required|date',
         ]);
-
-        $codFuncionario = $funcionario->cod_funcionario;
 
         $codProdutos = array_map('intval', $request->input('cod_produtos'));
 
@@ -104,10 +103,10 @@ class PedidoController extends Controller
             $ruaNumero = $request->input('rua_numero');
 
             $request->validate([
-                'cidade' => 'required|string|max:100',
-                'cep' => 'required|size:8',
-                'bairro' => 'required|string|max:100',
-                'rua_numero' => 'required|string|max:100',
+                'cidade' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
+                'cep' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|size:8',
+                'bairro' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
+                'rua_numero' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
             ]);
         }
 
@@ -122,13 +121,18 @@ class PedidoController extends Controller
                 VALUES (?, ?, ?, ?, ?)", [$codPedido, $cidade, $cep, $bairro, $ruaNumero]);
             }
             if (in_array('PRODUTO', $pedidoTipos)) {
-            foreach ($codProdutos as $codProduto) {
-                $quantidadeProduto = $quantidade[$codProduto] ?? 1;
-
-                DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE) VALUES (?, ?, ?)", [$codPedido, 
-                $codProduto, $quantidadeProduto]);
+                if (count($codProdutos) !== count($quantidade)) {
+                    return response()->json([
+                        'message' => 'Arrays de produtos e quantidades incompatíveis'
+                    ], 422);
                 }
-            }
+                foreach ($codProdutos as $codProduto) {
+                    $quantidadeProduto = $quantidade[$codProduto] ?? 1;
+
+                    DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE) VALUES (?, ?, ?)", [$codPedido, 
+                    $codProduto, $quantidadeProduto]);
+                    }
+                }
             foreach ($pedidoTipos as $pedidoTipo) {
                 DB::insert("INSERT INTO PEDIDOS_TIPOS (COD_PEDIDO, NOME_TIPO) VALUES (?, ?)", [$codPedido, $pedidoTipo]);
             }
@@ -153,13 +157,13 @@ class PedidoController extends Controller
         $prazo = $request->input('prazo');
         
         $request->validate([
-            'cod_cliente' => 'required|integer|exists:CLIENTES,COD_CLIENTE',
-            'cod_produtos' => 'required_if:pedido_tipos,PRODUTO|array',
-            'cod_produtos.*' => 'integer|exists:PRODUTOS,COD_PRODUTO',
-            'cod_endereco_cliente' => 'required|integer|exists:ENDERECOS_CLIENTES,COD_ENDERECO_CLIENTE',
+            'cod_cliente' => 'required|integer|exists:clientes,cod_cliente',
+            'cod_produtos' => 'required_if:pedido_tipos,produto|array',
+            'cod_produtos.*' => 'integer|exists:produtos,cod_produto',
+            'cod_endereco_cliente' => 'required|integer|exists:enderecos_clientes,cod_endereco_cliente',
             'pedido_tipos' => 'required|array',
             'pedido_tipos.*' => 'required|string|in:INSTALACAO,MANUTENCAO,PRODUTO',
-            'quantidade' => 'required_if:pedido_tipos,PRODUTO|array',
+            'quantidade' => 'required_if:pedido_tipos,produto|array',
             'quantidade.*' => 'integer|min:1',
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
             'valor_adicional' => 'nullable|numeric|min:0',

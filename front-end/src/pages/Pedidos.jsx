@@ -82,16 +82,28 @@ export default function Pedidos() {
 
   const handleChange = (e) => {
     const { name, value: rawValue, checked, dataset } = e.target;
-    const value = name === "codProdutos" ? Number(rawValue) : rawValue;
+    let value = name === "codProdutos" ? Number(rawValue) : rawValue;
+    //  ^^^^^  AGORA PODE MODIFICAR value
 
     // Checkbox múltiplo pedidoTipos
     if (name === "pedidoTipos") {
-      setForm(
-        (prev) =>
-          checked
-            ? { ...prev, [name]: [...prev[name], value] } // adiciona
-            : { ...prev, [name]: prev[name].filter((v) => v !== value) } // remove
+      setForm((prev) =>
+        checked
+          ? { ...prev, [name]: [...prev[name], value] }
+          : { ...prev, [name]: prev[name].filter((v) => v !== value) }
       );
+      return;
+    }
+
+    // SELECT DO ENDEREÇO
+    if (name === "cod_endereco_cliente") {
+      const intValue = rawValue === "" ? "" : Number(rawValue);
+
+      setForm((prev) => ({
+        ...prev,
+        cod_endereco_cliente: Number.isNaN(intValue) ? "" : intValue,
+      }));
+
       return;
     }
 
@@ -102,7 +114,7 @@ export default function Pedidos() {
           ? {
               ...prev,
               codProdutos: [...prev.codProdutos, value],
-              quantidade: { ...prev.quantidade, [value]: 1 }, // inicializa quantidade
+              quantidade: { ...prev.quantidade, [value]: 1 },
             }
           : {
               ...prev,
@@ -117,12 +129,10 @@ export default function Pedidos() {
       return;
     }
 
-    // Input de quantidade (passando cod_produto no data-cod)
+    // Input de quantidade
     if (name === "quantidade") {
       const codProduto = Number(dataset.cod);
       const valorQuantidade = Number(rawValue);
-
-      // Garantir que a quantidade seja pelo menos 1
       if (valorQuantidade < 1) return;
 
       setForm((prev) => ({
@@ -135,24 +145,74 @@ export default function Pedidos() {
       return;
     }
 
-    // Textarea descrição (limite de 500 caracteres)
+    // Endereco INST/MANU
+    if (
+      name === "rua_numero" ||
+      name === "bairro" ||
+      name === "cep" ||
+      name === "cidade"
+    ) {
+      setForm((prev) => ({
+        ...prev,
+        enderecoInstManu: {
+          ...prev.enderecoInstManu,
+          [name]: rawValue,
+        },
+      }));
+      return;
+    }
+
+    // Textarea descrição
     if (name === "descricao") {
-      if (value.length <= 500) {
-        setForm((prev) => ({ ...prev, descricao: value }));
+      if (rawValue.length <= 500) {
+        setForm((prev) => ({ ...prev, descricao: rawValue }));
       }
       return;
     }
 
     // Inputs normais
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: rawValue }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Formulário de envio:", form);
     try {
-      await pedidosStore(form);
+      // ✅ CORREÇÃO: Converter quantidade de objeto para array
+      const quantidadeArray = form.codProdutos.map(
+        (codProduto) => form.quantidade[codProduto] || 1
+      );
+
+      const dadosParaEnviar = {
+        cod_cliente: Number(form.codCliente),
+        cod_endereco_cliente: form.codEnderecoCliente
+          ? Number(form.codEnderecoCliente)
+          : null,
+        pedido_tipos: form.pedidoTipos,
+        cod_produtos: form.codProdutos.map(Number), // garantir que são números
+        quantidade: quantidadeArray, // ✅ AGORA É UM ARRAY
+        descricao: form.descricao,
+        valor_total: Number(form.valorTotal),
+        valor_adicional: Number(form.valor_adicional) || 0,
+        prazo: form.prazo,
+        // ✅ Endereço só para INSTALACAO/MANUTENCAO
+        ...(form.pedidoTipos.includes("INSTALACAO") ||
+        form.pedidoTipos.includes("MANUTENCAO")
+          ? {
+              cidade: form.enderecoInstManu.cidade,
+              cep: form.enderecoInstManu.cep,
+              bairro: form.enderecoInstManu.bairro,
+              rua_numero: form.enderecoInstManu.rua_numero,
+            }
+          : {}),
+      };
+
+      console.log("Dados formatados para enviar:", dadosParaEnviar);
+
+      await pedidosStore(dadosParaEnviar);
       alert("Pedido cadastrado com sucesso!");
 
+      // Reset do form
       setForm({
         codCliente: "",
         codEnderecoCliente: "",
@@ -170,9 +230,16 @@ export default function Pedidos() {
           rua_numero: "",
         },
       });
+
+      // Voltar para lista e recarregar
+      setAbaAtiva("lista");
+      handleRecarregar();
     } catch (err) {
       console.error("Erro ao cadastrar:", err);
-      alert("Erro ao cadastrar pedido!");
+      alert(
+        "Erro ao cadastrar pedido: " +
+          (err.response?.data?.message || err.message)
+      );
     }
   };
 

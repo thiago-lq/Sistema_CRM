@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { clientesShow } from "../../services/clientesShow";
 
+
+
 export default function FormularioCadastro({
   handleSubmit,
   handleChange,
@@ -79,49 +81,53 @@ export default function FormularioCadastro({
             Código do Cliente
           </label>
           <div className="flex justify-between">
-          <input
-            type="number"
-            name="codCliente"
-            placeholder="Digite o código do cliente"
-            value={form.codCliente}
-            onChange={handleChange}
-            className="w-75 p-2 border border-gray-300 rounded-md
+            <input
+              type="number"
+              name="codCliente"
+              placeholder="Digite o código do cliente"
+              value={form.codCliente}
+              onChange={handleChange}
+              className="w-75 p-2 border border-gray-300 rounded-md
                        focus:ring-indigo-500 focus:border-indigo-500
                        appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          />
-          {cliente && cliente.cpf_cliente &&  (
-            <label className="text-lg text-gray-700 mx-10">
-              CPF: {cliente.cpf_cliente}
-            </label>
-          )}
+            />
+            {cliente && cliente.cpf_cliente && (
+              <label className="text-lg text-gray-700 mx-10">
+                CPF: {cliente.cpf_cliente}
+              </label>
+            )}
           </div>
         </div>
 
-        {cliente && cliente.enderecos && form.pedidoTipos.includes("PRODUTO") &&(
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Endereço de Entrega
-            </label>
-            <select
-              name="codEnderecoCliente"
-              value={form.codEnderecoCliente}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md 
+        {cliente &&
+          cliente.endereco &&
+          form.pedidoTipos.includes("PRODUTO") && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Endereço de Entrega
+              </label>
+              <select
+                name="codEnderecoCliente"
+                value={form.codEnderecoCliente ?? ""}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md 
                          focus:ring-indigo-500 focus:border-indigo-500 hover:cursor-pointer"
-              required
-            >
-              <option disabled>Selecione um endereço</option>
-              {cliente.enderecos.map((e) => (
-                <option
-                  key={e.cod_endereco_cliente}
-                  value={e.cod_endereco_cliente}
-                >
-                  {e.rua_numero} - {e.bairro} - {e.cidade} - {e.cep}
+                required
+              >
+                <option disabled value="">
+                  Selecione um endereço
                 </option>
-              ))}
-            </select>
-          </div>
-        )}
+                {cliente.endereco?.map((e) => (
+                  <option
+                    key={e.cod_endereco_cliente}
+                    value={e.cod_endereco_cliente}
+                  >
+                    {e.rua_numero} - {e.bairro} - {e.cidade} - {e.cep}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
         {/* Produtos (somente se selecionou PRODUTO) */}
         {form.pedidoTipos.includes("PRODUTO") && (
