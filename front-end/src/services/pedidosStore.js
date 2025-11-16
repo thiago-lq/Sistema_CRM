@@ -1,5 +1,4 @@
-import api from ".//api";
-import { supabase } from "./supabase";
+import api from ".//api";   
 
 export async function pedidosStore(dados = {}) {
     try {

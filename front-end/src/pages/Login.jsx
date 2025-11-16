@@ -1,97 +1,42 @@
 // src/pages/Login.jsx
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../services/supabase";
 import Bar from "../components/Bar";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showForgot, setShowForgot] = useState(false);
-  const [adminKey, setAdminKey] = useState("");
-  const [forgotUsername, setForgotUsername] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // >>> NOVO <<<
-  const [primeiroAcesso, setPrimeiroAcesso] = useState(false);
-  const [novaSenhaAdm, setNovaSenhaAdm] = useState("");
-
-  // cria user admin inicial fixo (usuário = 1, senha = 1)
-  useEffect(() => {
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const adminExistente = users.find((u) => u.username === "1");
-    if (!adminExistente) {
-      localStorage.setItem("users", JSON.stringify([{ username: "1", password: "1" }]));
-    }
-
-    // define chave ADM fixa como 1
-    localStorage.setItem("senhaAdm", "1");
-  }, []);
-
-  async function enviarFormulario(e) {
+  async function handleLogin(e) {
     e.preventDefault();
     setLoading(true);
-    try {
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      const user = users.find((u) => u.username === username && u.password === password);
+    setError("");
 
-      if (!user) {
-        alert("Usuário ou senha inválidos.");
-        setLoading(false);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password
+      });
+
+      if (error) {
+        setError(error.message);
         return;
       }
 
-      // >>> BLOQUEIO: só navega se for login correto
-      if (username === "1" && password === "1") {
+      if (data.user) {
+        // Login bem-sucedido - redireciona para página inicial
         navigate("/PaginaInicial");
-      } else {
-        alert("Apenas o administrador pode acessar o sistema (usuário e senha = 1).");
       }
     } catch (err) {
-      console.error("Erro:", err.message);
+      setError("Erro inesperado. Tente novamente.");
+      console.error("Erro no login:", err);
     } finally {
       setLoading(false);
     }
-  }
-
-  // chave ADM fixa como 1
-  const ADM_KEY = "1";
-
-  const abrirForgot = () => {
-    setForgotUsername("");
-    setAdminKey("");
-    setNewPassword("");
-    setShowForgot(true);
-  };
-
-  const handleResetPassword = (e) => {
-    e.preventDefault();
-    if (adminKey !== ADM_KEY) {
-      alert("Chave ADM incorreta. Apenas o dono/gerente pode autorizar a troca.");
-      return;
-    }
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const idx = users.findIndex((u) => u.username === forgotUsername);
-    if (idx === -1) {
-      alert("Usuário não encontrado.");
-      return;
-    }
-    users[idx].password = newPassword;
-    localStorage.setItem("users", JSON.stringify(users));
-    alert("Senha alterada com sucesso.");
-    setShowForgot(false);
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
-          alt="Loading..."
-        />
-      </div>
-    );
   }
 
   return (
@@ -101,27 +46,40 @@ export default function Login() {
       </div>
 
       <div className="flex items-center justify-center min-h-[calc(100vh-80px)] bg-gray-100 mt-12">
-        <div className="w-full max-w-sm bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-            Acesso ao CRM
-          </h2>
+        <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+              Acesso ao Sistema
+            </h2>
+            <p className="text-gray-600">
+              Utilize seu email e senha para acessar o sistema.
+            </p>
+          </div>
 
-          <form onSubmit={enviarFormulario}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-black mb-1">
-                Usuário
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
               </label>
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg"
-                placeholder="Digite seu nome de usuário"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="seu@email.com"
+                disabled={loading}
               />
             </div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Senha
               </label>
               <input
@@ -129,86 +87,36 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg"
-                placeholder="********"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Sua senha"
+                disabled={loading}
               />
             </div>
+
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 hover:cursor-pointer"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed transition-colors"
             >
-              ENTRAR
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Entrando...
+                </div>
+              ) : (
+                "ENTRAR"
+              )}
             </button>
           </form>
 
-          <div className="text-center mt-4">
-            <button
-              onClick={abrirForgot}
-              className="text-sm text-indigo-600 hover:text-indigo-800 hover:cursor-pointer"
-            >
-              Esqueci minha senha
-            </button>
+          <div className="mt-6 text-center text-sm text-gray-600">
+            <p>Sistema protegido por autenticaçãoa</p>
           </div>
         </div>
       </div>
-
-      {showForgot && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
-            <h3 className="text-xl font-bold mb-4">
-              Recuperar senha (autorização ADM)
-            </h3>
-            <form onSubmit={handleResetPassword} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Nome do usuário
-                </label>
-                <input
-                  value={forgotUsername}
-                  onChange={(e) => setForgotUsername(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Chave ADM (dono/gerente)
-                </label>
-                <input
-                  value={adminKey}
-                  onChange={(e) => setAdminKey(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Nova senha
-                </label>
-                <input
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => setShowForgot(false)}
-                  className="px-4 py-2 bg-gray-200 rounded"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded"
-                >
-                  Confirmar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
