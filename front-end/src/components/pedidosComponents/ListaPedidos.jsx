@@ -6,7 +6,6 @@ export default function ListaPedidos({
   setPedidoSelecionado,
   setAbaAtiva,
   pedidos,
-  handleEditar,
   handleExcluir,
   handleRecarregar,
   loading,
@@ -183,15 +182,6 @@ export default function ListaPedidos({
                           className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
                         >
                           Ver
-                        </button>
-                        <button
-                          onClick={() => {
-                            handleEditar(pedido);
-                            setAbaAtiva("editar");
-                          }}
-                          className="bg-yellow-500 hover:bg-yellow-600 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
-                        >
-                          Editar
                         </button>
                         <button
                           onClick={() => handleExcluir(pedido.cod_pedido)}

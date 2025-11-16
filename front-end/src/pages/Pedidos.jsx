@@ -3,13 +3,11 @@ import {
   PedidosCadastro,
   DetalhesPedidos,
   ListaPedidos,
-  EditarPedidos,
 } from "../components/pedidosComponents";
 
 import { pedidosIndex } from "../services/pedidosIndex";
 import { pedidosStore } from "../services/pedidosStore";
 import { pedidosShow } from "../services/pedidosShow";
-import { pedidosUpdate } from "../services/pedidosUpdate";
 import { pedidosDelete } from "../services/pedidosDelete";
 
 import { produtosIndex } from "../services/produtosIndex";
@@ -298,9 +296,6 @@ export default function Pedidos() {
     produtos,
   };
 
-  const propsEditar = {
-};
-
   const propsDetalhes = {
     pedidoSelecionado,
     setAbaAtiva,
@@ -338,7 +333,6 @@ export default function Pedidos() {
         <div className="p-4">
           {abaAtiva === "lista" && <ListaPedidos {...propsLista} />}
           {abaAtiva === "cadastro" && <PedidosCadastro {...propsCadastro} />}
-          {abaAtiva === "editar" && <EditarPedidos {...propsEditar} />}
           {abaAtiva === "detalhes" && <DetalhesPedidos {...propsDetalhes} />}
         </div>
       </div>

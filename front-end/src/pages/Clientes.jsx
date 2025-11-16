@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { CadastroClientes, DetalhesClientes, ListaClientes, EditarClientes, } from "../components/clientesComponents";
 import { clientesIndex } from "../services/clientesIndex";
 import { clientesStore } from "../services/clientesStore";
-import { clientesShow } from "../services/clientesShow";
 import { clientesUpdate } from "../services/clientesUpdate";
 import { clientesDelete } from "../services/clientesDelete";
 
@@ -111,12 +110,7 @@ export default function Clientes() {
     const timeout = setTimeout(() => {
       setLoading(true);
       async function carregarClientes() {
-        if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
-          // é número
-          const dados = await clientesShow(Number(termoBusca));
-          setLoading(false);
-          setClientes(dados?.cod_cliente ? [dados] : []);
-        } else if (termoBusca.trim().length > 0) {
+        if (termoBusca.trim().length > 0) {
           // é texto
           const dados = await clientesIndex({ cpf: termoBusca });
           setLoading(false);
@@ -135,12 +129,7 @@ export default function Clientes() {
 
   const handleRecarregar = async () => {
     setLoading(true);
-    if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
-      // é número
-      const dados = await clientesShow(Number(termoBusca));
-      setLoading(false);
-      setClientes(dados?.cod_cliente ? [dados] : []);
-    } else if (termoBusca.trim().length > 0) {
+    if (termoBusca.trim().length > 0) {
       // é texto
       const dados = await clientesIndex({ cpf: termoBusca });
       setLoading(false);

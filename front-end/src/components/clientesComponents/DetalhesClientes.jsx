@@ -13,12 +13,15 @@ export default function DetalhesClientes({ clienteSelecionado, setModo }) {
           Detalhes do Cliente #{clienteSelecionado.cod_cliente}
         </h2>
 
-        <div className="grid grid-cols-2 gap-6 text-gray-700">
+        <div className="grid grid-cols-3 gap-6 text-gray-700">
           <p>
             <strong>Nome:</strong> {clienteSelecionado.nome}
           </p>
           <p>
             <strong>Email:</strong> {clienteSelecionado.email}
+          </p>
+          <p>
+            <strong>CPF:</strong> {clienteSelecionado.cpf_cliente}
           </p>
         </div>
 
