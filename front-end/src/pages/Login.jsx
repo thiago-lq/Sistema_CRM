@@ -113,7 +113,7 @@ export default function Login() {
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
-            <p>Sistema protegido por autenticaçãoa</p>
+            <p>Sistema protegido por autenticação</p>
           </div>
         </div>
       </div>
