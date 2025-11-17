@@ -260,6 +260,10 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
               </p>
             </div>
           </div>
+          <p className="w-full gap-2">
+          <span className="font-medium">Descrição: </span>
+          {pedidoSelecionado.descricao || "-"}
+          </p>
         </div>
       </div>
 
