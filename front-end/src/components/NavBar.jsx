@@ -1,7 +1,6 @@
 import empresa from "../assets/icone_empresa.png";
 import cliente from "../assets/icone_clientes.png";
 import pedidos from "../assets/icone_pedidos.png";
-import relatorios from "../assets/icone_relatorios.png";
 import logout from "../assets/icone_logout.png";
 
 import { useNavigate } from "react-router-dom";
@@ -9,7 +8,6 @@ import { useState, useEffect, useRef } from "react";
 
 import Inicio from "../pages/Inicio";
 import Clientes from "../pages/Clientes";
-import Relatorios from "./Relatorios";
 import Pedidos from "../pages/Pedidos";
 
 const LinkStyle =
@@ -80,11 +78,6 @@ export default function NavBar() {
             <img src={cliente} alt="clientes" className="h-[2.5rem]" />
             <span className="text-xs mt-1 font-medium">CLIENTES</span>
           </button>
-
-          <button onClick={() => setTab("relatorios")} className={LinkStyle}>
-            <img src={relatorios} alt="relatorios" className="h-[2.5rem]" />
-            <span className="text-xs mt-1 font-medium">RELATORIOS</span>
-          </button>
           <button onClick={() => navigate("/")} className={LinkStyle}>
             <img src={logout} alt="logout" className="h-[2.5rem]" />
             <span className="text-xs mt-1 font-medium">LOGOUT</span>
@@ -95,7 +88,6 @@ export default function NavBar() {
         {tab === "inicio" && <Inicio setTab={setTab} />}
         {tab === "pedidos" && <Pedidos />}
         {tab === "clientes" && <Clientes />}
-        {tab === "relatorios" && <Relatorios />}
       </div>
     </div>
   );
