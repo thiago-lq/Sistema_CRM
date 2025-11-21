@@ -8,17 +8,29 @@ use Illuminate\Support\Facades\DB;
 class ClienteController extends Controller
 {
 
-    // Controlador que busca os todos os clientes, ou busca um cliente específico pelo nome
+    // Controlador que busca os todos os clientes, ou busca um cliente específico pelo cpf ou cnpj
 
     public function index(Request $request) {
-        
-        $cpf = $request->query('cpf');
+        // Verifica se o request contém o filtro de busca para cpf ou cnpj
+        if ($request->query('cpf')) {
+            $cpf = $request->query('cpf');
+        } else if ($request->query('cnpj')) {
+            $cnpj = $request->query('cnpj');
+        } else {
+            return response()->json(['message' => 'Nenhum filtro de busca'], 400);
+        }
 
+        // Busca os clientes pra cada caso, se for cpf, se for cnpj ou se não tiver filtro
         if ($cpf) {
             $result = DB::select("SELECT c.*, t.TELEFONE, e.CIDADE, e.CEP, e.BAIRRO, e.RUA_NUMERO FROM CLIENTES c 
             LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
             LEFT JOIN ENDERECOS_CLIENTES e ON c.COD_CLIENTE = e.COD_CLIENTE
             WHERE c.CPF_CLIENTE ILIKE ? ORDER BY c.COD_CLIENTE", ["%$cpf%"]);
+        } else if ($cnpj) {
+            $result = DB::select("SELECT c.*, t.TELEFONE, e.CIDADE, e.CEP, e.BAIRRO, e.RUA_NUMERO FROM CLIENTES c 
+            LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
+            LEFT JOIN ENDERECOS_CLIENTES e ON c.COD_CLIENTE = e.COD_CLIENTE
+            WHERE c.CNPJ_CLIENTE ILIKE ? ORDER BY c.COD_CLIENTE", ["%$cnpj%"]);
         } else {
             $result = DB::select("SELECT c.*, t.TELEFONE, e.CIDADE, e.CEP, e.BAIRRO, e.RUA_NUMERO FROM CLIENTES c 
             LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
@@ -26,17 +38,22 @@ class ClienteController extends Controller
             ORDER BY c.COD_CLIENTE");
         }
 
+        // Se não encontrar nenhum cliente, retorna uma mensagem de erro
         if (!$result) {
             return response()->json(['message' => 'Nenhum cliente encontrado'], 404);
         }
 
+        // Cria um array de clientes, onde a chave é o ID do cliente
         $clientes = [];
+        // Percorre cada cliente no resultado da consulta, como se fosse uma linha "row"
         foreach ($result as $row) {
             $id = $row->cod_cliente;
+            // Verifica se o cliente já existe no array, se não existe, cria a estrutura básica para ele, se existe passa adiante
             if (!isset($clientes[$id])) {
                 $clientes[$id] = [
                     'cod_cliente' => $row->cod_cliente,
                     'cpf_cliente' => $row->cpf_cliente,
+                    'cnpj_cliente' => $row->cnpj_cliente,
                     'email' => $row->email,
                     'nome' => $row->nome,
                     'data_nascimento' => $row->data_nascimento,
@@ -44,17 +61,21 @@ class ClienteController extends Controller
                     'enderecos' => [],
                 ];
             }
+            // Verifica se a query retornou a coluna telefone ou se ela veio nula.
             if (isset($row->telefone) && $row->telefone && !in_array($row->telefone, $clientes[$id]['telefones'])) {
                 $clientes[$id]['telefones'][] = $row->telefone;
             }
 
+            // Verifica se a query retornou a coluna cidade ou se ela veio nula.
             if (isset($row->cidade) && $row->cidade) {
+                // Cria a estrutura para o endereço
                 $endereco = [
                     'cidade' => $row->cidade,
                     'cep' => $row->cep,
                     'bairro' => $row->bairro,
                     'rua_numero' => $row->rua_numero,
                 ];
+                // Verifica se o endereço já existe no array de endereços do cliente, se não existe, adiciona
                 if (!in_array($endereco, $clientes[$id]['enderecos'])) {
                     $clientes[$id]['enderecos'][] = $endereco;
                 }
@@ -66,16 +87,29 @@ class ClienteController extends Controller
     // Controlador que busca um cliente pelo seu ID
 
     public function show($id) {
-        $cliente = DB::select("SELECT * FROM CLIENTES WHERE COD_CLIENTE = ?", [$id]);
+        // Verifica se o ID enviado é um CPF ou CNPJ
+        if (strlen($id) == 11) {
+            $cliente = DB::select("SELECT * FROM CLIENTES WHERE CPF_CLIENTE = ?", [$id]);
+        } else if (strlen($id) == 14) {
+            $cliente = DB::select("SELECT * FROM CLIENTES WHERE CNPJ_CLIENTE = ?", [$id]);
+        } else {
+            return response()->json(['message' => 'Formato inválido'], 400);
+        }
+
+        // Se não encontrar nenhum cliente, retorna uma mensagem de erro
         if (!$cliente) {
             return response()->json(['message' => 'Cliente não encontrado'], 404);
         }
 
-        $telefones = DB::select("SELECT * FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
-        $enderecos = DB::select("SELECT * FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
+        // Busca os telefones e endereços do cliente
+        $telefones = DB::select("SELECT * FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$cliente->cod_cliente]);
+        $enderecos = DB::select("SELECT * FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$cliente->cod_cliente]);
 
+        // Define o cliente como um array
         $cliente = $cliente[0];
+        // Mapeia cada telefone para o array
         $cliente->telefones = array_map(fn($t) => $t->telefone, $telefones);
+        // Mapeia cada endereço para o array
         $cliente->enderecos = array_map(fn($e) => [
             'cod_endereco_cliente' => $e->cod_endereco_cliente,
             'cidade' => $e->cidade,
@@ -90,19 +124,25 @@ class ClienteController extends Controller
     // Controlador que cadastra um cliente
 
     public function store(Request $request) {
+        // Verifica se o request contém os dados do cliente
         $cpf = $request->input('cpf');
+        $cnpj = $request->input('cnpj');
         $email = $request->input('email');
         $nome = $request->input('nome');
         $dataNascimento = $request->input('data_nascimento');
         $telefones = $request->input('telefones');
         $enderecos = $request->input('enderecos', []);
 
+        // Verifica se os telefones não estão vazios e são um array de strings
         if (!empty($telefones) && is_string($telefones[0] ?? null)) {
+            // Mapeia cada telefone para um array com a chave "telefone"
             $telefones = array_map(fn($t) => ['telefone' => $t], $telefones);
         }
-
+        
+        // Valida os dados do cliente
         $request->validate([
-            'cpf' => 'required|size:11|unique:clientes,cpf_cliente',
+            'cpf' => 'nullable|size:11|unique:clientes,cpf_cliente',
+            'cnpj' => 'nullable|size:14|unique:clientes,cnpj_cliente',
             'email' => 'required|email|max:100',
             'nome' => 'required|string|max:100',
             'data_nascimento' => 'required|date',
@@ -112,6 +152,8 @@ class ClienteController extends Controller
             'enderecos.*.bairro' => 'required|string|max:100',
             'enderecos.*.rua_numero' => 'required|string|max:100',
         ]);
+
+        // Gera um ID aleatório para o cliente
         do {
             $codCliente = random_int(1, 999999);
             $exists = DB::select("SELECT 1 FROM CLIENTES WHERE COD_CLIENTE = ?", [$codCliente]);
@@ -119,23 +161,29 @@ class ClienteController extends Controller
 
         DB::beginTransaction();
 
+        // Inicia a transação, tentando inserir os dados do cliente
         try {
-            DB::insert("INSERT INTO CLIENTES (COD_CLIENTE, CPF_CLIENTE, EMAIL, NOME, DATA_NASCIMENTO) VALUES (?, ?, ?, ?, ?)", 
-            [$codCliente, $cpf, $email, $nome, $dataNascimento]);
+            DB::insert("INSERT INTO CLIENTES (COD_CLIENTE, CPF_CLIENTE, CNPJ_CLIENTE, EMAIL, NOME, DATA_NASCIMENTO) VALUES (?, ?, ?, ?, ?, ?)", 
+            [$codCliente, $cpf, $cnpj, $email, $nome, $dataNascimento]);
 
+            // Insere os endereços do cliente
             foreach ($enderecos as $end) {
                 DB::insert("INSERT INTO ENDERECOS_CLIENTES (COD_CLIENTE, CIDADE, CEP, BAIRRO, RUA_NUMERO) VALUES (?, ?, ?, ?, ?)",
                 [$codCliente, $end['cidade'], $end['cep'], $end['bairro'], $end['rua_numero']]);
             }
             
+            // Insere os telefones do cliente
             foreach ($telefones as $t) {
                 DB::insert("INSERT INTO TELEFONES_CLIENTES (COD_CLIENTE, TELEFONE) VALUES (?, ?)", [$codCliente, $t['telefone']]);
             }
 
             DB::commit();
 
+            // Commita a transação e retorna os dados do cliente com sucesso
             return response()->json(['message' => 'Cliente cadastrado com sucesso!', 'cod_cliente' => $codCliente, 'telefones' => $telefones], 201);
         } catch (\Exception $e) {
+
+            // Rollback a transação e retorna uma mensagem de erro
             DB::rollBack();
             return response()->json(['message' => 'Erro ao cadastrar o cliente', 'error' => $e->getMessage()], 500);
         }
@@ -144,19 +192,24 @@ class ClienteController extends Controller
     // Controlador que atualiza os dados de um cliente
 
     public function update(Request $request, $id) {
+        // Verifica se o request contém os dados do cliente
         $cpf = $request->input('cpf');
+        $cnpj = $request->input('cnpj');
         $email = $request->input('email');
         $nome = $request->input('nome');
         $dataNascimento = $request->input('data_nascimento');
         $telefones = $request->input('telefones');
         $enderecos = $request->input('enderecos', []);
 
+        // Verifica se os telefones não estão vazios e são um array de strings
         if (!empty($telefones) && is_string($telefones[0] ?? null)) {
             $telefones = array_map(fn($t) => ['telefone' => $t], $telefones);
         }
 
+        // Valida os dados do cliente
         $request->validate([
-            'cpf' => 'required|size:11|unique:clientes,cpf_cliente,' . $id . ',cod_cliente',
+            'cpf' => 'nullable|size:11|unique:clientes,cpf_cliente,' . $id . ',cod_cliente',
+            'cnpj' => 'nullable|size:14|unique:clientes,cnpj_cliente,' . $id . ',cod_cliente',
             'email' => 'required|email|max:100',
             'nome' => 'required|string|max:100',
             'data_nascimento' => 'required|date',
@@ -168,26 +221,31 @@ class ClienteController extends Controller
         ]);
 
         DB::beginTransaction();
-
+        // Inicia a transação, tentando atualizar os dados do cliente
         try {
-            DB::update("UPDATE CLIENTES SET CPF_CLIENTE = ?, EMAIL = ?, NOME = ?, DATA_NASCIMENTO = ? WHERE COD_CLIENTE = ?",
-            [$cpf, $email, $nome, $dataNascimento, $id]);
+            // Atualiza os dados do cliente
+            DB::update("UPDATE CLIENTES SET CPF_CLIENTE = ?, CNPJ_CLIENTE = ?, EMAIL = ?, NOME = ?, DATA_NASCIMENTO = ? WHERE COD_CLIENTE = ?",
+            [$cpf, $cnpj, $email, $nome, $dataNascimento, $id]);
 
             DB::delete("DELETE FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
+            // Insere os endereços do cliente, apagando os anteriores
             foreach($enderecos as $end) {
                 DB::insert("INSERT INTO ENDERECOS_CLIENTES (COD_CLIENTE, CIDADE, CEP, BAIRRO, RUA_NUMERO) VALUES (?, ?, ?, ?, ?)",
                 [$id, $end['cidade'], $end['cep'], $end['bairro'], $end['rua_numero']]);
             }
 
             DB::delete("DELETE FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
+            // Insere os telefones do cliente, apagando os anteriores
             foreach($telefones as $t) {
                 DB::insert("INSERT INTO TELEFONES_CLIENTES (COD_CLIENTE, TELEFONE) VALUES (?, ?)", [$id, $t['telefone']]);
             }
 
+            // Commita a transação e retorna uma mensagem de sucesso
             DB::commit();
             return response()->json(['message' => 'Cliente atualizado com sucesso!'], 201);
 
         } catch (\Exception $e) {
+            // Rollback a transação e retorna uma mensagem de erro
             DB::rollBack();
             return response()->json(['message' => 'Erro ao atualizar o cliente', 'error' => $e->getMessage()], 500);
         }
@@ -196,14 +254,15 @@ class ClienteController extends Controller
     // Controlador que exclui um cliente
 
     public function destroy($id) {
-        
+        // Inicia a transação, tentando excluir o cliente
         DB::beginTransaction();
         
         try {
+            // Exclui o cliente
             $deleted = DB::delete("DELETE FROM CLIENTES WHERE COD_CLIENTE = ?", [$id]);
 
             DB::commit();
-
+            // Commita a transação e retorna uma mensagem de sucesso ou cliente não encontrado
             if ($deleted) {
                 return response()->json(['message' => 'Cliente excluído com sucesso!'], 200);
             } else {
@@ -211,6 +270,7 @@ class ClienteController extends Controller
             }
 
         } catch (\Exception $e) {
+            // Rollback a transação e retorna uma mensagem de erro
             DB::rollBack();
             return response()->json(['message' => 'Erro ao excluir o cliente', 'error' => $e->getMessage()], 500);
         }

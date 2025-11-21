@@ -11,7 +11,8 @@ return new class extends Migration
         DB::statement("
           CREATE TABLE CLIENTES(
             COD_CLIENTE INT PRIMARY KEY,
-            CPF_CLIENTE CHAR(11) NOT NULL UNIQUE,
+            CPF_CLIENTE CHAR(11) UNIQUE,
+            CNPJ_CLIENTE CHAR(14) UNIQUE,
             EMAIL VARCHAR(100) NOT NULL,
             NOME VARCHAR(100) NOT NULL,
             DATA_NASCIMENTO DATE NOT NULL,
