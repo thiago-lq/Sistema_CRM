@@ -141,15 +141,25 @@ class ClienteController extends Controller
         
         // Valida os dados do cliente
         $request->validate([
+            // Valida se o cpf é não nulo, string, existe no banco de dados e com no máximo 11 caracteres
             'cpf' => 'nullable|size:11|unique:clientes,cpf_cliente',
+            // Valida se o cnpj é não nulo, string, existe no banco de dados e com no máximo 14 caracteres
             'cnpj' => 'nullable|size:14|unique:clientes,cnpj_cliente',
+            // Valida se o email é não nulo, string, com no máximo 100 caracteres e é um email válido
             'email' => 'required|email|max:100',
+            // Valida se o nome é não nulo, string, com no máximo 100 caracteres
             'nome' => 'required|string|max:100',
+            // Valida se a data de nascimento é não nula e é uma data válida
             'data_nascimento' => 'required|date',
+            // Valida se os telefones não estão vazios e com tamanho 11
             'telefones.*.telefone' => 'required|string|size:11',
+            // Valida se os endereços não estão vazios e com tamanho 100
             'enderecos.*.cidade' => 'required|string|max:100',
+            // Valida se os endereços não estão vazios e com tamanho 8
             'enderecos.*.cep' => 'required|size:8',
+            // Valida se os endereços não estão vazios e com tamanho 100
             'enderecos.*.bairro' => 'required|string|max:100',
+            // Valida se os endereços não estão vazios e com tamanho 100
             'enderecos.*.rua_numero' => 'required|string|max:100',
         ]);
 
@@ -208,15 +218,25 @@ class ClienteController extends Controller
 
         // Valida os dados do cliente
         $request->validate([
+            // Valida se o cpf é não nulo, string, existe no banco de dados e com no máximo 11 caracteres
             'cpf' => 'nullable|size:11|unique:clientes,cpf_cliente,' . $id . ',cod_cliente',
+            // Valida se o cnpj é não nulo, string, existe no banco de dados e com no máximo 14 caracteres
             'cnpj' => 'nullable|size:14|unique:clientes,cnpj_cliente,' . $id . ',cod_cliente',
+            // Valida se o email é não nulo, string, com no máximo 100 caracteres e é um email válido
             'email' => 'required|email|max:100',
+            // Valida se o nome é não nulo, string, com no máximo 100 caracteres
             'nome' => 'required|string|max:100',
+            // Valida se a data de nascimento é não nula e é uma data válida
             'data_nascimento' => 'required|date',
+            // Valida se os telefones não estão vazios e com tamanho 11
             'telefones.*.telefone' => 'required|string|size:11',
+            // Valida se os endereços não estão vazios e com tamanho 100
             'enderecos.*.cidade' => 'required|string|max:100',
+            // Valida se os endereços não estão vazios e com tamanho 8
             'enderecos.*.cep' => 'required|size:8',
+            // Valida se os endereços não estão vazios e com tamanho 100
             'enderecos.*.bairro' => 'required|string|max:100',
+            // Valida se os endereços não estão vazios e com tamanho 100
             'enderecos.*.rua_numero' => 'required|string|max:100',
         ]);
 
