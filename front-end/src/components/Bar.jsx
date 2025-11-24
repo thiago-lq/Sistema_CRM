@@ -1,6 +1,7 @@
 import empresa from "../assets/icone_empresa.png";
 
 export default function Bar(){
+  {/* Componente que renderiza a barra de navegação no login */}
   return(
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-md flex items-center justify-between px-5 py-0 z-50">
       <div className="flex items-center space-x-3">

@@ -34,13 +34,6 @@ Route::middleware('auth.funcionario')->group(function() {
     Route::get('/pagamentos_clientes', [PagamentosClientesController::class, 'index']);
     Route::get('/pagamentos_clientes/{id1}/{id2}', [PagamentosClientesController::class, 'show']);
 
-    // Rotas de Relatórios
-    Route::get('/relatorios', [RelatorioController::class, 'index']);
-    Route::get('/relatorios/{id}', [RelatorioController::class, 'show']);
-    Route::post('/relatorios', [RelatorioController::class, 'store']);
-    Route::put('/relatorios/{id}', [RelatorioController::class, 'update']);
-    Route::delete('/relatorios/{id}', [RelatorioController::class, 'destroy']);
-
     // Rotas de Produtos
     Route::get('/produtos', [ProdutoController::class, 'index']);
 });

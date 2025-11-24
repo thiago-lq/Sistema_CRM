@@ -9,21 +9,24 @@ import { useState, useEffect, useRef } from "react";
 import Inicio from "../pages/Inicio";
 import Clientes from "../pages/Clientes";
 import Pedidos from "../pages/Pedidos";
-
+// Constante que armazena os styles.css que serão aplicados ao componente
 const LinkStyle =
   "flex flex-col items-center p-2 rounded-lg text-gray-700 hover:opacity-60 hover:cursor-pointer transition-all duration-300";
 
 export default function NavBar() {
+  // Constantes que serão utilizadas no componente
   const [tab, setTab] = useState("inicio");
   const navigate = useNavigate();
   const [showNavbar, setShowNavbar] = useState(true);
   const lastScrollY = useRef(0);
   const timeoutRef = useRef(null);
 
+  // Escuta que o usuário rola para cima ou para baixo
   useEffect(() => {
     function handleScroll() {
       const currentScroll = window.scrollY;
 
+      // Rolando para baixo
       if (currentScroll > lastScrollY.current && currentScroll > 100) {
         setShowNavbar(false);
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -42,16 +45,19 @@ export default function NavBar() {
 
       lastScrollY.current = currentScroll;
     }
-
+    // Adiciona o listener
     window.addEventListener("scroll", handleScroll);
     return () => {
+      // Remove o listener
       window.removeEventListener("scroll", handleScroll);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
+    // Apenas executa quando a condição for alterada
   }, [showNavbar]);
 
   return (
     <div>
+      {/* Componente que renderiza a barra de navegação */}
       <nav
         className={`fixed top-0 left-0 right-0 bg-white shadow-lg flex items-center justify-around px-0 py-4 z-50
          transition-transform duration-300 ${
@@ -84,6 +90,7 @@ export default function NavBar() {
           </button>
         </div>
       </nav>
+      {/* Componente que renderiza o conteúdo do componente */}
       <div className="mb-10">
         {tab === "inicio" && <Inicio setTab={setTab} />}
         {tab === "pedidos" && <Pedidos />}

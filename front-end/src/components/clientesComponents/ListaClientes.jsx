@@ -13,6 +13,7 @@ export default function ListaClientes({
 }) {
   return (
     <div>
+      {/* Componente que vai ser renderizado no componente principal */}
       <div className="flex flex-row items-center justify-between mb-8">
         <h2 className="text-4xl font-bold text-gray-800 flex items-center gap-3">
           Clientes

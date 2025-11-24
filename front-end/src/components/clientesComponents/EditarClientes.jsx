@@ -22,7 +22,9 @@ export default function EditarClientes({
       </button>
       <div className="flex flex-col justify-between mb-10 items-center w-full">
         <p className="font-semibold text-3xl ">Editar Clientes</p>
-        <p className="text-gray-500 mt-1">Atualize os dados do cliente abaixo</p>
+        <p className="text-gray-500 mt-1">
+          Atualize os dados do cliente abaixo
+        </p>
       </div>
       <form onSubmit={handleSubmitEditar} className="space-y-4">
         <div className="grid grid-cols-4 gap-4 px-30">
@@ -50,33 +52,49 @@ export default function EditarClientes({
               required
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">CPF</label>
-            <input
-              type="text"
-              name="cpf"
-              value={clienteEditar.cpf_cliente}
-              onChange={handleChangeEditar}
-              className="w-full p-2 border rounded-lg"
-              required
-            />
-          </div>
-          <div className="flex items-center justify-center">
-          <div className="relative">
-            <label className="block text-sm font-medium mb-1">
-              Data de Nascimento
-            </label>
-            <input
-              type="date"
-              name="data_nascimento"
-              value={clienteEditar.data_nascimento}
-              onChange={handleChangeEditar}
-              className="p-2 border rounded-lg max-w"
-              required
-            />
-          </div>
-        </div>
+          {clienteEditar.cpf_cliente && (
+            <div>
+              <label className="block text-sm font-medium mb-1">CPF</label>
+              <input
+                type="text"
+                name="cpf_cliente"
+                value={clienteEditar.cpf_cliente}
+                onChange={handleChangeEditar}
+                className="w-full p-2 border rounded-lg"
+                required
+              />
+            </div>
+          )}
+          {clienteEditar.data_nascimento && (
+            <div className="flex items-center justify-center">
+              <div className="relative">
+                <label className="block text-sm font-medium mb-1">
+                  Data de Nascimento
+                </label>
+                <input
+                  type="date"
+                  name="data_nascimento"
+                  value={clienteEditar.data_nascimento}
+                  onChange={handleChangeEditar}
+                  className="p-2 border rounded-lg max-w"
+                  required
+                />
+              </div>
+            </div>
+          )}
+          {clienteEditar.cnpj_cliente && (
+            <div>
+              <label className="block text-sm font-medium mb-1">CNPJ</label>
+              <input
+                type="text"
+                name="cnpj_cliente"
+                value={clienteEditar.cnpj_cliente}
+                onChange={handleChangeEditar}
+                className="w-full p-2 border rounded-lg"
+                required
+              />
+            </div>
+          )}
         </div>
         <div className="flex px-30 flex-col mt-10 w-max gap-3">
           <div className="mt-1.5 space-x-3">
@@ -87,7 +105,7 @@ export default function EditarClientes({
                 onClick={adicionarCampoTelefone}
               >
                 <p className="text-lg px-2 mb-1">+</p>
-              </button> 
+              </button>
             )}
             {clienteEditar.telefones.length > minCamposTelefone && (
               <button

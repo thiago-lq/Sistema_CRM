@@ -1,5 +1,6 @@
 export default function Inicio({ setTab }) {
   return (
+    // Página inicial do sistema
     <div className="p-8 mt-35">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
@@ -10,7 +11,7 @@ export default function Inicio({ setTab }) {
             Visão rápida — abra a seção desejada clicando nos cards.
           </p>
         </div>
-
+        {/* Cards de acesso */}
         <div className="flex justify-center gap-6">
           <div
             className="p-6 bg-white rounded-2xl shadow-2xl hover:shadow-lg transition cursor-pointer"
@@ -36,8 +37,7 @@ export default function Inicio({ setTab }) {
         <div className="mt-8 bg-white p-6 rounded-xl shadow-2xl">
           <h3 className="text-lg font-semibold mb-2">Visão rápida</h3>
           <p className="text-gray-600">
-            Use os cards acima para acessar rapidamente Clientes, Pedidos e
-            Relatorios.
+            Use os cards acima para acessar rapidamente Clientes, Pedidos
           </p>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 export default function CadastroClientes({
   handleSubmit,
   handleChange,
@@ -12,24 +13,42 @@ export default function CadastroClientes({
   maxCamposEndereco,
   minCamposEndereco,
 }) {
+  // Constante que armazena o tipo de pessoa que está sendo cadastrado
+  const [pessoa, setPessoa] = useState("");
   return (
     <div>
-      <button
-        onClick={() => setModo("lista")}
-        className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition hover:cursor-pointer"
-      >
-        Voltar
-      </button>
+      {/* Componente que vai ser renderizado no componente principal */}
+      <div className="flex flex-row justify-between items-center">
+        <button
+          onClick={() => setModo("lista")}
+          className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition hover:cursor-pointer"
+        >
+          Voltar
+        </button>
+        {/* Select para o tipo de pessoa */}
+        <div>
+          <select
+            value={pessoa}
+            onChange={(e) => setPessoa(e.target.value)}
+            className="form-select"
+          >
+            <option value="" disabled>
+              Selecione o tipo de pessoa...
+            </option>
+            <option value="fisica">Pessoa Física</option>
+            <option value="juridica">Pessoa Jurídica</option>
+          </select>
+        </div>
+      </div>
       <div className="flex flex-col justify-between mb-10 items-center w-full">
         <p className="font-semibold text-3xl ">Cadastrar Cliente</p>
         <p className="text-gray-500 mt-1">Preencha os dados abaixo</p>
       </div>
+      {/* Formulário de cadastro */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-4 gap-5 px-30">
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Nome
-            </label>
+            <label className="block text-sm font-medium mb-1">Nome</label>
             <input
               type="text"
               name="nome"
@@ -50,19 +69,34 @@ export default function CadastroClientes({
               required
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">CPF</label>
-            <input
-              type="text"
-              name="cpf"
-              value={form.cpf}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="flex items-center justify-center">
+          {pessoa === "fisica" && (
+            <div>
+              <label className="block text-sm font-medium mb-1">CPF</label>
+              <input
+                type="text"
+                name="cpf"
+                value={form.cpf}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+          )}
+          {pessoa === "juridica" && (
+            <div>
+              <label className="block text-sm font-medium mb-1">CNPJ</label>
+              <input
+                type="text"
+                name="cnpj"
+                value={form.cnpj}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+          )}
+          { pessoa === "fisica" && (
+            <div className="flex items-center justify-center">
             <div className="relative">
               <label className="block text-sm font-medium mb-1">
                 Data de Nascimento
@@ -77,6 +111,7 @@ export default function CadastroClientes({
               />
             </div>
           </div>
+          )}
         </div>
         <div className="flex px-30 flex-col mt-10 w-max gap-3">
           <div className="mt-1.5">

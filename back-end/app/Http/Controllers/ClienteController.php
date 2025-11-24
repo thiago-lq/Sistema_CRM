@@ -12,12 +12,24 @@ class ClienteController extends Controller
 
     public function index(Request $request) {
         // Verifica se o request contém o filtro de busca para cpf ou cnpj
-        if ($request->query('cpf')) {
-            $cpf = $request->query('cpf');
-        } else if ($request->query('cnpj')) {
-            $cnpj = $request->query('cnpj');
-        } else {
-            return response()->json(['message' => 'Nenhum filtro de busca'], 400);
+        $termo = $request->query('termo');
+        $cpf = null;
+        $cnpj = null;
+
+        // Verifica se há termo de busca
+        if ($termo) {
+            // Remove caracteres não numéricos
+            $termoLimpo = preg_replace('/[^0-9]/', '', $termo);
+            $tamanho = strlen($termoLimpo);
+            
+            if ($tamanho == 11) {
+                $cpf = $termoLimpo;
+            } else if ($tamanho == 14) {
+                $cnpj = $termoLimpo;
+            } else {
+                // Se não for CPF/CNPJ válido, retorna erro
+                return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 400);
+            }
         }
 
         // Busca os clientes pra cada caso, se for cpf, se for cnpj ou se não tiver filtro
@@ -150,7 +162,7 @@ class ClienteController extends Controller
             // Valida se o nome é não nulo, string, com no máximo 100 caracteres
             'nome' => 'required|string|max:100',
             // Valida se a data de nascimento é não nula e é uma data válida
-            'data_nascimento' => 'required|date',
+            'data_nascimento' => 'nullable|date',
             // Valida se os telefones não estão vazios e com tamanho 11
             'telefones.*.telefone' => 'required|string|size:11',
             // Valida se os endereços não estão vazios e com tamanho 100
@@ -227,7 +239,7 @@ class ClienteController extends Controller
             // Valida se o nome é não nulo, string, com no máximo 100 caracteres
             'nome' => 'required|string|max:100',
             // Valida se a data de nascimento é não nula e é uma data válida
-            'data_nascimento' => 'required|date',
+            'data_nascimento' => 'nullable|date',
             // Valida se os telefones não estão vazios e com tamanho 11
             'telefones.*.telefone' => 'required|string|size:11',
             // Valida se os endereços não estão vazios e com tamanho 100

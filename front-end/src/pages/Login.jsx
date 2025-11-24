@@ -1,21 +1,24 @@
-// src/pages/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import Bar from "../components/Bar";
 
+// Página de Login
 export default function Login() {
+  // Constantes que serão utilizadas no componente
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // Função que será chamada ao clicar no botão de login
   async function handleLogin(e) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
+    // Validação de dados
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -40,6 +43,7 @@ export default function Login() {
   }
 
   return (
+    // Componente que será renderizada no componente principal
     <div>
       <div className="fixed top-0 left-0 right-0 z-50">
         <Bar />
@@ -61,7 +65,7 @@ export default function Login() {
               {error}
             </div>
           )}
-
+          {/* Formulário de login */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

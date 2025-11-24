@@ -5,7 +5,7 @@ import NavBar from './components/NavBar';
 
 function App() {
   return (
-    
+    // Encapsulamento de rotas possíveis
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
