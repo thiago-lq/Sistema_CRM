@@ -193,27 +193,39 @@ class PedidoController extends Controller
             }
             // Se o pedido tiver tipo de produto, insere os dados do produto no banco de dados
             if (in_array('PRODUTO', $pedidoTipos)) {
-                // Verifica se os códigos dos produtos e as quantidades são compatíveis
-                if (count($codProdutos) !== count($quantidade)) {
+                // Verifica se há produtos
+                if (empty($codProdutos)) {
                     return response()->json([
-                        'message' => 'Arrays de produtos e quantidades incompatíveis'
+                        'message' => 'Nenhum produto selecionado para pedido do tipo PRODUTO'
                     ], 422);
                 }
+                
                 // Loop para pegar os códigos dos produtos
-                foreach ($codProdutos as $codProduto) {
-                    // Verifica se a quantidade para o produto como chave existe
-                    if (!isset($quantidade[$codProduto])) {
+                foreach ($codProdutos as $index => $codProduto) {
+                    // Verifica se a quantidade para este índice existe
+                    if (!isset($quantidade[$index])) {
                         return response()->json([
                             'erro' => "Quantidade não informada para o produto $codProduto"
                         ], 422);
                     }
-                    // Pega a quantidade de acordo com o produto como chave
-                    $quantidadeProduto = $quantidade[$codProduto];
-                    // Insere os dados em itens_produtos no banco de dados
-                    DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE) VALUES (?, ?, ?)", [$codPedido, 
-                    $codProduto, $quantidadeProduto]);
+                    
+                    $quantidadeProduto = $quantidade[$index];
+                    
+                    // Valida se a quantidade é válida
+                    if ($quantidadeProduto < 1) {
+                        return response()->json([
+                            'erro' => "Quantidade inválida para o produto $codProduto"
+                        ], 422);
                     }
+                    
+                    // Insere os dados em itens_produtos no banco de dados
+                    DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE) VALUES (?, ?, ?)", [
+                        $codPedido, 
+                        $codProduto, 
+                        $quantidadeProduto
+                    ]);
                 }
+            }
             // Loop para pegar cada tipo pedido
             foreach ($pedidoTipos as $pedidoTipo) {
                 // Insere os dados em pedidos_tipos no banco de dados
@@ -358,18 +370,47 @@ class PedidoController extends Controller
     public function destroy($id) {
         DB::beginTransaction();
         try {
-            // Deleta os dados do pedido no banco de dados
-            $deleted = DB::delete("DELETE FROM PEDIDOS WHERE COD_PEDIDO = ?", [$id]);
-
-            // Verifica se o pedido foi deletado com sucesso, se não retorna que não foi encontrado
-            if ($deleted) {
-                return response()->json(['message' => 'Pedido excluído com sucesso!'], 200);
-            } else {
+            // ⭐ 1. Verifica se o pedido existe
+            $pedido = DB::select("SELECT * FROM PEDIDOS WHERE COD_PEDIDO = ?", [$id]);
+            
+            if (empty($pedido)) {
                 return response()->json(['message' => 'Pedido não encontrado'], 404);
             }
-            // Caso falhe, pega o erro e retorna
+
+            // ⭐ 2. Verifica se existe pagamento associado ao pedido
+            $pagamento = DB::select("SELECT * FROM PAGAMENTOS_CLIENTES WHERE COD_PEDIDO = ?", [$id]);
+            
+            if (!empty($pagamento)) {
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'Não é possível excluir o pedido pois existe um pagamento associado a ele'
+                ], 422);
+            }
+
+            // ⭐ 3. Exclui os registros relacionados (na ordem correta)
+            
+            // Primeiro exclui os itens do pedido
+            DB::delete("DELETE FROM ITENS_PRODUTOS WHERE COD_PEDIDO = ?", [$id]);
+            
+            // Exclui os tipos do pedido
+            DB::delete("DELETE FROM PEDIDOS_TIPOS WHERE COD_PEDIDO = ?", [$id]);
+            
+            // Exclui os endereços de instalação/manutenção
+            DB::delete("DELETE FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);
+            
+            // ⭐ 4. Finalmente exclui o pedido
+            $deleted = DB::delete("DELETE FROM PEDIDOS WHERE COD_PEDIDO = ?", [$id]);
+
+            DB::commit();
+            
+            return response()->json(['message' => 'Pedido excluído com sucesso!'], 200);
+
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Erro ao excluir o pedido', 'error' => $e->getMessage()], 500);
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Erro ao excluir o pedido', 
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

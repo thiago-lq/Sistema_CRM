@@ -99,39 +99,54 @@ class ClienteController extends Controller
     // Controlador que busca um cliente pelo seu ID
 
     public function show($id) {
-        // Verifica se o ID enviado é um CPF ou CNPJ
-        if (strlen($id) == 11) {
-            $cliente = DB::select("SELECT * FROM CLIENTES WHERE CPF_CLIENTE = ?", [$id]);
-        } else if (strlen($id) == 14) {
-            $cliente = DB::select("SELECT * FROM CLIENTES WHERE CNPJ_CLIENTE = ?", [$id]);
+    $cpf = null;
+    $cnpj = null;
+    
+    if ($id) {
+        $idLimpo = preg_replace('/[^0-9]/', '', $id);
+        $tamanho = strlen($idLimpo);
+        
+        if ($tamanho == 11) {
+            $cpf = $idLimpo;
+        } else if ($tamanho == 14) {
+            $cnpj = $idLimpo;
         } else {
-            return response()->json(['message' => 'Formato inválido'], 400);
+            return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 400);
         }
-
-        // Se não encontrar nenhum cliente, retorna uma mensagem de erro
-        if (!$cliente) {
-            return response()->json(['message' => 'Cliente não encontrado'], 404);
-        }
-
-        // Busca os telefones e endereços do cliente
-        $telefones = DB::select("SELECT * FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$cliente->cod_cliente]);
-        $enderecos = DB::select("SELECT * FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$cliente->cod_cliente]);
-
-        // Define o cliente como um array
-        $cliente = $cliente[0];
-        // Mapeia cada telefone para o array
-        $cliente->telefones = array_map(fn($t) => $t->telefone, $telefones);
-        // Mapeia cada endereço para o array
-        $cliente->enderecos = array_map(fn($e) => [
-            'cod_endereco_cliente' => $e->cod_endereco_cliente,
-            'cidade' => $e->cidade,
-            'cep' => $e->cep,
-            'bairro' => $e->bairro,
-            'rua_numero' => $e->rua_numero,
-        ], $enderecos);
-
-        return response()->json($cliente, 200);
     }
+
+    if ($cpf) {
+        $clientes = DB::select("SELECT * FROM CLIENTES WHERE CPF_CLIENTE = ?", [$cpf]);
+    } else if ($cnpj) {
+        $clientes = DB::select("SELECT * FROM CLIENTES WHERE CNPJ_CLIENTE = ?", [$cnpj]);
+    } else {
+        return response()->json(['message' => 'Formato inválido'], 400);
+    }
+
+    // Verifica se encontrou algum cliente
+    if (empty($clientes)) {
+        return response()->json(['message' => 'Cliente não encontrado'], 404);
+    }
+
+    // Pega o primeiro cliente (deveria ser único)
+    $cliente = $clientes[0];
+
+    // Agora sim, usa o cod_cliente do cliente encontrado
+    $telefones = DB::select("SELECT * FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$cliente->cod_cliente]);
+    $enderecos = DB::select("SELECT * FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$cliente->cod_cliente]);
+
+    // Adiciona telefones e endereços ao cliente
+    $cliente->telefones = array_map(fn($t) => $t->telefone, $telefones);
+    $cliente->enderecos = array_map(fn($e) => [
+        'cod_endereco_cliente' => $e->cod_endereco_cliente,
+        'cidade' => $e->cidade,
+        'cep' => $e->cep,
+        'bairro' => $e->bairro,
+        'rua_numero' => $e->rua_numero,
+    ], $enderecos);
+
+    return response()->json($cliente, 200);
+}
 
     // Controlador que cadastra um cliente
 
@@ -290,21 +305,44 @@ class ClienteController extends Controller
         DB::beginTransaction();
         
         try {
-            // Exclui o cliente
-            $deleted = DB::delete("DELETE FROM CLIENTES WHERE COD_CLIENTE = ?", [$id]);
-
-            DB::commit();
-            // Commita a transação e retorna uma mensagem de sucesso ou cliente não encontrado
-            if ($deleted) {
-                return response()->json(['message' => 'Cliente excluído com sucesso!'], 200);
-            } else {
+            // ⭐ 1. Verifica se o cliente existe
+            $cliente = DB::select("SELECT * FROM CLIENTES WHERE COD_CLIENTE = ?", [$id]);
+            
+            if (empty($cliente)) {
                 return response()->json(['message' => 'Cliente não encontrado'], 404);
             }
 
+            // ⭐ 2. Verifica se existem pedidos associados ao cliente
+            $pedidos = DB::select("SELECT * FROM PEDIDOS WHERE COD_CLIENTE = ?", [$id]);
+            
+            if (!empty($pedidos)) {
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'Não é possível excluir o cliente pois existem pedidos associados a ele'
+                ], 422);
+            }
+
+            // ⭐ 3. Exclui os registros relacionados (na ordem correta)
+            
+            // Primeiro exclui os telefones
+            DB::delete("DELETE FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
+            
+            // Depois exclui os endereços
+            DB::delete("DELETE FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
+            
+            // ⭐ 4. Finalmente exclui o cliente
+            $deleted = DB::delete("DELETE FROM CLIENTES WHERE COD_CLIENTE = ?", [$id]);
+
+            DB::commit();
+            
+            return response()->json(['message' => 'Cliente excluído com sucesso!'], 200);
+
         } catch (\Exception $e) {
-            // Rollback a transação e retorna uma mensagem de erro
             DB::rollBack();
-            return response()->json(['message' => 'Erro ao excluir o cliente', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Erro ao excluir o cliente', 
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

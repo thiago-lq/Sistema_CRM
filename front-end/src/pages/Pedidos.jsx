@@ -13,6 +13,7 @@ import { pedidosDelete } from "../services/pedidosDelete";
 import { produtosIndex } from "../services/produtosIndex";
 
 export default function Pedidos() {
+  // Constantes necessárias para o componente
   const [pedidos, setPedidos] = useState([]);
   const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
   const [abaAtiva, setAbaAtiva] = useState("lista");
@@ -21,6 +22,7 @@ export default function Pedidos() {
   const [descricao, setDescricao] = useState("");
   const [produtos, setProdutos] = useState([]);
 
+  // Constante da estrutura do formulário
   const [form, setForm] = useState({
     codCliente: "",
     codEnderecoCliente: "",
@@ -40,44 +42,57 @@ export default function Pedidos() {
     },
   });
 
-  // Carregar dados
-
+  // UseEffect para carregar os dados do back-end
   useEffect(() => {
+    // Temporizador, para que o componente não seja renderizado a cada mudança de estado
     const timeout = setTimeout(() => {
+      // Loading visual
       setLoading(true);
       async function carregarPedidos() {
+        // Verifica se há termo de busca
         if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
-          // é número
+          // é número, busca pelo ID do pedido
           const dados = await pedidosShow(Number(termoBusca));
           setLoading(false);
+          // Se dados existir de acordo com o ID, adiciona ao array, se não existir, cria um array vazio
           setPedidos(dados?.cod_pedido ? [dados] : []);
         } else {
+          // Não é número, busca todos os pedidos
           const dados = await pedidosIndex();
           setLoading(false);
           setPedidos(dados);
         }
       }
+      // Chama a função, e define um tempo de timeout
       carregarPedidos();
     }, 1000);
-
+    // Quando a função for deletada, o timeout é cancelado
     return () => clearTimeout(timeout);
+    // Apenas executa quando o termoBusca for alterado
   }, [termoBusca]);
 
+  // Função que recarrega os dados do back-end no front-end
   const handleRecarregar = async () => {
+    // Loading visual
     setLoading(true);
+    // Verifica se há termo de busca
     if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
-      // é número
+      // é número, busca pelo ID do pedido
       const dados = await pedidosShow(Number(termoBusca));
       setLoading(false);
+      // Se dados existir de acordo com o ID, adiciona ao array, se não existir, cria um array vazio
       setPedidos(dados?.cod_pedido ? [dados] : []);
     } else {
+      // Não é número, busca todos os pedidos
       const dados = await pedidosIndex();
       setLoading(false);
       setPedidos(dados);
     }
   };
 
+  // Função que lida com o formulário de cadastro
   const handleChange = (e) => {
+    // Lê o valor do campo e o nome do campo
     const { name, value: rawValue, checked, dataset } = e.target;
     let value = name === "codProdutos" ? Number(rawValue) : rawValue;
     //  ^^^^^  AGORA PODE MODIFICAR value
@@ -175,7 +190,7 @@ export default function Pedidos() {
     e.preventDefault();
     console.log("Formulário de envio:", form);
     try {
-      // ✅ CORREÇÃO: Converter quantidade de objeto para array
+      // Converter quantidade de objeto para array
       const quantidadeArray = form.codProdutos.map(
         (codProduto) => form.quantidade[codProduto] || 1
       );
@@ -187,12 +202,12 @@ export default function Pedidos() {
           : null,
         pedido_tipos: form.pedidoTipos,
         cod_produtos: form.codProdutos.map(Number), // garantir que são números
-        quantidade: quantidadeArray, // ✅ AGORA É UM ARRAY
+        quantidade: quantidadeArray, // AGORA É UM ARRAY
         descricao: form.descricao,
         valor_total: Number(form.valorTotal),
         valor_adicional: Number(form.valor_adicional) || 0,
         prazo: form.prazo,
-        // ✅ Endereço só para INSTALACAO/MANUTENCAO
+        // Endereço só para INSTALACAO/MANUTENCAO
         ...(form.pedidoTipos.includes("INSTALACAO") ||
         form.pedidoTipos.includes("MANUTENCAO")
           ? {
@@ -238,20 +253,23 @@ export default function Pedidos() {
     }
   };
 
+  // Função que deleta um pedido
   const handleExcluir = (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este pedido?")) return;
     pedidosDelete(id);
   };
 
+  // Função que carrega os dados dos produtos do back-end
   useEffect(() => {
     const carregarProdutos = async () => {
       const dados = await produtosIndex();
       setProdutos(dados);
     };
     carregarProdutos();
+    // Apenas executa quando uma vez, quando alterado
   }, []);
 
-  // Cálculo mais eficiente
+  // Cálculo mais eficiente do total do pedido
   useEffect(() => {
     let total = parseFloat(form.valor_adicional) || 0;
 
@@ -264,8 +282,10 @@ export default function Pedidos() {
     });
 
     setForm((prev) => ({ ...prev, valorTotal: total.toFixed(2) }));
+    // Apenas executa quando os produtos, quantidade e valor_adicional forem alterados
   }, [form.codProdutos, form.quantidade, form.valor_adicional, produtos]);
 
+  // tabClasses para a aba de cada aba
   const tabClasses = (tabName) =>
     `py-2 px-4 text-center cursor-pointer font-medium transition-colors duration-200 
     ${

@@ -219,19 +219,19 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
             <div className="text-sm space-y-1">
               <p>
                 <span className="font-medium">Cidade:</span>{" "}
-                {pedidoSelecionado.inst_cidade || "-"}
+                {pedidoSelecionado.manu_inst_cidade || "-"}
               </p>
               <p>
                 <span className="font-medium">CEP:</span>{" "}
-                {pedidoSelecionado.inst_cep || "-"}
+                {pedidoSelecionado.manu_inst_cep || "-"}
               </p>
               <p>
                 <span className="font-medium">Bairro:</span>{" "}
-                {pedidoSelecionado.inst_bairro || "-"}
+                {pedidoSelecionado.manu_inst_bairro || "-"}
               </p>
               <p>
                 <span className="font-medium">Rua/Número:</span>{" "}
-                {pedidoSelecionado.inst_rua || "-"}
+                {pedidoSelecionado.manu_inst_rua || "-"}
               </p>
             </div>
           </div>

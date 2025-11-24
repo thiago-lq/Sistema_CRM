@@ -12,7 +12,7 @@ return new class extends Migration
                 COD_PEDIDO_TIPO SERIAL PRIMARY KEY,
                 COD_PEDIDO INT NOT NULL,
                 NOME_TIPO VARCHAR(10) CHECK (NOME_TIPO IN ('INSTALACAO', 'MANUTENCAO', 'PRODUTO')) NOT NULL,
-                FOREIGN KEY (COD_PEDIDO) REFERENCES PEDIDOS(COD_PEDIDO) ON DELETE CASCADE
+                FOREIGN KEY (COD_PEDIDO) REFERENCES PEDIDOS(COD_PEDIDO)
             );
         ");
     }

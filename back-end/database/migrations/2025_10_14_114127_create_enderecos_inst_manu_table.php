@@ -16,7 +16,7 @@ return new class extends Migration
             CEP CHAR(8) NOT NULL,
             BAIRRO VARCHAR(100) NOT NULL,
             RUA_NUMERO VARCHAR(100) NOT NULL,
-            FOREIGN KEY (COD_PEDIDO) REFERENCES PEDIDOS(COD_PEDIDO) ON DELETE CASCADE
+            FOREIGN KEY (COD_PEDIDO) REFERENCES PEDIDOS(COD_PEDIDO)
             );
         ");
     }

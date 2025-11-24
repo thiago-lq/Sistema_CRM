@@ -8,22 +8,33 @@ export default function FormularioCadastro({
   produtos,
 }) {
   const [cliente, setCliente] = useState({});
+  const [buscaCliente, setBuscaCliente] = useState(false);
 
   useEffect(() => {
-    if (!form.codCliente) {
+    if (!buscaCliente) {
       setCliente({});
+      return;
     }
+
     const fetchCliente = async () => {
       try {
-        const dadosCliente = await clientesShow(form.codCliente);
+        const dadosCliente = await clientesShow(buscaCliente);
         setCliente(dadosCliente);
+        if (dadosCliente && dadosCliente.cod_cliente) {
+          handleChange({
+            target: {
+              name: "codCliente",
+              value: dadosCliente.cod_cliente
+            }
+          });
+        }
       } catch (error) {
         console.error("Erro ao buscar cliente:", error);
         setCliente({});
       }
     };
     fetchCliente();
-  }, [form.codCliente]);
+  }, [buscaCliente, handleChange]);
 
   return (
     <div className="bg-white">
@@ -73,26 +84,36 @@ export default function FormularioCadastro({
           </div>
         </div>
 
-        {/* Código do cliente */}
+        {/* CPF ou CNPJ do cliente */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Código do Cliente
+            CPF ou CNPJ
           </label>
           <div className="flex justify-between">
             <input
               type="number"
-              name="codCliente"
-              placeholder="Digite o código do cliente"
-              value={form.codCliente}
-              onChange={handleChange}
+              name="busca"
+              placeholder="Digite o CPF ou CNPJ"
+              value={buscaCliente}
+              onChange={(e) => setBuscaCliente(e.target.value)}
               className="w-75 p-2 border border-gray-300 rounded-md
                        focus:ring-indigo-500 focus:border-indigo-500
                        appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
-            {cliente && cliente.cpf_cliente && (
+            {cliente && cliente.cod_cliente && (
+              <div>
               <label className="text-lg text-gray-700 mx-10">
-                CPF: {cliente.cpf_cliente}
+                Código do Cliente:
               </label>
+              <input type="number" 
+                      value={cliente.cod_cliente} 
+                      placeholder="Digite o código do cliente"
+                      onChange={handleChange}
+                      className="w-75 p-2 border border-gray-300 rounded-md
+                       focus:ring-indigo-500 focus:border-indigo-500
+                       appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      disabled />
+              </div>
             )}
           </div>
         </div>
