@@ -24,8 +24,8 @@ export default function FormularioCadastro({
           handleChange({
             target: {
               name: "codCliente",
-              value: dadosCliente.cod_cliente
-            }
+              value: dadosCliente.cod_cliente,
+            },
           });
         }
       } catch (error) {
@@ -34,7 +34,7 @@ export default function FormularioCadastro({
       }
     };
     fetchCliente();
-  }, [buscaCliente, handleChange]);
+  }, [buscaCliente]);
 
   return (
     <div className="bg-white">
@@ -102,50 +102,50 @@ export default function FormularioCadastro({
             />
             {cliente && cliente.cod_cliente && (
               <div>
-              <label className="text-lg text-gray-700 mx-10">
-                Código do Cliente:
-              </label>
-              <input type="number" 
-                      value={cliente.cod_cliente} 
-                      placeholder="Digite o código do cliente"
-                      onChange={handleChange}
-                      className="w-75 p-2 border border-gray-300 rounded-md
-                       focus:ring-indigo-500 focus:border-indigo-500
-                       appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                      disabled />
+                <label className="text-lg text-gray-700 mx-10">
+                  Código do Cliente:
+                </label>
+                <input
+                  type="number"
+                  value={cliente.cod_cliente}
+                  placeholder="Digite o código do cliente"
+                  onChange={handleChange}
+                  className="w-75 p-2 border border-gray-300 rounded-md 
+                 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-100"
+                  disabled
+                />
               </div>
             )}
           </div>
         </div>
 
-        {cliente &&
-          form.pedidoTipos.includes("PRODUTO") && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Endereço de Entrega
-              </label>
-              <select
-                name="codEnderecoCliente"
-                value={form.codEnderecoCliente ?? ""}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md 
+        {cliente && form.pedidoTipos.includes("PRODUTO") && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Endereço de Entrega
+            </label>
+            <select
+              name="codEnderecoCliente"
+              value={form.codEnderecoCliente ?? ""}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md 
                          focus:ring-indigo-500 focus:border-indigo-500 hover:cursor-pointer"
-                required
-              >
-                <option disabled value="">
-                  Selecione um endereço
+              required
+            >
+              <option disabled value="">
+                Selecione um endereço
+              </option>
+              {cliente.enderecos?.map((e) => (
+                <option
+                  key={e.cod_endereco_cliente}
+                  value={e.cod_endereco_cliente}
+                >
+                  {e.rua_numero} - {e.bairro} - {e.cidade} - {e.cep}
                 </option>
-                {cliente.enderecos?.map((e) => (
-                  <option
-                    key={e.cod_endereco_cliente}
-                    value={e.cod_endereco_cliente}
-                  >
-                    {e.rua_numero} - {e.bairro} - {e.cidade} - {e.cep}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Produtos (somente se selecionou PRODUTO) */}
         {form.pedidoTipos.includes("PRODUTO") && (
