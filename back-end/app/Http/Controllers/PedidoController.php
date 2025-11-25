@@ -9,54 +9,54 @@ class PedidoController extends Controller
 {
     // Controlador que busca todos os pedidos
     public function index() {
-    $pedido = DB::select("
-    SELECT
-        -- Definição dos dados que irão vir na query, com as suas respectivas variáveis
-        p.*,
-        e.CIDADE AS MANU_INST_CIDADE,
-        e.CEP AS MANU_INST_CEP,
-        e.BAIRRO AS MANU_INST_BAIRRO,
-        e.RUA_NUMERO AS MANU_INST_RUA,
-        ec.CIDADE AS CLI_CIDADE,
-        ec.CEP AS CLI_CEP,
-        ec.BAIRRO AS CLI_BAIRRO,
-        ec.RUA_NUMERO AS CLI_RUA,
-        pc.STATUS AS status_pagamento,
-        p.CREATED_AT AS created_at,
-        f.NOME_FUNCIONARIO AS funcionario_nome,
-        -- Agregação dos tipos em uma subquery para evitar duplicação
-        (
-            SELECT STRING_AGG(pt.NOME_TIPO, ', ')
-            FROM PEDIDOS_TIPOS pt 
-            WHERE pt.COD_PEDIDO = p.COD_PEDIDO
-        ) AS tipos_pedido,
-        -- Agregação dos itens do pedido COM OS NOMES CORRETOS
-        (
-            SELECT JSON_AGG(
-                json_build_object(
-                    'cod_produto', ip.COD_PRODUTO,
-                    'nome_produto', ip.NOME_PRODUTO,  -- NOME CORRETO
-                    'quantidade', it.QUANTIDADE,
-                    'preco_unitario', ip.VALOR_UNITARIO  -- NOME CORRETO
+        $pedido = DB::select("
+        SELECT
+            -- Definição dos dados que irão vir na query, com as suas respectivas variáveis
+            p.*,
+            e.CIDADE AS MANU_INST_CIDADE,
+            e.CEP AS MANU_INST_CEP,
+            e.BAIRRO AS MANU_INST_BAIRRO,
+            e.RUA_NUMERO AS MANU_INST_RUA,
+            ec.CIDADE AS CLI_CIDADE,
+            ec.CEP AS CLI_CEP,
+            ec.BAIRRO AS CLI_BAIRRO,
+            ec.RUA_NUMERO AS CLI_RUA,
+            pc.STATUS AS status_pagamento,
+            p.CREATED_AT AS created_at,
+            f.NOME_FUNCIONARIO AS funcionario_nome,
+            -- Agregação dos tipos em uma subquery para evitar duplicação
+            (
+                SELECT STRING_AGG(pt.NOME_TIPO, ', ')
+                FROM PEDIDOS_TIPOS pt 
+                WHERE pt.COD_PEDIDO = p.COD_PEDIDO
+            ) AS tipos_pedido,
+            -- Agregação dos itens do pedido COM OS NOMES CORRETOS
+            (
+                SELECT JSON_AGG(
+                    json_build_object(
+                        'cod_produto', ip.COD_PRODUTO,
+                        'nome_produto', ip.NOME_PRODUTO,  -- NOME CORRETO
+                        'quantidade', it.QUANTIDADE,
+                        'preco_unitario', ip.VALOR_UNITARIO  -- NOME CORRETO
+                    )
                 )
-            )
-            -- Faz a comparação de chaves estrangeiras, e junta os dados em uma tabela (json) de acordo com a chave (inner join)
-            FROM ITENS_PRODUTOS it
-            INNER JOIN PRODUTOS ip ON it.COD_PRODUTO = ip.COD_PRODUTO
-            WHERE it.COD_PEDIDO = p.COD_PEDIDO
-        ) AS itens_pedido
+                -- Faz a comparação de chaves estrangeiras, e junta os dados em uma tabela (json) de acordo com a chave (inner join)
+                FROM ITENS_PRODUTOS it
+                INNER JOIN PRODUTOS ip ON it.COD_PRODUTO = ip.COD_PRODUTO
+                WHERE it.COD_PEDIDO = p.COD_PEDIDO
+            ) AS itens_pedido
 
-    FROM PEDIDOS p
-    LEFT JOIN ENDERECOS_INST_MANU e ON p.COD_PEDIDO = e.COD_PEDIDO 
-    LEFT JOIN ENDERECOS_CLIENTES ec ON p.COD_ENDERECO_CLIENTE = ec.COD_ENDERECO_CLIENTE 
-    LEFT JOIN PAGAMENTOS_CLIENTES pc ON pc.COD_PEDIDO = p.COD_PEDIDO
-    LEFT JOIN FUNCIONARIOS_CRM f ON f.COD_FUNCIONARIO = p.COD_FUNCIONARIO
+        FROM PEDIDOS p
+        LEFT JOIN ENDERECOS_INST_MANU e ON p.COD_PEDIDO = e.COD_PEDIDO 
+        LEFT JOIN ENDERECOS_CLIENTES ec ON p.COD_ENDERECO_CLIENTE = ec.COD_ENDERECO_CLIENTE 
+        LEFT JOIN PAGAMENTOS_CLIENTES pc ON pc.COD_PEDIDO = p.COD_PEDIDO
+        LEFT JOIN FUNCIONARIOS_CRM f ON f.COD_FUNCIONARIO = p.COD_FUNCIONARIO
 
-    ORDER BY p.COD_PEDIDO
-    ");
+        ORDER BY p.COD_PEDIDO
+        ");
 
-    return response()->json($pedido);
-}
+        return response()->json($pedido);
+    }
 
     // Controlador que busca um pedido pelo seu ID
     public function show($id) {
@@ -243,8 +243,20 @@ class PedidoController extends Controller
 
     // Controlador que atualiza um pedido
     public function update(Request $request, $id) {
+
+        \Log::info('UPDATE PEDIDO - INICIADO', [
+            'id' => $id,
+            'payload' => $request->all()
+        ]);
+
         // Pega os dados do pedido para atualizar
-        $funcionario = $request->attributes->get('funcionario'); // Codigo do funcionário vem do middleware
+        $funcionario = $request->attributes->get('funcionario');
+        $codFuncionario = $funcionario->cod_funcionario;
+
+        \Log::info('FUNCIONARIO RESOLVIDO', [
+            'funcionario' => $funcionario
+        ]);
+
         // Os dados abaixo vem dos inputs do request enviado
         $codCliente = $request->input('cod_cliente');
         $codProdutos = $request->input('cod_produtos');
@@ -255,116 +267,194 @@ class PedidoController extends Controller
         $valorTotal = $request->input('valor_total');
         $valorAdicional = $request->input('valor_adicional', 0);
         $prazo = $request->input('prazo');
-        
+
+        \Log::info('DADOS EXTRAIDOS DO REQUEST', [
+            'codCliente' => $codCliente,
+            'codProdutos' => $codProdutos,
+            'codEnderecoCliente' => $codEnderecoCliente,
+            'pedidoTipos' => $pedidoTipos,
+            'quantidade' => $quantidade,
+            'valorTotal' => $valorTotal,
+            'valorAdicional' => $valorAdicional,
+            'prazo' => $prazo
+        ]);
+
         // Validação dos dados enviados
+        \Log::info('INICIANDO PRIMEIRA VALIDACAO...');
         $request->validate([
-            // Valida se o código do cliente é não nulo, inteiro e existe no banco de dados
             'cod_cliente' => 'required|integer|exists:clientes,cod_cliente',
-            // Valida se os códigos dos produtos são necessários de acordo com o tipo do pedido
             'cod_produtos' => 'required_if:pedido_tipos.*,PRODUTO|array',
-            // Valida se os códigos dos produtos são números inteiros e existem no banco de dados
             'cod_produtos.*' => 'integer|exists:produtos,cod_produto',
-            // Valida se o código do endereço do cliente pode ser nulo, se é necessário de acordo com o tipo do pedido
-            // inteiro e existe no banco de dados
             'cod_endereco_cliente' => 'nullable|required_if:pedido_tipos.*,PRODUTO|integer|exists:enderecos_clientes,cod_endereco_cliente',
-            // Valida se o pedido_tipos é um array
             'pedido_tipos' => 'required|array',
-            // Válida se pedido_tipos não é nulo, string e é uma das 3 opções permitidas
             'pedido_tipos.*' => 'required|string|in:INSTALACAO,MANUTENCAO,PRODUTO',
-            // Valida se as quantidade é necessária de acordo com o tipo do pedido
             'quantidade' => 'required_if:pedido_tipos.*,PRODUTO|array',
-            // Valida se as quantidade são números inteiros e maiores que 0
             'quantidade.*' => 'integer|min:1',
-            // Valida se a descrição é não nula, string, e com no máximo 500 caracteres
             'descricao' => 'required|string|max:500',
-            // Valida se o valor_total é não nulo, numérico, e com o valor máximo de 99.999.999,99
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
-            // Valida se o valor_adicional é não nulo, numérico, e com o valor minimo de 0
             'valor_adicional' => 'nullable|numeric|min:0',
-            // Valida se o prazo é não nulo, data
             'prazo' => 'required|date',
         ]);
 
-        // Pega o request input cod_produtos e converte por meio do array_map cada valor para inteiro
+        \Log::info('VALIDACAO 1 OK');
+
+        // Converte produtos em inteiros
         $codProdutos = array_map('intval', $request->input('cod_produtos'));
 
-        // Se o pedido tiver tipo de instalação ou manutenção, entra em mais validações
+        // Se o pedido tiver tipo de instalação ou manutenção
         if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
+
+            \Log::info('VALIDACAO EXTRA PARA INSTALACAO/MANUTENCAO');
+
             $cidade = $request->input('cidade');
             $cep = $request->input('cep');
             $bairro = $request->input('bairro');
             $ruaNumero = $request->input('rua_numero');
 
-            // Valida se as cidades, cep, bairro e rua_numero são necessárias de acordo com o tipo do pedido
+            \Log::info('DADOS DE ENDERECO RECEBIDOS', [
+                'cidade' => $cidade,
+                'cep' => $cep,
+                'bairro' => $bairro,
+                'rua_numero' => $ruaNumero
+            ]);
+
             $request->validate([
-                // Valida se é string e com no máximo 100 caracteres
                 'cidade' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
-                // Valida se é string e com no máximo 8 caracteres
                 'cep' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|size:8',
-                // Valida se é string e com no máximo 100 caracteres
                 'bairro' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
-                // Valida se é string e com no máximo 100 caracteres
                 'rua_numero' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
             ]);
+
+            \Log::info('VALIDACAO EXTRA OK');
         }
 
         DB::beginTransaction();
-        // Inicia transação
-        try {
-            // Atualiza os dados do pedido no banco de dados
-            DB::update("UPDATE PEDIDOS SET COD_CLIENTE = ?, COD_ENDERECO_CLIENTE = ?, COD_FUNCIONARIO = ?, DESCRICAO = ?, 
-            VALOR_TOTAL = ?, VALOR_ADICIONAL = ?, PRAZO = ? WHERE COD_PEDIDO = ?", [$codCliente, $codEnderecoCliente, 
-            $codFuncionario, $descricao, $valorTotal, $valorAdicional, $prazo, $id]);
+        \Log::info('TRANSACTION INICIADA');
 
-            // Se o pedido tiver tipo de instalação ou manutenção, apaga os dados anteriores do endereço no banco de dados
-            // e insere novos
+        try {
+
+            \Log::info('EXECUTANDO UPDATE DO PEDIDO', [
+                'id' => $id
+            ]);
+
+            DB::update("UPDATE PEDIDOS SET COD_CLIENTE = ?, COD_ENDERECO_CLIENTE = ?, COD_FUNCIONARIO = ?, DESCRICAO = ?, 
+            VALOR_TOTAL = ?, VALOR_ADICIONAL = ?, PRAZO = ? WHERE COD_PEDIDO = ?", [
+                $codCliente, $codEnderecoCliente, $codFuncionario,
+                $descricao, $valorTotal, $valorAdicional, $prazo, $id
+            ]);
+
+            \Log::info('UPDATE PEDIDOS OK');
+
+            // CORREÇÃO: LÓGICA MELHORADA PARA INSTALAÇÃO / MANUTENÇÃO
+            // Sempre apaga primeiro os registros existentes
+            DB::delete("DELETE FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);
+            \Log::info('REGISTROS ANTIGOS DE ENDERECO INST/MANU REMOVIDOS');
+
+            // Só insere novo endereço se INSTALACAO ou MANUTENCAO estiverem selecionados
             if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
-                DB::delete("DELETE FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);
-                DB::insert("INSERT INTO ENDERECOS_INST_MANU (COD_PEDIDO, CIDADE, CEP, BAIRRO, RUA_NUMERO) VALUES (?, ?, ?, ?, ?)", [
+
+                \Log::info('INSERINDO NOVO ENDERECO DE INSTALACAO/MANUTENCAO');
+
+                $cidade = $request->input('cidade');
+                $cep = $request->input('cep');
+                $bairro = $request->input('bairro');
+                $ruaNumero = $request->input('rua_numero');
+
+                DB::insert("INSERT INTO ENDERECOS_INST_MANU (COD_PEDIDO, CIDADE, CEP, BAIRRO, RUA_NUMERO)
+                VALUES (?, ?, ?, ?, ?)", [
                     $id, $cidade, $cep, $bairro, $ruaNumero
                 ]);
+
+                \Log::info('ENDERECO INST/MANU INSERIDO COM SUCESSO');
+            } else {
+                \Log::info('INSTALACAO/MANUTENCAO NAO SELECIONADOS - ENDERECO MANTIDO COMO NULL');
             }
-            // Se o pedido tiver tipo de produto, apaga os dados anteriores do pedido de produtos no banco de dados
-            // e insere novos
-            if (in_array('PRODUTO', $pedidoTipos)) {
-                DB::delete("DELETE FROM ITENS_PRODUTOS WHERE COD_PEDIDO = ?", [$id]);
-                // Verifica se os códigos dos produtos e as quantidades são compatíveis
+
+            // CORREÇÃO: LÓGICA MELHORADA PARA PRODUTOS
+            // Sempre apaga primeiro os registros existentes
+            DB::delete("DELETE FROM ITENS_PRODUTOS WHERE COD_PEDIDO = ?", [$id]);
+            \Log::info('REGISTROS ANTIGOS DE PRODUTOS REMOVIDOS');
+
+            // Só insere novos produtos se PRODUTO estiver selecionado E houver produtos
+            if (in_array('PRODUTO', $pedidoTipos) && !empty($codProdutos)) {
+
+                \Log::info('INSERINDO NOVOS PRODUTOS DO PEDIDO', [
+                    'codProdutos' => $codProdutos,
+                    'quantidade' => $quantidade
+                ]);
+
+                // Validação de compatibilidade entre arrays
                 if (count($codProdutos) !== count($quantidade)) {
-                    return response()->json([
-                        'message' => 'Arrays de produtos e quantidades incompatíveis'
-                    ], 422);
+                    \Log::error('ERRO: quantidade incompatível', [
+                        'codProdutos' => $codProdutos,
+                        'quantidade' => $quantidade
+                    ]);
+                    return response()->json(['message' => 'Arrays de produtos e quantidades incompatíveis'], 422);
                 }
-                // Loop para pegar os códigos dos produtos
+
                 foreach ($codProdutos as $codProduto) {
-                    // Verifica se a quantidade para o produto como chave existe
+
                     if (!isset($quantidade[$codProduto])) {
-                        return response()->json([
-                            'erro' => "Quantidade não informada para o produto $codProduto"
-                        ], 422);
+                        \Log::error('ERRO: quantidade faltando', [
+                            'produto' => $codProduto
+                        ]);
+                        return response()->json(['erro' => "Quantidade não informada para o produto $codProduto"], 422);
                     }
-                    // Pega a quantidade de acordo com o produto como chave
+
                     $quantidadeProduto = $quantidade[$codProduto];
-                    // Insere os dados em itens_produtos no banco de dados
-                    DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE) VALUES (?, ?, ?)", [$id, 
-                    $codProduto, $quantidadeProduto]);
+
+                    DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE)
+                    VALUES (?, ?, ?)", [$id, $codProduto, $quantidadeProduto]);
+                    
+                    \Log::info('PRODUTO INSERIDO', [
+                        'cod_produto' => $codProduto,
+                        'quantidade' => $quantidadeProduto
+                    ]);
                 }
+
+                \Log::info('PRODUTOS INSERIDOS COM SUCESSO');
+            } else {
+                \Log::info('PRODUTO NAO SELECIONADO OU SEM PRODUTOS - DADOS MANTIDOS COMO NULL');
             }
-            // Delete os dados de pedido_tipos anteriores no banco de dados
+
+            \Log::info('ATUALIZANDO TIPOS DO PEDIDO');
+
+            // Sempre apaga e reinsere os tipos
             DB::delete("DELETE FROM PEDIDOS_TIPOS WHERE COD_PEDIDO = ?", [$id]);
-            // Loop para pegar cada tipo pedido
-            foreach ($pedidoTipos as $pedidoTipo) {
-                // Insere os dados em pedidos_tipos no banco de dados
-                DB::insert("INSERT INTO PEDIDOS_TIPOS (COD_PEDIDO, NOME_TIPO) VALUES (?, ?)", [$id, $pedidoTipo]);
+
+            foreach ($pedidoTipos as $tipo) {
+                DB::insert("INSERT INTO PEDIDOS_TIPOS (COD_PEDIDO, NOME_TIPO) VALUES (?, ?)", [$id, $tipo]);
+                \Log::info('TIPO INSERIDO: ' . $tipo);
             }
-            // Commit a transação e retona o pedido com sucesso
+
+            \Log::info('TIPOS DO PEDIDO ATUALIZADOS');
+
             DB::commit();
-            return response()->json(['message' => 'Pedido atualizado com sucesso!', 'cod_pedido' => $id], 200);
+            \Log::info('TRANSACTION COMMITADO COM SUCESSO', ['pedido' => $id]);
+
+            return response()->json([
+                'message' => 'Pedido atualizado com sucesso!',
+                'cod_pedido' => $id
+            ], 200);
+
         } catch (\Exception $e) {
-            // Rollback a transação e retorna o erro
+
             DB::rollBack();
-            return response()->json(['message' => 'Erro ao atualizar o pedido', 'error' => $e->getMessage()], 500);
+
+            \Log::error('ERRO NO UPDATE DO PEDIDO', [
+                'mensagem' => $e->getMessage(),
+                'linha' => $e->getLine(),
+                'arquivo' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Erro ao atualizar o pedido',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
+
 
     // Controlador que apaga um pedido
     public function destroy($id) {

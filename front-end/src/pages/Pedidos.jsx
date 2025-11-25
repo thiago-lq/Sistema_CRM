@@ -3,6 +3,7 @@ import {
   PedidosCadastro,
   DetalhesPedidos,
   ListaPedidos,
+  EditarPedidos,
 } from "../components/pedidosComponents";
 
 import { pedidosIndex } from "../services/pedidosIndex";
@@ -319,6 +320,12 @@ export default function Pedidos() {
     setAbaAtiva,
   };
 
+  const propsEditar = {
+    pedidoSelecionado,
+    setAbaAtiva,
+    produtos,
+  }
+
   return (
     // Otimização: A div externa está responsável pelo fundo e margem
     <div className=" bg-white">
@@ -352,6 +359,7 @@ export default function Pedidos() {
           {abaAtiva === "lista" && <ListaPedidos {...propsLista} />}
           {abaAtiva === "cadastro" && <PedidosCadastro {...propsCadastro} />}
           {abaAtiva === "detalhes" && <DetalhesPedidos {...propsDetalhes} />}
+          {abaAtiva === "editar" && <EditarPedidos {...propsEditar} />}
         </div>
       </div>
     </div>

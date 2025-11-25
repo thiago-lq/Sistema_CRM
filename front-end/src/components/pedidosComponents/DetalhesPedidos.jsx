@@ -74,6 +74,12 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
               {formatarMoeda(pedidoSelecionado.valor_total)}
             </p>
           </div>
+          <div>
+            <p className="font-semibold text-gray-700">Valor Adicional:</p>
+            <p className="font-bold text-gray-900">
+              {formatarMoeda(pedidoSelecionado.valor_adicional)}
+            </p>
+          </div>
 
           <div>
             <p className="font-semibold text-gray-700">
@@ -110,7 +116,10 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
               )}
             </div>
           </div>
-
+          <div>
+            <p className="font-semibold text-gray-700">Prazo</p>
+            <span>{pedidoSelecionado.prazo}</span>
+          </div>
           <div>
             <p className="font-semibold text-gray-700">Status Pagamento:</p>
             <span
@@ -261,8 +270,8 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
             </div>
           </div>
           <p className="w-full gap-2">
-          <span className="font-medium">Descrição: </span>
-          {pedidoSelecionado.descricao || "-"}
+            <span className="font-medium">Descrição: </span>
+            {pedidoSelecionado.descricao || "-"}
           </p>
         </div>
       </div>

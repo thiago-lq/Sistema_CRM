@@ -182,6 +182,14 @@ export default function ListaPedidos({
                         >
                           Ver
                         </button>
+                        <button onClick={() => {
+                          setPedidoSelecionado(pedido);
+                          setAbaAtiva("editar");
+                        }}
+                        className="bg-amber-400 hover:bg-amber-500 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                        >
+                          Editar
+                        </button>
                         <button
                           onClick={() => handleExcluir(pedido.cod_pedido)}
                           className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
