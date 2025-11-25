@@ -107,20 +107,6 @@ class PedidoController extends Controller
 
     // Controlador que cadastra um pedido
     public function store(Request $request) {
-        // Pega os dados do pedido para cadastrar
-        $funcionario = $request->attributes->get('funcionario');
-        $codFuncionario = $funcionario->cod_funcionario; // Codigo do funcionário vem do middleware
-        // Os dados abaixo vem dos inputs do request enviado
-        $codCliente = $request->input('cod_cliente');
-        $codProdutos = $request->input('cod_produtos');
-        $codEnderecoCliente = $request->input('cod_endereco_cliente');
-        $pedidoTipos = $request->input('pedido_tipos');
-        $quantidade = $request->input('quantidade');
-        $descricao = $request->input('descricao');
-        $valorTotal = $request->input('valor_total');
-        $valorAdicional = $request->input('valor_adicional', 0);
-        $prazo = $request->input('prazo');
-
         // Validação dos dados enviados do pedido
         $request->validate([
             // Valida se o código do cliente é não nulo, inteiro e existe no banco de dados
@@ -150,6 +136,20 @@ class PedidoController extends Controller
             'prazo' => 'required|date',
         ]);
 
+        // Pega os dados do pedido para cadastrar
+        $funcionario = $request->attributes->get('funcionario');
+        $codFuncionario = $funcionario->cod_funcionario; // Codigo do funcionário vem do middleware
+        // Os dados abaixo vem dos inputs do request enviado
+        $codCliente = $request->input('cod_cliente');
+        $codProdutos = $request->input('cod_produtos');
+        $codEnderecoCliente = $request->input('cod_endereco_cliente');
+        $pedidoTipos = $request->input('pedido_tipos');
+        $quantidade = $request->input('quantidade');
+        $descricao = $request->input('descricao');
+        $valorTotal = $request->input('valor_total');
+        $valorAdicional = $request->input('valor_adicional', 0);
+        $prazo = $request->input('prazo');
+
         // Pega o request input cod_produtos e converte por meio do array_map cada valor para inteiro
         $codProdutos = array_map('intval', $request->input('cod_produtos'));
 
@@ -161,11 +161,6 @@ class PedidoController extends Controller
 
         // Se o pedido tiver tipo de instalação ou manutenção, entra em mais validações
         if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
-            $cidade = $request->input('cidade');
-            $cep = $request->input('cep');
-            $bairro = $request->input('bairro');
-            $ruaNumero = $request->input('rua_numero');
-
             // Valida se as cidades, cep, bairro e rua_numero são necessárias de acordo com o tipo do pedido
             $request->validate([
                 // Valida se é string e com no máximo 100 caracteres
@@ -177,6 +172,11 @@ class PedidoController extends Controller
                 // Valida se é string e com no máximo 100 caracteres
                 'rua_numero' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
             ]);
+
+            $cidade = $request->input('cidade');
+            $cep = $request->input('cep');
+            $bairro = $request->input('bairro');
+            $ruaNumero = $request->input('rua_numero');
         }
 
         DB::beginTransaction();
@@ -243,44 +243,6 @@ class PedidoController extends Controller
 
     // Controlador que atualiza um pedido
     public function update(Request $request, $id) {
-
-        \Log::info('UPDATE PEDIDO - INICIADO', [
-            'id' => $id,
-            'payload' => $request->all()
-        ]);
-
-        // Pega os dados do pedido para atualizar
-        $funcionario = $request->attributes->get('funcionario');
-        $codFuncionario = $funcionario->cod_funcionario;
-
-        \Log::info('FUNCIONARIO RESOLVIDO', [
-            'funcionario' => $funcionario
-        ]);
-
-        // Os dados abaixo vem dos inputs do request enviado
-        $codCliente = $request->input('cod_cliente');
-        $codProdutos = $request->input('cod_produtos');
-        $codEnderecoCliente = $request->input('cod_endereco_cliente');
-        $pedidoTipos = $request->input('pedido_tipos');
-        $quantidade = $request->input('quantidade');
-        $descricao = $request->input('descricao');
-        $valorTotal = $request->input('valor_total');
-        $valorAdicional = $request->input('valor_adicional', 0);
-        $prazo = $request->input('prazo');
-
-        \Log::info('DADOS EXTRAIDOS DO REQUEST', [
-            'codCliente' => $codCliente,
-            'codProdutos' => $codProdutos,
-            'codEnderecoCliente' => $codEnderecoCliente,
-            'pedidoTipos' => $pedidoTipos,
-            'quantidade' => $quantidade,
-            'valorTotal' => $valorTotal,
-            'valorAdicional' => $valorAdicional,
-            'prazo' => $prazo
-        ]);
-
-        // Validação dos dados enviados
-        \Log::info('INICIANDO PRIMEIRA VALIDACAO...');
         $request->validate([
             'cod_cliente' => 'required|integer|exists:clientes,cod_cliente',
             'cod_produtos' => 'required_if:pedido_tipos.*,PRODUTO|array',
@@ -296,27 +258,25 @@ class PedidoController extends Controller
             'prazo' => 'required|date',
         ]);
 
-        \Log::info('VALIDACAO 1 OK');
+        // Pega os dados do pedido para atualizar
+        $funcionario = $request->attributes->get('funcionario');
+        $codFuncionario = $funcionario->cod_funcionario;
+        // Os dados abaixo vem dos inputs do request enviado
+        $codCliente = $request->input('cod_cliente');
+        $codProdutos = $request->input('cod_produtos');
+        $codEnderecoCliente = $request->input('cod_endereco_cliente');
+        $pedidoTipos = $request->input('pedido_tipos');
+        $quantidade = $request->input('quantidade');
+        $descricao = $request->input('descricao');
+        $valorTotal = $request->input('valor_total');
+        $valorAdicional = $request->input('valor_adicional', 0);
+        $prazo = $request->input('prazo');
 
         // Converte produtos em inteiros
         $codProdutos = array_map('intval', $request->input('cod_produtos'));
 
         // Se o pedido tiver tipo de instalação ou manutenção
         if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
-
-            \Log::info('VALIDACAO EXTRA PARA INSTALACAO/MANUTENCAO');
-
-            $cidade = $request->input('cidade');
-            $cep = $request->input('cep');
-            $bairro = $request->input('bairro');
-            $ruaNumero = $request->input('rua_numero');
-
-            \Log::info('DADOS DE ENDERECO RECEBIDOS', [
-                'cidade' => $cidade,
-                'cep' => $cep,
-                'bairro' => $bairro,
-                'rua_numero' => $ruaNumero
-            ]);
 
             $request->validate([
                 'cidade' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
@@ -325,17 +285,16 @@ class PedidoController extends Controller
                 'rua_numero' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
             ]);
 
-            \Log::info('VALIDACAO EXTRA OK');
+            $cidade = $request->input('cidade');
+            $cep = $request->input('cep');
+            $bairro = $request->input('bairro');
+            $ruaNumero = $request->input('rua_numero');
+
         }
 
         DB::beginTransaction();
-        \Log::info('TRANSACTION INICIADA');
 
         try {
-
-            \Log::info('EXECUTANDO UPDATE DO PEDIDO', [
-                'id' => $id
-            ]);
 
             DB::update("UPDATE PEDIDOS SET COD_CLIENTE = ?, COD_ENDERECO_CLIENTE = ?, COD_FUNCIONARIO = ?, DESCRICAO = ?, 
             VALOR_TOTAL = ?, VALOR_ADICIONAL = ?, PRAZO = ? WHERE COD_PEDIDO = ?", [
@@ -343,17 +302,12 @@ class PedidoController extends Controller
                 $descricao, $valorTotal, $valorAdicional, $prazo, $id
             ]);
 
-            \Log::info('UPDATE PEDIDOS OK');
-
             // CORREÇÃO: LÓGICA MELHORADA PARA INSTALAÇÃO / MANUTENÇÃO
             // Sempre apaga primeiro os registros existentes
             DB::delete("DELETE FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);
-            \Log::info('REGISTROS ANTIGOS DE ENDERECO INST/MANU REMOVIDOS');
 
             // Só insere novo endereço se INSTALACAO ou MANUTENCAO estiverem selecionados
             if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
-
-                \Log::info('INSERINDO NOVO ENDERECO DE INSTALACAO/MANUTENCAO');
 
                 $cidade = $request->input('cidade');
                 $cep = $request->input('cep');
@@ -365,39 +319,24 @@ class PedidoController extends Controller
                     $id, $cidade, $cep, $bairro, $ruaNumero
                 ]);
 
-                \Log::info('ENDERECO INST/MANU INSERIDO COM SUCESSO');
             } else {
-                \Log::info('INSTALACAO/MANUTENCAO NAO SELECIONADOS - ENDERECO MANTIDO COMO NULL');
             }
 
             // CORREÇÃO: LÓGICA MELHORADA PARA PRODUTOS
             // Sempre apaga primeiro os registros existentes
             DB::delete("DELETE FROM ITENS_PRODUTOS WHERE COD_PEDIDO = ?", [$id]);
-            \Log::info('REGISTROS ANTIGOS DE PRODUTOS REMOVIDOS');
 
             // Só insere novos produtos se PRODUTO estiver selecionado E houver produtos
             if (in_array('PRODUTO', $pedidoTipos) && !empty($codProdutos)) {
 
-                \Log::info('INSERINDO NOVOS PRODUTOS DO PEDIDO', [
-                    'codProdutos' => $codProdutos,
-                    'quantidade' => $quantidade
-                ]);
-
                 // Validação de compatibilidade entre arrays
                 if (count($codProdutos) !== count($quantidade)) {
-                    \Log::error('ERRO: quantidade incompatível', [
-                        'codProdutos' => $codProdutos,
-                        'quantidade' => $quantidade
-                    ]);
                     return response()->json(['message' => 'Arrays de produtos e quantidades incompatíveis'], 422);
                 }
 
                 foreach ($codProdutos as $codProduto) {
 
                     if (!isset($quantidade[$codProduto])) {
-                        \Log::error('ERRO: quantidade faltando', [
-                            'produto' => $codProduto
-                        ]);
                         return response()->json(['erro' => "Quantidade não informada para o produto $codProduto"], 422);
                     }
 
@@ -406,31 +345,18 @@ class PedidoController extends Controller
                     DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE)
                     VALUES (?, ?, ?)", [$id, $codProduto, $quantidadeProduto]);
                     
-                    \Log::info('PRODUTO INSERIDO', [
-                        'cod_produto' => $codProduto,
-                        'quantidade' => $quantidadeProduto
-                    ]);
+
                 }
-
-                \Log::info('PRODUTOS INSERIDOS COM SUCESSO');
-            } else {
-                \Log::info('PRODUTO NAO SELECIONADO OU SEM PRODUTOS - DADOS MANTIDOS COMO NULL');
             }
-
-            \Log::info('ATUALIZANDO TIPOS DO PEDIDO');
 
             // Sempre apaga e reinsere os tipos
             DB::delete("DELETE FROM PEDIDOS_TIPOS WHERE COD_PEDIDO = ?", [$id]);
 
             foreach ($pedidoTipos as $tipo) {
                 DB::insert("INSERT INTO PEDIDOS_TIPOS (COD_PEDIDO, NOME_TIPO) VALUES (?, ?)", [$id, $tipo]);
-                \Log::info('TIPO INSERIDO: ' . $tipo);
             }
 
-            \Log::info('TIPOS DO PEDIDO ATUALIZADOS');
-
             DB::commit();
-            \Log::info('TRANSACTION COMMITADO COM SUCESSO', ['pedido' => $id]);
 
             return response()->json([
                 'message' => 'Pedido atualizado com sucesso!',
@@ -440,13 +366,6 @@ class PedidoController extends Controller
         } catch (\Exception $e) {
 
             DB::rollBack();
-
-            \Log::error('ERRO NO UPDATE DO PEDIDO', [
-                'mensagem' => $e->getMessage(),
-                'linha' => $e->getLine(),
-                'arquivo' => $e->getFile(),
-                'trace' => $e->getTraceAsString()
-            ]);
 
             return response()->json([
                 'message' => 'Erro ao atualizar o pedido',
@@ -460,14 +379,14 @@ class PedidoController extends Controller
     public function destroy($id) {
         DB::beginTransaction();
         try {
-            // ⭐ 1. Verifica se o pedido existe
+            //1. Verifica se o pedido existe
             $pedido = DB::select("SELECT * FROM PEDIDOS WHERE COD_PEDIDO = ?", [$id]);
             
             if (empty($pedido)) {
                 return response()->json(['message' => 'Pedido não encontrado'], 404);
             }
 
-            // ⭐ 2. Verifica se existe pagamento associado ao pedido
+            //2. Verifica se existe pagamento associado ao pedido
             $pagamento = DB::select("SELECT * FROM PAGAMENTOS_CLIENTES WHERE COD_PEDIDO = ?", [$id]);
             
             if (!empty($pagamento)) {
@@ -477,7 +396,7 @@ class PedidoController extends Controller
                 ], 422);
             }
 
-            // ⭐ 3. Exclui os registros relacionados (na ordem correta)
+            //3. Exclui os registros relacionados (na ordem correta)
             
             // Primeiro exclui os itens do pedido
             DB::delete("DELETE FROM ITENS_PRODUTOS WHERE COD_PEDIDO = ?", [$id]);
@@ -488,7 +407,7 @@ class PedidoController extends Controller
             // Exclui os endereços de instalação/manutenção
             DB::delete("DELETE FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);
             
-            // ⭐ 4. Finalmente exclui o pedido
+            //4. Finalmente exclui o pedido
             $deleted = DB::delete("DELETE FROM PEDIDOS WHERE COD_PEDIDO = ?", [$id]);
 
             DB::commit();

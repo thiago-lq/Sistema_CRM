@@ -151,21 +151,6 @@ class ClienteController extends Controller
     // Controlador que cadastra um cliente
 
     public function store(Request $request) {
-        // Verifica se o request contém os dados do cliente
-        $cpf = $request->input('cpf');
-        $cnpj = $request->input('cnpj');
-        $email = $request->input('email');
-        $nome = $request->input('nome');
-        $dataNascimento = $request->input('data_nascimento');
-        $telefones = $request->input('telefones');
-        $enderecos = $request->input('enderecos', []);
-
-        // Verifica se os telefones não estão vazios e são um array de strings
-        if (!empty($telefones) && is_string($telefones[0] ?? null)) {
-            // Mapeia cada telefone para um array com a chave "telefone"
-            $telefones = array_map(fn($t) => ['telefone' => $t], $telefones);
-        }
-        
         // Valida os dados do cliente
         $request->validate([
             // Valida se o cpf é não nulo, string, existe no banco de dados e com no máximo 11 caracteres
@@ -189,6 +174,21 @@ class ClienteController extends Controller
             // Valida se os endereços não estão vazios e com tamanho 100
             'enderecos.*.rua_numero' => 'required|string|max:100',
         ]);
+
+        // Verifica se o request contém os dados do cliente
+        $cpf = $request->input('cpf');
+        $cnpj = $request->input('cnpj');
+        $email = $request->input('email');
+        $nome = $request->input('nome');
+        $dataNascimento = $request->input('data_nascimento');
+        $telefones = $request->input('telefones');
+        $enderecos = $request->input('enderecos', []);
+
+        // Verifica se os telefones não estão vazios e são um array de strings
+        if (!empty($telefones) && is_string($telefones[0] ?? null)) {
+            // Mapeia cada telefone para um array com a chave "telefone"
+            $telefones = array_map(fn($t) => ['telefone' => $t], $telefones);
+        }
 
         // Gera um ID aleatório para o cliente
         do {
@@ -229,20 +229,6 @@ class ClienteController extends Controller
     // Controlador que atualiza os dados de um cliente
 
     public function update(Request $request, $id) {
-        // Verifica se o request contém os dados do cliente
-        $cpf = $request->input('cpf');
-        $cnpj = $request->input('cnpj');
-        $email = $request->input('email');
-        $nome = $request->input('nome');
-        $dataNascimento = $request->input('data_nascimento');
-        $telefones = $request->input('telefones');
-        $enderecos = $request->input('enderecos', []);
-
-        // Verifica se os telefones não estão vazios e são um array de strings
-        if (!empty($telefones) && is_string($telefones[0] ?? null)) {
-            $telefones = array_map(fn($t) => ['telefone' => $t], $telefones);
-        }
-
         // Valida os dados do cliente
         $request->validate([
             // Valida se o cpf é não nulo, string, existe no banco de dados e com no máximo 11 caracteres
@@ -266,6 +252,20 @@ class ClienteController extends Controller
             // Valida se os endereços não estão vazios e com tamanho 100
             'enderecos.*.rua_numero' => 'required|string|max:100',
         ]);
+
+        // Verifica se o request contém os dados do cliente
+        $cpf = $request->input('cpf');
+        $cnpj = $request->input('cnpj');
+        $email = $request->input('email');
+        $nome = $request->input('nome');
+        $dataNascimento = $request->input('data_nascimento');
+        $telefones = $request->input('telefones');
+        $enderecos = $request->input('enderecos', []);
+
+        // Verifica se os telefones não estão vazios e são um array de strings
+        if (!empty($telefones) && is_string($telefones[0] ?? null)) {
+            $telefones = array_map(fn($t) => ['telefone' => $t], $telefones);
+        }
 
         DB::beginTransaction();
         // Inicia a transação, tentando atualizar os dados do cliente

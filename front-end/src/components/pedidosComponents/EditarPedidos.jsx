@@ -108,11 +108,6 @@ export default function EditarPedidos({
         prazo: pedidoSelecionado.prazo || "",
         enderecoInstManu: enderecoInstManu,
       });
-
-      // Buscar dados do cliente automaticamente
-      if (pedidoSelecionado.cod_cliente) {
-        setBuscaClienteEditar(pedidoSelecionado.cod_cliente.toString());
-      }
     }
   }, [pedidoSelecionado]);
 
