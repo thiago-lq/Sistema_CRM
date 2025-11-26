@@ -7,9 +7,12 @@ use Illuminate\Support\Facades\DB;
 
 class PedidoController extends Controller
 {
-    // Controlador que busca todos os pedidos
-    public function index() {
-        $pedido = DB::select("
+    // Controlador que busca todos os pedidos ou filtra por termo de busca
+    public function index(Request $request) {
+        // Recebe o termo de busca da query string
+        $termoBusca = $request->query('termo', '');
+        
+        $query = "
         SELECT
             -- Definição dos dados que irão vir na query, com as suas respectivas variáveis
             p.*,
@@ -51,54 +54,49 @@ class PedidoController extends Controller
         LEFT JOIN ENDERECOS_CLIENTES ec ON p.COD_ENDERECO_CLIENTE = ec.COD_ENDERECO_CLIENTE 
         LEFT JOIN PAGAMENTOS_CLIENTES pc ON pc.COD_PEDIDO = p.COD_PEDIDO
         LEFT JOIN FUNCIONARIOS_CRM f ON f.COD_FUNCIONARIO = p.COD_FUNCIONARIO
-
-        ORDER BY p.COD_PEDIDO
-        ");
+        ";
+        
+        // Adiciona WHERE se houver termo de busca
+        if (!empty($termoBusca)) {
+            $query .= " WHERE p.COD_PEDIDO::text LIKE ? OR f.NOME_FUNCIONARIO ILIKE ? OR ec.CIDADE ILIKE ?";
+            $termoLike = '%' . $termoBusca . '%';
+            $pedido = DB::select($query . " ORDER BY p.COD_PEDIDO", [$termoLike, $termoLike, $termoLike]);
+        } else {
+            $query .= " ORDER BY p.COD_PEDIDO";
+            $pedido = DB::select($query);
+        }
 
         return response()->json($pedido);
     }
 
-    // Controlador que busca um pedido pelo seu ID
-    public function show($id) {
-        // Pega o pedido do banco de dados por ID enviado
+        public function show($id) {
         $pedido = DB::select("SELECT * FROM PEDIDOS WHERE COD_PEDIDO = ?", [$id]);
-        // Verifica se pedido está vazio, se estiver vazio retorna uma mensagem de erro, se não retorna o pedido
-        if (!$pedido) {
+        
+        if (empty($pedido)) {
             return response()->json(['message' => 'Pedido não encontrado'], 404);
         }
 
-        // Busca os endereços do pedido de acordo com o ID
-        $enderecosInstManu= DB::select("SELECT * FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);
-        // Busca os itens do pedido de acordo com o ID
+        $enderecosInstManu = DB::select("SELECT * FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);
         $itensProdutos = DB::select("SELECT * FROM ITENS_PRODUTOS WHERE COD_PEDIDO = ?", [$id]);
-        // Busca os tipos do pedido de acordo com o ID
         $pedidoTipos = DB::select("SELECT * FROM PEDIDOS_TIPOS WHERE COD_PEDIDO = ?", [$id]);
-        // Busca os endereços do cliente com o ID de endereços dentro do pedido do ID enviado
         $enderecosClientes = DB::select("SELECT * FROM ENDERECOS_CLIENTES WHERE COD_ENDERECO_CLIENTE = ?", 
-        [$pedido[0]['COD_ENDERECO_CLIENTE']]);
-        // Busca o pagamento do cliente de acordo com o ID enviado
+        [$pedido[0]->COD_ENDERECO_CLIENTE]);
         $pagamentoCliente = DB::select("SELECT * FROM PAGAMENTOS_CLIENTES WHERE COD_PEDIDO = ?", [$id]);
-        // Busca o funcionário com o codigo do funcionário dentro do pedido do ID enviado
-        $funcionario = DB::select("SELECT * FROM FUNCIONARIOS_CRM WHERE COD_FUNCIONARIO = ?", [$pedido[0]['COD_FUNCIONARIO']]);
+        $funcionario = DB::select("SELECT * FROM FUNCIONARIOS_CRM WHERE COD_FUNCIONARIO = ?", 
+        [$pedido[0]->COD_FUNCIONARIO]);
 
-        // Cria um array de produtos
         $produtos = [];
-        // Verifica se os itens do pedido estão vazios
         if (!empty($itensProdutos)) {
-            // Pega a coluna do array que tem os códigos dos produtos
-            $codigos =array_column($itensProdutos, 'COD_PRODUTO');
-            // Cria um array de strings para ser um placeholder dinâmico para o mysql, de acordo com a quantidade de codigos
+            $codigos = array_column($itensProdutos, 'COD_PRODUTO');
             $placeholders = implode(',', array_fill(0, count($codigos), '?'));
-            // Pega os produtos do banco de dados pelos códigos dos produtos que estão no pedido
             $produtos = DB::select("SELECT * FROM PRODUTOS WHERE COD_PRODUTO IN ($placeholders)", $codigos);
         }
         
-        // Retorna os dados do pedido com uma estrutura base
         return response()->json([
             'pedido' => $pedido[0],
-            'funcionario' => $funcionario[0],
-            'enderecos_inst_manu' => $enderecosInstManu[0],
-            'enderecos_clientes' => $enderecosClientes[0],
+            'funcionario' => !empty($funcionario) ? $funcionario[0] : null,
+            'enderecos_inst_manu' => !empty($enderecosInstManu) ? $enderecosInstManu[0] : null,
+            'enderecos_clientes' => !empty($enderecosClientes) ? $enderecosClientes[0] : null,
             'itens_produtos' => $itensProdutos,
             'pedidos_tipos' => $pedidoTipos,
             'produtos' => $produtos,

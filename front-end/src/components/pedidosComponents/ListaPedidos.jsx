@@ -1,5 +1,4 @@
 import recarregar from "../../assets/recarregar.jpg";
-import { pedidosShow } from "../../services/pedidosShow";
 
 export default function ListaPedidos({
   termoBusca,
@@ -51,13 +50,6 @@ export default function ListaPedidos({
       </div>
     );
   };
-
-  // Filtro de busca
-  const pedidosFiltrados = pedidos?.filter(
-    (pedido) =>
-      pedido.cod_pedido?.toString().includes(termoBusca.toLowerCase()) ||
-      pedido.cod_cliente?.toString().includes(termoBusca.toLowerCase())
-  );
 
   return (
     <div className="bg-white mt-3 rounded-lg shadow-sm">
@@ -134,8 +126,8 @@ export default function ListaPedidos({
                     </div>
                   </td>
                 </tr>
-              ) : pedidosFiltrados?.length > 0 ? (
-                pedidosFiltrados.map((pedido) => (
+              ) : pedidos?.length > 0 ? (
+                pedidos.map((pedido) => (
                   <tr
                     key={pedido.cod_pedido}
                     className="hover:bg-gray-50 transition-colors duration-150"
@@ -225,11 +217,7 @@ export default function ListaPedidos({
 
       {/* Footer com contador */}
       <div className="px-4 py-3 bg-gray-50 border-t text-xs text-gray-500 flex justify-between items-center">
-        <span>
-          Mostrando {pedidosFiltrados?.length || 0} de {pedidos?.length || 0}{" "}
-          pedidos
-        </span>
-        {termoBusca && <span>Filtrado por: {termoBusca}</span>}
+        Total de registros: {pedidos.length}
       </div>
     </div>
   );

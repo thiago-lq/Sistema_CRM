@@ -8,7 +8,6 @@ import {
 
 import { pedidosIndex } from "../services/pedidosIndex";
 import { pedidosStore } from "../services/pedidosStore";
-import { pedidosShow } from "../services/pedidosShow";
 import { pedidosDelete } from "../services/pedidosDelete";
 
 import { produtosIndex } from "../services/produtosIndex";
@@ -51,12 +50,12 @@ export default function Pedidos() {
       setLoading(true);
       async function carregarPedidos() {
         // Verifica se há termo de busca
-        if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
+        if (termoBusca.trim().length > 0) {
           // é número, busca pelo ID do pedido
-          const dados = await pedidosShow(Number(termoBusca));
+          const dados = await pedidosIndex( { termo: termoBusca });
           setLoading(false);
           // Se dados existir de acordo com o ID, adiciona ao array, se não existir, cria um array vazio
-          setPedidos(dados?.cod_pedido ? [dados] : []);
+          setPedidos(dados);
         } else {
           // Não é número, busca todos os pedidos
           const dados = await pedidosIndex();
@@ -77,12 +76,12 @@ export default function Pedidos() {
     // Loading visual
     setLoading(true);
     // Verifica se há termo de busca
-    if (!isNaN(termoBusca.trim()) && termoBusca.trim().length > 0) {
+    if (termoBusca.trim().length > 0) {
       // é número, busca pelo ID do pedido
-      const dados = await pedidosShow(Number(termoBusca));
+      const dados = await pedidosIndex( {termo: termoBusca });
       setLoading(false);
       // Se dados existir de acordo com o ID, adiciona ao array, se não existir, cria um array vazio
-      setPedidos(dados?.cod_pedido ? [dados] : []);
+      setPedidos(dados);
     } else {
       // Não é número, busca todos os pedidos
       const dados = await pedidosIndex();
