@@ -13,7 +13,7 @@ export default function EditarClientes({
   minCamposEndereco,
 }) {
   return (
-    <div>
+    <div className="p-2">
       <button
         onClick={() => setModo("lista")}
         className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition hover:cursor-pointer"
@@ -27,7 +27,7 @@ export default function EditarClientes({
         </p>
       </div>
       <form onSubmit={handleSubmitEditar} className="space-y-4">
-        <div className="grid grid-cols-4 gap-4 px-30">
+        <div className="grid grid-cols-4 gap-4 px-5">
           <div>
             <label className="block text-sm font-medium mb-1">
               Nome do Cliente
@@ -96,7 +96,7 @@ export default function EditarClientes({
             </div>
           )}
         </div>
-        <div className="flex px-30 flex-col mt-10 w-max gap-3">
+        <div className="flex px-5 flex-col mt-10 w-max gap-3">
           <div className="mt-1.5 space-x-3">
             {clienteEditar.telefones.length < maxCamposTelefone && (
               <button
@@ -135,7 +135,7 @@ export default function EditarClientes({
             ))}
           </div>
         </div>
-        <div className="flex px-30 flex-col w-full">
+        <div className="flex px-5 flex-col w-full">
           <div className="space-x-3 my-5">
             {clienteEditar.enderecos.length < maxCamposEndereco && (
               <button
@@ -181,7 +181,7 @@ export default function EditarClientes({
                     name="bairro"
                     value={end.bairro}
                     onChange={(e) => handleChangeEditar(e, index, "enderecos")}
-                    className="max-w-md w-70 p-2 border rounded-lg"
+                    className="w-full p-2 border rounded-lg"
                     required
                   />
                 </div>
@@ -205,7 +205,7 @@ export default function EditarClientes({
                     name="cidade"
                     value={end.cidade}
                     onChange={(e) => handleChangeEditar(e, index, "enderecos")}
-                    className="w-70 p-2 border rounded-lg"
+                    className="w-full p-2 border rounded-lg"
                     required
                   />
                 </div>

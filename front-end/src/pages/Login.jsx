@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
-import Bar from "../components/Bar";
 
 // Página de Login
 export default function Login() {
@@ -45,10 +44,6 @@ export default function Login() {
   return (
     // Componente que será renderizada no componente principal
     <div>
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <Bar />
-      </div>
-
       <div className="flex items-center justify-center min-h-[calc(100vh-80px)] bg-gray-100 mt-12">
         <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
           <div className="text-center mb-6">

@@ -331,7 +331,7 @@ export default function Pedidos() {
     <div className=" bg-white">
       {/* LINHA CHAVE (1): Altere a classe max-w-lg (que limita a largura total do conteúdo) para um valor maior como max-w-3xl, max-w-4xl, ou até max-w-full se quiser que ele use toda a largura disponível.
        */}
-      <div className="max-w-2/3 mx-auto bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30">
+      <div className="max-w-3/4 mx-auto bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30">
         <h1 className="text-3xl font-extrabold p-4 text-center text-gray-800">
           Gerenciamento de Pedidos
         </h1>

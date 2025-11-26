@@ -1,4 +1,5 @@
 import recarregar from "../../assets/recarregar.jpg";
+import { pedidosShow } from "../../services/pedidosShow";
 
 export default function ListaPedidos({
   termoBusca,
@@ -98,17 +99,17 @@ export default function ListaPedidos({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   ID
                 </th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Cliente
                 </th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tipos
                 </th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Data
+                <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Data de criação
                 </th>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Valor Total
@@ -116,7 +117,7 @@ export default function ListaPedidos({
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -139,7 +140,7 @@ export default function ListaPedidos({
                     key={pedido.cod_pedido}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
-                    <td className="py-3 px-4 text-sm font-medium text-gray-900">
+                    <td className="py-3 px-2 text-sm font-medium text-gray-900">
                       #{pedido.cod_pedido}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-700">

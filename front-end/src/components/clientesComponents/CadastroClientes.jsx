@@ -16,7 +16,7 @@ export default function CadastroClientes({
   // Constante que armazena o tipo de pessoa que está sendo cadastrado
   const [pessoa, setPessoa] = useState("");
   return (
-    <div>
+    <div className="p-2">
       {/* Componente que vai ser renderizado no componente principal */}
       <div className="flex flex-row justify-between items-center">
         <button
@@ -46,7 +46,7 @@ export default function CadastroClientes({
       </div>
       {/* Formulário de cadastro */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-4 gap-5 px-30">
+        <div className="grid grid-cols-4 gap-5 px-5">
           <div>
             <label className="block text-sm font-medium mb-1">Nome</label>
             <input
@@ -113,7 +113,7 @@ export default function CadastroClientes({
           </div>
           )}
         </div>
-        <div className="flex px-30 flex-col mt-10 w-max gap-3">
+        <div className="flex px-5 flex-col mt-10 w-max gap-3">
           <div className="mt-1.5">
             {form.telefones.length < maxCamposTelefone && (
               <button
@@ -134,7 +134,7 @@ export default function CadastroClientes({
               </button>
             )}
           </div>
-          <div className="flex flex-row space-x-10">
+          <div className="grid grid-cols-3 space-x-10">
             {form.telefones.map((t, index) => (
               <div key={index} className="flex flex-col w-full">
                 <label className="block text-sm font-medium mb-1">
@@ -152,7 +152,7 @@ export default function CadastroClientes({
             ))}
           </div>
         </div>
-        <div className="flex px-30 flex-col w-full">
+        <div className="flex px-5 flex-col w-full">
           <div className="space-x-3 mb-3">
             {form.enderecos.length < maxCamposEndereco && (
               <button
@@ -175,7 +175,7 @@ export default function CadastroClientes({
           </div>
           <div className="flex flex-col">
             {form.enderecos.map((end, index) => (
-              <div key={index} className="grid grid-cols-4 space-x-3 w-full">
+              <div key={index} className="grid grid-cols-4 space-x-10 w-full">
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Rua e Número
@@ -198,7 +198,7 @@ export default function CadastroClientes({
                     name="bairro"
                     value={end.bairro}
                     onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="max-w-md w-70 p-2 border rounded"
+                    className="w-full p-2 border rounded"
                     required
                   />
                 </div>
@@ -222,7 +222,7 @@ export default function CadastroClientes({
                     name="cidade"
                     value={end.cidade}
                     onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="w-70 p-2 border rounded"
+                    className="w-full p-2 border rounded"
                     required
                   />
                 </div>

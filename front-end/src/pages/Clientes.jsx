@@ -329,7 +329,7 @@ export default function Clientes() {
   };
   // Componente que renderiza o componente principal
   return (
-    <div className="px-10 pt-13 pb-5 m-3 bg-white rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.50)] mt-40">
+    <div className="max-w-4/5 mx-auto px-5 pt-13 pb-5 m-3 bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30">
       {modo === "lista" && <ListaClientes {...propsLista} />}
       {modo === "cadastro" && <CadastroClientes {...propsCadastro} />}
       {modo === "detalhes" && <DetalhesClientes {...propsDetalhes} />}

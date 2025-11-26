@@ -1,19 +1,18 @@
 export default function DetalhesClientes({ clienteSelecionado, setModo }) {
   return (
-    <div className="p-6">
+    <div className="p-2">
       <button
         onClick={() => setModo("lista")}
-        className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition hover:cursor-pointer"
+        className="mb-3 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition hover:cursor-pointer"
       >
         Voltar
       </button>
 
-      <div className="bg-white rounded-xl p-6">
+      <div className="bg-white rounded-xl p-3">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
           Detalhes do Cliente #{clienteSelecionado.cod_cliente}
         </h2>
-
-        <div className="grid grid-cols-4 gap-6 text-gray-700">
+        <div className="grid grid-cols-4 gap-3 text-gray-700">
           <p>
             <strong>Nome:</strong> {clienteSelecionado.nome}
           </p>
@@ -31,14 +30,9 @@ export default function DetalhesClientes({ clienteSelecionado, setModo }) {
             </p>
           )}
           {clienteSelecionado.data_nascimento && (
-          <div className="flex flex-col items-center justify-center">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Data de Nascimento
-            </h3>
-            <p className="text-gray-500">
-              {clienteSelecionado.data_nascimento}
+            <p>
+              <strong>Data de Nascimento:</strong> {clienteSelecionado.data_nascimento}
             </p>
-          </div>
         )}
         </div>
         </div>
