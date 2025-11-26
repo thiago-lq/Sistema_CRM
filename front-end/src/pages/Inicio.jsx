@@ -98,12 +98,12 @@ export default function Inicio({ setTab }) {
             </h3>
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
+                <div className="text-gray-600 mt-1">Clientes:</div>
                 <div className="text-3xl font-bold text-indigo-600">{clientes.length}</div>
-                <div className="text-gray-600 mt-1">Clientes</div>
               </div>
               <div className="text-center">
+                <div className="text-gray-600 mt-1">Pedidos:</div>
                 <div className="text-3xl font-bold text-emerald-600">{pedidos.length}</div>
-                <div className="text-gray-600 mt-1">Hoje</div>
               </div>
             </div>
           </div>
