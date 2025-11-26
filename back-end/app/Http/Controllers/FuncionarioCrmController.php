@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class Funcionario_CrmController extends Controller
+class FuncionarioCrmController extends Controller
 {
 
     // Controlador que busca os todos os funcionarios, ou busca um funcionario específico pelo nome
