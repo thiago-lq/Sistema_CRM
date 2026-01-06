@@ -130,6 +130,8 @@ class PedidoController extends Controller
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
             // Valida se o valor_adicional é não nulo, numérico, e com o valor minimo de 0
             'valor_adicional' => 'nullable|numeric|min:0',
+            'metodo_pagamento' => 'required|string|in:PIX,CREDITO,DEBITO,DINHEIRO,BOLETO',
+            'parcelas' => 'nullable|integer',
             // Valida se o prazo é não nulo, data
             'prazo' => 'required|date',
         ]);
@@ -146,6 +148,8 @@ class PedidoController extends Controller
         $descricao = $request->input('descricao');
         $valorTotal = $request->input('valor_total');
         $valorAdicional = $request->input('valor_adicional', 0);
+        $metodoPagamento = $request->input('metodo_pagamento');
+        $parcelas = $request->input('parcelas', 0);
         $prazo = $request->input('prazo');
 
         // Pega o request input cod_produtos e converte por meio do array_map cada valor para inteiro
@@ -182,8 +186,8 @@ class PedidoController extends Controller
         try {
             // Insere os dados do pedido no banco de dados
             DB::insert("INSERT INTO PEDIDOS (COD_PEDIDO, COD_CLIENTE, COD_ENDERECO_CLIENTE, COD_FUNCIONARIO, DESCRICAO, 
-            VALOR_TOTAL, VALOR_ADICIONAL, PRAZO) VALUES (?, ?, ?, ?, ?, ?, ? , ?)", [$codPedido, $codCliente, $codEnderecoCliente, 
-            $codFuncionario, $descricao, $valorTotal, $valorAdicional, $prazo]);
+            VALOR_TOTAL, VALOR_ADICIONAL, METODO_PAGAMENTO, PARCELAS, PRAZO) VALUES (?, ?, ?, ?, ?, ?, ? , ?, ?, ?)", [$codPedido, 
+            $codCliente, $codEnderecoCliente, $codFuncionario, $descricao, $valorTotal, $valorAdicional, $metodoPagamento, $parcelas, $prazo]);
             // Se o pedido tiver tipo de instalação ou manutenção, insere os dados do endereço no banco de dados
             if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
                 DB::insert("INSERT INTO ENDERECOS_INST_MANU (COD_PEDIDO, CIDADE, CEP, BAIRRO, RUA_NUMERO)
@@ -253,6 +257,8 @@ class PedidoController extends Controller
             'descricao' => 'required|string|max:500',
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
             'valor_adicional' => 'nullable|numeric|min:0',
+            'metodo_pagamento' => 'required|string|in:PIX,CREDITO,DEBITO,DINHEIRO,BOLETO',
+            'parcelas' => 'nullable|integer',
             'prazo' => 'required|date',
         ]);
 
@@ -268,6 +274,8 @@ class PedidoController extends Controller
         $descricao = $request->input('descricao');
         $valorTotal = $request->input('valor_total');
         $valorAdicional = $request->input('valor_adicional', 0);
+        $metodoPagamento = $request->input('metodo_pagamento');
+        $parcelas = $request->input('parcelas', 0);
         $prazo = $request->input('prazo');
 
         // Converte produtos em inteiros
@@ -295,9 +303,9 @@ class PedidoController extends Controller
         try {
 
             DB::update("UPDATE PEDIDOS SET COD_CLIENTE = ?, COD_ENDERECO_CLIENTE = ?, COD_FUNCIONARIO = ?, DESCRICAO = ?, 
-            VALOR_TOTAL = ?, VALOR_ADICIONAL = ?, PRAZO = ? WHERE COD_PEDIDO = ?", [
-                $codCliente, $codEnderecoCliente, $codFuncionario,
-                $descricao, $valorTotal, $valorAdicional, $prazo, $id
+            VALOR_TOTAL = ?, VALOR_ADICIONAL = ?, METODO_PAGAMENTO = ?, PARCELAS = ?, PRAZO = ? WHERE COD_PEDIDO = ?", [
+                $codCliente, $codEnderecoCliente, $codFuncionario, $descricao, $valorTotal, $valorAdicional, $metodoPagamento, $parcelas, 
+                $prazo, $id
             ]);
 
             // CORREÇÃO: LÓGICA MELHORADA PARA INSTALAÇÃO / MANUTENÇÃO

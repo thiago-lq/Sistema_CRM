@@ -70,7 +70,6 @@ export default function NavBar() {
             onClick={() => setTab("inicio")}
           >
             <img src={empresa} alt="empresa" className="h-[2rem]" />
-            <span className="text-xl font-bold text-black italic ml-2">SEU CRM</span>
           </button>
         </div>
 

@@ -32,6 +32,8 @@ export default function Pedidos() {
     descricao: "",
     valorTotal: "",
     valor_adicional: 0,
+    metodoPagamento: "",
+    parcelas: 0,
     prazo: "",
 
     enderecoInstManu: {
@@ -206,6 +208,8 @@ export default function Pedidos() {
         descricao: form.descricao,
         valor_total: Number(form.valorTotal),
         valor_adicional: Number(form.valor_adicional) || 0,
+        metodo_pagamento: form.metodoPagamento,
+        parcelas: form.parcelas,
         prazo: form.prazo,
         // Endereço só para INSTALACAO/MANUTENCAO
         ...(form.pedidoTipos.includes("INSTALACAO") ||
@@ -232,6 +236,8 @@ export default function Pedidos() {
         descricao: "",
         valorTotal: "",
         valor_adicional: 0,
+        metodoPagamento: "",
+        parcelas: 0,
         prazo: "",
         enderecoInstManu: {
           cidade: "",

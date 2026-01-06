@@ -49,14 +49,14 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
         Detalhes do Pedido #{pedidoSelecionado.cod_pedido}
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div className="grid grid-cols-2 gap-4 text-sm">
         {/* Dados Básicos do Pedido */}
         <div className="space-y-3">
           <div className="flex gap-1">
             <p className="font-semibold text-gray-700">Cliente:</p>
             <p>{pedidoSelecionado.cod_cliente || "-"}</p>
           </div>
-          <div className="flex gap-20">
+          <div className="flex gap-30">
             <div>
               <p className="font-semibold text-gray-700">Data de Criação:</p>
               <p>{formatoBrasileiro(pedidoSelecionado.created_at)}</p>
@@ -68,6 +68,7 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
               <p>{formatoBrasileiro(pedidoSelecionado.updated_at)}</p>
             </div>
           </div>
+          <div className="flex gap-38">
           <div>
             <p className="font-semibold text-gray-700">Valor Total:</p>
             <p className="font-bold text-gray-900">
@@ -75,12 +76,26 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
             </p>
           </div>
           <div>
+            <p className="font-semibold text-gray-700">Método de Pagamento:</p>
+            <p className="font-bold text-gray-900">
+              {pedidoSelecionado.metodo_pagamento}
+            </p>
+          </div>
+          </div>
+          <div className="flex gap-31">
+          <div>
             <p className="font-semibold text-gray-700">Valor Adicional:</p>
             <p className="font-bold text-gray-900">
               {formatarMoeda(pedidoSelecionado.valor_adicional)}
             </p>
           </div>
-
+          <div>
+            <p className="font-semibold text-gray-700">Parcelas:</p>
+            <p className="font-bold text-gray-900">
+              {pedidoSelecionado.parcelas}
+            </p>
+          </div>
+          </div>
           <div>
             <p className="font-semibold text-gray-700">
               Funcionário Responsável: {pedidoSelecionado.funcionario_nome}
@@ -135,7 +150,7 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
                 ? "Pago"
                 : pedidoSelecionado.status_pagamento === false
                 ? "Pendente"
-                : "N/A"}
+                : "Processando"}
             </span>
           </div>
         </div>

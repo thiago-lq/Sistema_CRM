@@ -30,7 +30,6 @@ class EnsureFuncionarioIsAuthenticated
 
     private function validateSupabaseToken($token) {
         $client = new \GuzzleHttp\Client();
-
         try {
             $response = $client->get('https://uvwzveuytsxswmlgoskn.supabase.co/auth/v1/user', [
                 'headers' => [

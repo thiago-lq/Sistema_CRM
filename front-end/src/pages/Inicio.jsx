@@ -10,24 +10,14 @@ export default function Inicio({ setTab }) {
     async function fetchClientes() {
       try {
         const dadosClientes = await clientesIndex();
+        const dadosPedidos = await pedidosIndex();
         setClientes(dadosClientes);
+        setPedidos(dadosPedidos);
       } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
+        console.error("Erro ao buscar dados:", error);
       }
     }
     fetchClientes();
-  }, []);
-
-  useEffect(() => {
-    async function fetchPedidos() {
-      try {
-        const dadosPedidos = await pedidosIndex();
-        setPedidos(dadosPedidos);
-      } catch (error) {
-        console.error("Erro ao buscar pedidos:", error);
-      }
-    }
-    fetchPedidos();
   }, []);
 
   return (
@@ -36,7 +26,7 @@ export default function Inicio({ setTab }) {
         {/* Header */}
         <div className="text-center mb-16 mt-25">
           <h1 className="text-5xl font-bold text-gray-800 mb-4">
-            Painel do CRM
+            Painel do Gerenciador de OS
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Gerencie seus clientes e pedidos de forma eficiente com nossa plataforma intuitiva
