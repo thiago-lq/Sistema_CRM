@@ -5,10 +5,10 @@ import {
   ListaClientes,
   EditarClientes,
 } from "../components/clientesComponents";
-import { clientesIndex } from "../services/clientesIndex";
-import { clientesStore } from "../services/clientesStore";
-import { clientesUpdate } from "../services/clientesUpdate";
-import { clientesDelete } from "../services/clientesDelete";
+import { clientesIndex } from "../services/cliente/clientesIndex";
+import { clientesStore } from "../services/cliente/clientesStore";
+import { clientesUpdate } from "../services/cliente/clientesUpdate";
+import { clientesDelete } from "../services/cliente/clientesDelete";
 
 export default function Clientes() {
   // Constantes que serão utilizadas no componente

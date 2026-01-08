@@ -6,9 +6,9 @@ import {
   EditarPedidos,
 } from "../components/pedidosComponents";
 
-import { pedidosIndex } from "../services/pedidosIndex";
-import { pedidosStore } from "../services/pedidosStore";
-import { pedidosDelete } from "../services/pedidosDelete";
+import { pedidosIndex } from "../services/pedido/pedidosIndex";
+import { pedidosStore } from "../services/pedido/pedidosStore";
+import { pedidosDelete } from "../services/pedido/pedidosDelete";
 
 import { produtosIndex } from "../services/produtosIndex";
 

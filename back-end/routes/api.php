@@ -15,6 +15,8 @@ Route::middleware('auth.funcionario')->group(function() {
     // Rotas de Clientes e telefones de clientes
     Route::get('/clientes', [ClienteController::class, 'index']);
     Route::get('/clientes/{id}', [ClienteController::class, 'show']);
+    Route::get('/novosClientes', [ClienteController::class, 'novosClientes']);
+    Route::get('/dadosCliente/{id}', [ClienteController::class, 'dadosCliente']);
     Route::post('/clientes', [ClienteController::class, 'store']);
     Route::put('/clientes/{id}', [ClienteController::class, 'update']);
     Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
@@ -26,6 +28,8 @@ Route::middleware('auth.funcionario')->group(function() {
     // Rotas de Pedidos
     Route::get('/pedidos', [PedidoController::class, 'index']);
     Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
+    Route::get('/novosPedidos', [PedidoController::class, 'novosPedidos']);
+    Route::get('/pedidosAtrasados', [PedidoController::class, 'pedidosAtrasados']);
     Route::post('/pedidos', [PedidoController::class, 'store']);
     Route::put('/pedidos/{id}', [PedidoController::class, 'update']);
     Route::delete('/pedidos/{id}', [PedidoController::class, 'destroy']);

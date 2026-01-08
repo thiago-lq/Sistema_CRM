@@ -69,7 +69,7 @@ export default function NavBar() {
             className="flex items-center text-gray-700 hover:opacity-60 hover:cursor-pointer transition-all duration-300"
             onClick={() => setTab("inicio")}
           >
-            <img src={empresa} alt="empresa" className="h-[2rem]" />
+            <img src={empresa} alt="empresa" className="h-[3rem]" />
           </button>
         </div>
 
@@ -85,7 +85,7 @@ export default function NavBar() {
           </button>
           <button onClick={() => navigate("/")} className={LinkStyle}>
             <img src={logout} alt="logout" className="h-[2rem]" />
-            <span className="text-xs mt-1 font-medium">LOGOUT</span>
+            <span className="text-xs mt-1 font-medium">SAIR</span>
           </button>
         </div>
       </nav>

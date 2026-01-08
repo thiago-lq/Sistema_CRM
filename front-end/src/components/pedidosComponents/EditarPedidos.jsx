@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { clientesShow } from "../../services/clientesShow";
-import { pedidosUpdate } from "../../services/pedidosUpdate";
+import { clientesShow } from "../../services/cliente/clientesShow";
+import { pedidosUpdate } from "../../services/pedido/pedidosUpdate";
 
 export default function EditarPedidos({
   pedidoSelecionado,

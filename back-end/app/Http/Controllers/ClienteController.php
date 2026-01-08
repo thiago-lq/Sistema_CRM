@@ -34,19 +34,16 @@ class ClienteController extends Controller
 
         // Busca os clientes pra cada caso, se for cpf, se for cnpj ou se não tiver filtro
         if ($cpf) {
-            $result = DB::select("SELECT c.*, t.TELEFONE, e.CIDADE, e.CEP, e.BAIRRO, e.RUA_NUMERO FROM CLIENTES c 
+            $result = DB::select("SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE FROM CLIENTES c 
             LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
-            LEFT JOIN ENDERECOS_CLIENTES e ON c.COD_CLIENTE = e.COD_CLIENTE
             WHERE c.CPF_CLIENTE ILIKE ? ORDER BY c.COD_CLIENTE", ["%$cpf%"]);
         } else if ($cnpj) {
-            $result = DB::select("SELECT c.*, t.TELEFONE, e.CIDADE, e.CEP, e.BAIRRO, e.RUA_NUMERO FROM CLIENTES c 
+            $result = DB::select("SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE FROM CLIENTES c 
             LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
-            LEFT JOIN ENDERECOS_CLIENTES e ON c.COD_CLIENTE = e.COD_CLIENTE
             WHERE c.CNPJ_CLIENTE ILIKE ? ORDER BY c.COD_CLIENTE", ["%$cnpj%"]);
         } else {
-            $result = DB::select("SELECT c.*, t.TELEFONE, e.CIDADE, e.CEP, e.BAIRRO, e.RUA_NUMERO FROM CLIENTES c 
+            $result = DB::select("SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE FROM CLIENTES c 
             LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
-            LEFT JOIN ENDERECOS_CLIENTES e ON c.COD_CLIENTE = e.COD_CLIENTE
             ORDER BY c.COD_CLIENTE");
         }
 
@@ -64,35 +61,15 @@ class ClienteController extends Controller
             if (!isset($clientes[$id])) {
                 $clientes[$id] = [
                     'cod_cliente' => $row->cod_cliente,
-                    'cpf_cliente' => $row->cpf_cliente,
-                    'cnpj_cliente' => $row->cnpj_cliente,
                     'email' => $row->email,
                     'nome' => $row->nome,
-                    'data_nascimento' => $row->data_nascimento,
                     'created_at' => $row->created_at,
-                    'updated_at' => $row->updated_at,
                     'telefones' => [],
-                    'enderecos' => [],
                 ];
             }
             // Verifica se a query retornou a coluna telefone ou se ela veio nula.
             if (isset($row->telefone) && $row->telefone && !in_array($row->telefone, $clientes[$id]['telefones'])) {
                 $clientes[$id]['telefones'][] = $row->telefone;
-            }
-
-            // Verifica se a query retornou a coluna cidade ou se ela veio nula.
-            if (isset($row->cidade) && $row->cidade) {
-                // Cria a estrutura para o endereço
-                $endereco = [
-                    'cidade' => $row->cidade,
-                    'cep' => $row->cep,
-                    'bairro' => $row->bairro,
-                    'rua_numero' => $row->rua_numero,
-                ];
-                // Verifica se o endereço já existe no array de endereços do cliente, se não existe, adiciona
-                if (!in_array($endereco, $clientes[$id]['enderecos'])) {
-                    $clientes[$id]['enderecos'][] = $endereco;
-                }
             }
         }
         return response()->json(array_values($clientes), 200);
@@ -101,53 +78,123 @@ class ClienteController extends Controller
     // Controlador que busca um cliente pelo seu ID
 
     public function show($id) {
-    $cpf = null;
-    $cnpj = null;
-    
-    if ($id) {
-        $idLimpo = preg_replace('/[^0-9]/', '', $id);
-        $tamanho = strlen($idLimpo);
+        $cpf = null;
+        $cnpj = null;
         
-        if ($tamanho == 11) {
-            $cpf = $idLimpo;
-        } else if ($tamanho == 14) {
-            $cnpj = $idLimpo;
+        if ($id) {
+            $idLimpo = preg_replace('/[^0-9]/', '', $id);
+            $tamanho = strlen($idLimpo);
+            
+            if ($tamanho == 11) {
+                $cpf = $idLimpo;
+            } else if ($tamanho == 14) {
+                $cnpj = $idLimpo;
+            } else {
+                return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 400);
+            }
+        }
+
+        if ($cpf) {
+            $clientes = DB::select("SELECT COD_CLIENTE, NOME FROM CLIENTES WHERE CPF_CLIENTE = ?", [$cpf]);
+        } else if ($cnpj) {
+            $clientes = DB::select("SELECT COD_CLIENTE, NOME FROM CLIENTES WHERE CNPJ_CLIENTE = ?", [$cnpj]);
         } else {
-            return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 400);
+            return response()->json(['message' => 'Formato inválido'], 400);
+        }
+
+        // Verifica se encontrou algum cliente
+        if (empty($clientes)) {
+            return response()->json(['message' => 'Cliente não encontrado'], 404);
+        }
+
+        // Pega o primeiro cliente (deveria ser único)
+        $cliente = $clientes[0];
+
+        // Agora sim, usa o cod_cliente do cliente encontrado
+        $enderecos = DB::select("SELECT * FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$cliente->cod_cliente]);
+
+        // Adiciona endereços ao cliente
+        $cliente->enderecos = array_map(fn($e) => [
+            'cod_endereco_cliente' => $e->cod_endereco_cliente,
+            'cidade' => $e->cidade,
+            'cep' => $e->cep,
+            'bairro' => $e->bairro,
+            'rua_numero' => $e->rua_numero,
+        ], $enderecos);
+
+        return response()->json($cliente, 200);
+    }
+
+    public function novosClientes() {
+        try {
+            $clientes = DB::select("SELECT COD_CLIENTE FROM CLIENTES WHERE CREATED_AT > NOW() - INTERVAL '7 days'");
+            return response()->json($clientes, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erro ao buscar novos clientes'], 500);
         }
     }
 
-    if ($cpf) {
-        $clientes = DB::select("SELECT * FROM CLIENTES WHERE CPF_CLIENTE = ?", [$cpf]);
-    } else if ($cnpj) {
-        $clientes = DB::select("SELECT * FROM CLIENTES WHERE CNPJ_CLIENTE = ?", [$cnpj]);
-    } else {
-        return response()->json(['message' => 'Formato inválido'], 400);
+    public function dadosCliente($id)
+{
+    try {
+        $result = DB::select("
+            SELECT 
+                c.*,
+                t.TELEFONE AS telefone,
+                e.CIDADE AS cidade,
+                e.CEP AS cep,
+                e.RUA_NUMERO AS rua_numero,
+                e.BAIRRO AS bairro
+            FROM CLIENTES c
+            LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE
+            LEFT JOIN ENDERECOS_CLIENTES e ON c.COD_CLIENTE = e.COD_CLIENTE
+            WHERE c.COD_CLIENTE = ?
+        ", [$id]);
+
+        if (empty($result)) {
+            return response()->json(['message' => 'Cliente não encontrado'], 404);
+        }
+
+        $firstRow = $result[0];
+
+        $cliente = [
+            'cod_cliente' => $firstRow->cod_cliente,
+            'cpf_cliente' => $firstRow->cpf_cliente,
+            'cnpj_cliente' => $firstRow->cnpj_cliente,
+            'email' => $firstRow->email,
+            'nome' => $firstRow->nome,
+            'data_nascimento' => $firstRow->data_nascimento,
+            'created_at' => $firstRow->created_at,
+            'updated_at' => $firstRow->updated_at,
+            'telefones' => [],
+            'enderecos' => [],
+        ];
+
+        foreach ($result as $row) {
+            if (!empty($row->telefone) && !in_array($row->telefone, $cliente['telefones'])) {
+                $cliente['telefones'][] = $row->telefone;
+            }
+
+            if (!empty($row->cidade)) {
+                $cliente['enderecos'][] = [
+                    'cidade' => $row->cidade,
+                    'cep' => $row->cep,
+                    'bairro' => $row->bairro,
+                    'rua_numero' => $row->rua_numero,
+                ];
+            }
+        }
+
+        $cliente['enderecos'] = array_values(array_unique($cliente['enderecos'], SORT_REGULAR));
+
+        return response()->json($cliente, 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Erro ao buscar cliente',
+            'error' => $e->getMessage()
+        ], 500);
     }
-
-    // Verifica se encontrou algum cliente
-    if (empty($clientes)) {
-        return response()->json(['message' => 'Cliente não encontrado'], 404);
-    }
-
-    // Pega o primeiro cliente (deveria ser único)
-    $cliente = $clientes[0];
-
-    // Agora sim, usa o cod_cliente do cliente encontrado
-    $telefones = DB::select("SELECT * FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$cliente->cod_cliente]);
-    $enderecos = DB::select("SELECT * FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$cliente->cod_cliente]);
-
-    // Adiciona telefones e endereços ao cliente
-    $cliente->telefones = array_map(fn($t) => $t->telefone, $telefones);
-    $cliente->enderecos = array_map(fn($e) => [
-        'cod_endereco_cliente' => $e->cod_endereco_cliente,
-        'cidade' => $e->cidade,
-        'cep' => $e->cep,
-        'bairro' => $e->bairro,
-        'rua_numero' => $e->rua_numero,
-    ], $enderecos);
-
-    return response()->json($cliente, 200);
 }
 
     // Controlador que cadastra um cliente

@@ -1,23 +1,27 @@
 import { useState, useEffect } from "react";
-import { clientesIndex } from "../services/clientesIndex";
-import { pedidosIndex } from "../services/pedidosIndex";
+import { novosClientes } from "../services/cliente/novosClientes";
+import { novosPedidos } from "../services/pedido/novosPedidos";
+import { pedidosAtrasados } from "../services/pedido/pedidosAtrasados";
 
 export default function Inicio({ setTab }) {
   const [clientes, setClientes] = useState([]);
   const [pedidos, setPedidos] = useState([]);
+  const [Atrasados, setAtrasados] = useState([]);
 
   useEffect(() => {
-    async function fetchClientes() {
+    async function fetchDados() {
       try {
-        const dadosClientes = await clientesIndex();
-        const dadosPedidos = await pedidosIndex();
+        const dadosClientes = await novosClientes();
+        const dadosPedidos = await novosPedidos();
+        const dadosPedidosAtrasados = await pedidosAtrasados();
         setClientes(dadosClientes);
         setPedidos(dadosPedidos);
+        setAtrasados(dadosPedidosAtrasados);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
       }
     }
-    fetchClientes();
+    fetchDados();
   }, []);
 
   return (
@@ -26,7 +30,7 @@ export default function Inicio({ setTab }) {
         {/* Header */}
         <div className="text-center mb-16 mt-25">
           <h1 className="text-5xl font-bold text-gray-800 mb-4">
-            Painel do Gerenciador de OS
+            Painel do CRM
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Gerencie seus clientes e pedidos de forma eficiente com nossa plataforma intuitiva
@@ -84,16 +88,20 @@ export default function Inicio({ setTab }) {
         <div className="w-max mx-auto mt-16">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white">
             <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
-              Resumo do Dia
+              Resumo da semana
             </h3>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="text-gray-600 mt-1">Clientes:</div>
+                <div className="text-gray-600 mt-1">Novos clientes:</div>
                 <div className="text-3xl font-bold text-indigo-600">{clientes.length}</div>
               </div>
               <div className="text-center">
-                <div className="text-gray-600 mt-1">Pedidos:</div>
+                <div className="text-gray-600 mt-1">Novos pedidos:</div>
                 <div className="text-3xl font-bold text-emerald-600">{pedidos.length}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-gray-600 mt-1">Pedidos atrasados:</div>
+                <div className="text-3xl font-bold text-red-600">{Atrasados.length}</div>
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { clientesShow } from "../../services/clientesShow";
+import { clientesShow } from "../../services/cliente/clientesShow";
 
 export default function FormularioCadastro({
   handleSubmit,

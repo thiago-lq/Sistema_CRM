@@ -243,6 +243,24 @@ class PedidoController extends Controller
         }
     }
 
+    public function novosPedidos() {
+        try {
+            $novosPedidos = DB::select("SELECT COD_PEDIDO FROM PEDIDOS WHERE CREATED_AT > NOW() - INTERVAL '7 days'");
+            return response()->json($novosPedidos, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erro ao buscar novos pedidos'], 500);
+        }
+    }
+
+    public function pedidosAtrasados() {
+        try {
+            $pedidosAtrasados = DB::select("SELECT COD_PEDIDO FROM PEDIDOS WHERE PRAZO < NOW()");
+            return response()->json($pedidosAtrasados, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erro ao buscar pedidos atrasados'], 500);
+        }
+    }
+
     // Controlador que atualiza um pedido
     public function update(Request $request, $id) {
         $request->validate([
