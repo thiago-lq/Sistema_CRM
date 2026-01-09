@@ -15,6 +15,38 @@ class PedidoController extends Controller
         $query = "
         SELECT
             -- Definição dos dados que irão vir na query, com as suas respectivas variáveis
+            p.COD_PEDIDO AS cod_pedido,
+            p.COD_CLIENTE AS cod_cliente,
+            p.VALOR_TOTAL AS valor_total,
+            pc.STATUS AS status_pagamento,
+            p.CREATED_AT AS created_at,
+            -- Agregação dos tipos em uma subquery para evitar duplicação
+            (
+                SELECT STRING_AGG(pt.NOME_TIPO, ', ')
+                FROM PEDIDOS_TIPOS pt 
+                WHERE pt.COD_PEDIDO = p.COD_PEDIDO
+            ) AS tipos_pedido
+        FROM PEDIDOS p 
+        LEFT JOIN PAGAMENTOS_CLIENTES pc ON pc.COD_PEDIDO = p.COD_PEDIDO
+        ";
+        
+        // Adiciona WHERE se houver termo de busca
+        if (!empty($termoBusca)) {
+            $query .= " WHERE p.COD_PEDIDO::text LIKE ? OR p.COD_CLIENTE::text LIKE ?";
+            $termoLike = '%' . $termoBusca . '%';
+            $pedido = DB::select($query . " ORDER BY p.COD_PEDIDO", [$termoLike, $termoLike]);
+        } else {
+            $query .= " ORDER BY p.COD_PEDIDO";
+            $pedido = DB::select($query);
+        }
+
+        return response()->json($pedido);
+    }
+
+        public function show($id) {
+        $pedido = DB::select("
+        SELECT
+            -- Definição dos dados que irão vir na query, com as suas respectivas variáveis
             p.*,
             e.CIDADE AS MANU_INST_CIDADE,
             e.CEP AS MANU_INST_CEP,
@@ -54,53 +86,13 @@ class PedidoController extends Controller
         LEFT JOIN ENDERECOS_CLIENTES ec ON p.COD_ENDERECO_CLIENTE = ec.COD_ENDERECO_CLIENTE 
         LEFT JOIN PAGAMENTOS_CLIENTES pc ON pc.COD_PEDIDO = p.COD_PEDIDO
         LEFT JOIN FUNCIONARIOS_CRM f ON f.COD_FUNCIONARIO = p.COD_FUNCIONARIO
-        ";
-        
-        // Adiciona WHERE se houver termo de busca
-        if (!empty($termoBusca)) {
-            $query .= " WHERE p.COD_PEDIDO::text LIKE ? OR f.NOME_FUNCIONARIO ILIKE ? OR ec.CIDADE ILIKE ?";
-            $termoLike = '%' . $termoBusca . '%';
-            $pedido = DB::select($query . " ORDER BY p.COD_PEDIDO", [$termoLike, $termoLike, $termoLike]);
-        } else {
-            $query .= " ORDER BY p.COD_PEDIDO";
-            $pedido = DB::select($query);
-        }
-
-        return response()->json($pedido);
-    }
-
-        public function show($id) {
-        $pedido = DB::select("SELECT * FROM PEDIDOS WHERE COD_PEDIDO = ?", [$id]);
+        WHERE p.COD_PEDIDO = ?", [$id]);
         
         if (empty($pedido)) {
             return response()->json(['message' => 'Pedido não encontrado'], 404);
         }
-
-        $enderecosInstManu = DB::select("SELECT * FROM ENDERECOS_INST_MANU WHERE COD_PEDIDO = ?", [$id]);
-        $itensProdutos = DB::select("SELECT * FROM ITENS_PRODUTOS WHERE COD_PEDIDO = ?", [$id]);
-        $pedidoTipos = DB::select("SELECT * FROM PEDIDOS_TIPOS WHERE COD_PEDIDO = ?", [$id]);
-        $enderecosClientes = DB::select("SELECT * FROM ENDERECOS_CLIENTES WHERE COD_ENDERECO_CLIENTE = ?", 
-        [$pedido[0]->COD_ENDERECO_CLIENTE]);
-        $pagamentoCliente = DB::select("SELECT * FROM PAGAMENTOS_CLIENTES WHERE COD_PEDIDO = ?", [$id]);
-        $funcionario = DB::select("SELECT * FROM FUNCIONARIOS_CRM WHERE COD_FUNCIONARIO = ?", 
-        [$pedido[0]->COD_FUNCIONARIO]);
-
-        $produtos = [];
-        if (!empty($itensProdutos)) {
-            $codigos = array_column($itensProdutos, 'COD_PRODUTO');
-            $placeholders = implode(',', array_fill(0, count($codigos), '?'));
-            $produtos = DB::select("SELECT * FROM PRODUTOS WHERE COD_PRODUTO IN ($placeholders)", $codigos);
-        }
         
-        return response()->json([
-            'pedido' => $pedido[0],
-            'funcionario' => !empty($funcionario) ? $funcionario[0] : null,
-            'enderecos_inst_manu' => !empty($enderecosInstManu) ? $enderecosInstManu[0] : null,
-            'enderecos_clientes' => !empty($enderecosClientes) ? $enderecosClientes[0] : null,
-            'itens_produtos' => $itensProdutos,
-            'pedidos_tipos' => $pedidoTipos,
-            'produtos' => $produtos,
-        ], 200);
+        return response()->json($pedido[0]);
     }
 
     // Controlador que cadastra um pedido

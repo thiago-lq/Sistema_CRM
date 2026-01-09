@@ -1,5 +1,44 @@
+import { useState, useEffect } from "react";
+import { pedidosShow } from "../../services/pedido/pedidosShow";
+
 export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
-  if (!pedidoSelecionado) return <p>Pedido não encontrado.</p>;
+  const [pedido, setPedido] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPedido = async () => {
+      if (!pedidoSelecionado?.cod_pedido) {
+        setPedido(null);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const dados = await pedidosShow(pedidoSelecionado.cod_pedido);
+        setPedido(dados);
+      } catch (error) {
+        console.error("Erro ao buscar dados do pedido:", error);
+        setPedido(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPedido();
+  }, [pedidoSelecionado?.cod_pedido]);
+
+  // Se está carregando
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-3 text-gray-600">Carregando dados do pedido...</p>
+        </div>
+      </div>
+    );
+  }
 
   const formatoBrasileiro = (data) => {
     if (!data) return "-";
@@ -17,19 +56,19 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
 
   // Converte string JSON para objeto se necessário
   const getItensPedido = () => {
-    if (!pedidoSelecionado.itens_pedido) return [];
+    if (!pedido.itens_pedido) return [];
 
     // Se for string, parse para JSON
-    if (typeof pedidoSelecionado.itens_pedido === "string") {
+    if (typeof pedido.itens_pedido === "string") {
       try {
-        return JSON.parse(pedidoSelecionado.itens_pedido);
+        return JSON.parse(pedido.itens_pedido);
       } catch (e) {
         console.error("Erro ao parsear itens do pedido:", e);
         return [];
       }
     }
 
-    return pedidoSelecionado.itens_pedido || [];
+    return pedido.itens_pedido || [];
   };
 
   const itens = getItensPedido();
@@ -46,7 +85,7 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mt-4">
       <h2 className="text-xl font-semibold mb-4">
-        Detalhes do Pedido #{pedidoSelecionado.cod_pedido}
+        Detalhes do Pedido #{pedido.cod_pedido}
       </h2>
 
       <div className="grid grid-cols-2 gap-4 text-sm">
@@ -54,31 +93,31 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
         <div className="space-y-3">
           <div className="flex gap-1">
             <p className="font-semibold text-gray-700">Cliente:</p>
-            <p>{pedidoSelecionado.cod_cliente || "-"}</p>
+            <p>{pedido.cod_cliente || "-"}</p>
           </div>
           <div className="flex gap-30">
             <div>
               <p className="font-semibold text-gray-700">Data de Criação:</p>
-              <p>{formatoBrasileiro(pedidoSelecionado.created_at)}</p>
+              <p>{formatoBrasileiro(pedido.created_at)}</p>
             </div>
             <div>
               <p className="font-semibold text-gray-700">
                 Data de atualização:
               </p>
-              <p>{formatoBrasileiro(pedidoSelecionado.updated_at)}</p>
+              <p>{formatoBrasileiro(pedido.updated_at)}</p>
             </div>
           </div>
           <div className="flex gap-38">
           <div>
             <p className="font-semibold text-gray-700">Valor Total:</p>
             <p className="font-bold text-gray-900">
-              {formatarMoeda(pedidoSelecionado.valor_total)}
+              {formatarMoeda(pedido.valor_total)}
             </p>
           </div>
           <div>
             <p className="font-semibold text-gray-700">Método de Pagamento:</p>
             <p className="font-bold text-gray-900">
-              {pedidoSelecionado.metodo_pagamento}
+              {pedido.metodo_pagamento}
             </p>
           </div>
           </div>
@@ -86,22 +125,22 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
           <div>
             <p className="font-semibold text-gray-700">Valor Adicional:</p>
             <p className="font-bold text-gray-900">
-              {formatarMoeda(pedidoSelecionado.valor_adicional)}
+              {formatarMoeda(pedido.valor_adicional)}
             </p>
           </div>
           <div>
             <p className="font-semibold text-gray-700">Parcelas:</p>
             <p className="font-bold text-gray-900">
-              {pedidoSelecionado.parcelas}
+              {pedido.parcelas}
             </p>
           </div>
           </div>
           <div>
             <p className="font-semibold text-gray-700">
-              Funcionário Responsável: {pedidoSelecionado.funcionario_nome}
+              Funcionário Responsável: {pedido.funcionario_nome}
             </p>
             <p className="text-xs text-gray-500">
-              Código: {pedidoSelecionado.cod_funcionario}
+              Código: {pedido.cod_funcionario}
             </p>
           </div>
         </div>
@@ -111,8 +150,8 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
           <div>
             <p className="font-semibold text-gray-700">Tipos do Pedido:</p>
             <div className="flex gap-2 flex-wrap mt-1">
-              {pedidoSelecionado.tipos_pedido ? (
-                pedidoSelecionado.tipos_pedido.split(", ").map((tipo, idx) => (
+              {pedido.tipos_pedido ? (
+                pedido.tipos_pedido.split(", ").map((tipo, idx) => (
                   <span
                     key={idx}
                     className={`px-2 py-1 text-xs rounded-full ${
@@ -133,22 +172,22 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
           </div>
           <div>
             <p className="font-semibold text-gray-700">Prazo</p>
-            <span>{pedidoSelecionado.prazo}</span>
+            <span>{pedido.prazo}</span>
           </div>
           <div>
             <p className="font-semibold text-gray-700">Status Pagamento:</p>
             <span
               className={`text-sm font-medium ${
-                pedidoSelecionado.status_pagamento === true
+                pedido.status_pagamento === true
                   ? "text-green-900"
-                  : pedidoSelecionado.status_pagamento === false
+                  : pedido.status_pagamento === false
                   ? "text-yellow-800"
                   : "text-gray-800"
               }`}
             >
-              {pedidoSelecionado.status_pagamento === true
+              {pedido.status_pagamento === true
                 ? "Pago"
-                : pedidoSelecionado.status_pagamento === false
+                : pedido.status_pagamento === false
                 ? "Pendente"
                 : "Processando"}
             </span>
@@ -243,19 +282,19 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
             <div className="text-sm space-y-1">
               <p>
                 <span className="font-medium">Cidade:</span>{" "}
-                {pedidoSelecionado.manu_inst_cidade || "-"}
+                {pedido.manu_inst_cidade || "-"}
               </p>
               <p>
                 <span className="font-medium">CEP:</span>{" "}
-                {pedidoSelecionado.manu_inst_cep || "-"}
+                {pedido.manu_inst_cep || "-"}
               </p>
               <p>
                 <span className="font-medium">Bairro:</span>{" "}
-                {pedidoSelecionado.manu_inst_bairro || "-"}
+                {pedido.manu_inst_bairro || "-"}
               </p>
               <p>
                 <span className="font-medium">Rua/Número:</span>{" "}
-                {pedidoSelecionado.manu_inst_rua || "-"}
+                {pedido.manu_inst_rua || "-"}
               </p>
             </div>
           </div>
@@ -268,25 +307,25 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
             <div className="text-sm space-y-1">
               <p>
                 <span className="font-medium">Cidade:</span>{" "}
-                {pedidoSelecionado.cli_cidade || "-"}
+                {pedido.cli_cidade || "-"}
               </p>
               <p>
                 <span className="font-medium">CEP:</span>{" "}
-                {pedidoSelecionado.cli_cep || "-"}
+                {pedido.cli_cep || "-"}
               </p>
               <p>
                 <span className="font-medium">Bairro:</span>{" "}
-                {pedidoSelecionado.cli_bairro || "-"}
+                {pedido.cli_bairro || "-"}
               </p>
               <p>
                 <span className="font-medium">Rua/Número:</span>{" "}
-                {pedidoSelecionado.cli_rua || "-"}
+                {pedido.cli_rua || "-"}
               </p>
             </div>
           </div>
           <p className="w-full gap-2">
             <span className="font-medium">Descrição: </span>
-            {pedidoSelecionado.descricao || "-"}
+            {pedido.descricao || "-"}
           </p>
         </div>
       </div>

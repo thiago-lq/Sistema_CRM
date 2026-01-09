@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { clientesShow } from "../../services/cliente/clientesShow";
 import { pedidosUpdate } from "../../services/pedido/pedidosUpdate";
+import { pedidosShow } from "../../services/pedido/pedidosShow";
 
 export default function EditarPedidos({
   pedidoSelecionado,
@@ -9,7 +10,9 @@ export default function EditarPedidos({
 }) {
   const [clienteEditar, setClienteEditar] = useState({});
   const [buscaClienteEditar, setBuscaClienteEditar] = useState("");
+  const [pedido, setPedido] = useState(null);
   const pedidoProcessadoRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   // Estados para o cartão (igual ao Cadastro)
   const [mostrarCartao, setMostrarCartao] = useState(false);
@@ -84,107 +87,80 @@ export default function EditarPedidos({
 
     // Se mudar as parcelas no formulário do cartão, atualiza no form principal
     if (name === "parcelas") {
-      setFormEditar(prev => ({ ...prev, parcelas: valorFormatado }));
+      setFormEditar((prev) => ({ ...prev, parcelas: valorFormatado }));
     }
   };
 
-  // Quando o método de pagamento muda, esconde o formulário de cartão
   useEffect(() => {
-    if (formEditar.metodoPagamento !== "CREDITO") {
-      setMostrarCartao(false);
-    }
-  }, [formEditar.metodoPagamento]);
+    const fetchPedido = async () => {
+      if (!pedidoSelecionado?.cod_pedido) {
+        setPedido(null);
+        return;
+      }
 
-  // Efeito para carregar os dados do pedidoSelecionado quando o componente montar
-  useEffect(() => {
-    if (!pedidoSelecionado) return;
-    // Verificar se temos um pedido e se ainda não processamos este específico
-    if (
-      pedidoSelecionado &&
-      pedidoSelecionado.cod_pedido !== pedidoProcessadoRef.current
-    ) {
-      // Marcar este pedido como processado
-      pedidoProcessadoRef.current = pedidoSelecionado.cod_pedido;
-
-      // Processar tipos de pedido
-      const tiposArray = pedidoSelecionado.tipos_pedido
-        ? pedidoSelecionado.tipos_pedido.split(", ").map((item) => item.trim())
-        : [];
-
-      // Processar itens do pedido - CORREÇÃO PARA LIDAR COM OBJETOS PHP
-      let itensPedido = [];
-      let quantidadeObj = {};
-
+      setLoading(true);
       try {
-        if (pedidoSelecionado.itens_pedido) {
-          // Se for string, faz parse JSON
-          if (typeof pedidoSelecionado.itens_pedido === "string") {
-            itensPedido = JSON.parse(pedidoSelecionado.itens_pedido);
-          }
-          // Se for array, usa diretamente
-          else if (Array.isArray(pedidoSelecionado.itens_pedido)) {
-            itensPedido = pedidoSelecionado.itens_pedido;
-          }
-          // Se for objeto (stdClass), converte para array
-          else if (
-            typeof pedidoSelecionado.itens_pedido === "object" &&
-            pedidoSelecionado.itens_pedido !== null
-          ) {
-            // Converte objeto para array usando Object.values
-            itensPedido = Object.values(pedidoSelecionado.itens_pedido);
-          }
-
-          console.log("Itens do pedido processados:", itensPedido);
-
-          // Processar quantidades
-          itensPedido.forEach((item) => {
-            if (item && item.cod_produto) {
-              quantidadeObj[item.cod_produto] = item.quantidade || 1;
-            }
-          });
-        }
+        const dados = await pedidosShow(pedidoSelecionado.cod_pedido);
+        setPedido(dados);
       } catch (error) {
-        console.error("Erro ao processar itens_pedido:", error);
-        console.error("itens_pedido original:", pedidoSelecionado.itens_pedido);
+        console.error("Erro ao buscar dados do pedido:", error);
+        setPedido(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPedido();
+  }, [pedidoSelecionado?.cod_pedido]);
+
+  useEffect(() => {
+    if (!pedido) return;
+
+    if (pedido.cod_pedido === pedidoProcessadoRef.current) return;
+
+    pedidoProcessadoRef.current = pedido.cod_pedido;
+
+    const tiposArray = pedido.tipos_pedido
+      ? pedido.tipos_pedido.split(", ").map((t) => t.trim())
+      : [];
+
+    let itensPedido = [];
+    let quantidadeObj = {};
+
+    if (pedido.itens_pedido) {
+      if (typeof pedido.itens_pedido === "string") {
+        itensPedido = JSON.parse(pedido.itens_pedido);
+      } else if (Array.isArray(pedido.itens_pedido)) {
+        itensPedido = pedido.itens_pedido;
+      } else if (typeof pedido.itens_pedido === "object") {
+        itensPedido = Object.values(pedido.itens_pedido);
       }
 
-      // Processar endereço de instalação/manutenção
-      const enderecoInstManu = {
-        cidade: pedidoSelecionado.manu_inst_cidade || "",
-        cep: pedidoSelecionado.manu_inst_cep || "",
-        bairro: pedidoSelecionado.manu_inst_bairro || "",
-        rua_numero: pedidoSelecionado.manu_inst_rua || "",
-      };
-
-      // Processar endereço do cliente (para produtos)
-      const codEnderecoCliente = pedidoSelecionado.cod_endereco_cliente || "";
-
-      setFormEditar({
-        codCliente: pedidoSelecionado.cod_cliente || "",
-        codEnderecoCliente: codEnderecoCliente,
-        pedidoTipos: tiposArray,
-        codProdutos:
-          itensPedido.map((item) => item?.cod_produto).filter(Boolean) || [],
-        quantidade: quantidadeObj,
-        descricao: pedidoSelecionado.descricao || "",
-        valorTotal: pedidoSelecionado.valor_total || "",
-        valor_adicional: pedidoSelecionado.valor_adicional || 0,
-        metodoPagamento: pedidoSelecionado.metodo_pagamento || "",
-        parcelas: pedidoSelecionado.parcelas || 0,
-        prazo: pedidoSelecionado.prazo || "",
-        enderecoInstManu: enderecoInstManu,
+      itensPedido.forEach((item) => {
+        quantidadeObj[item.cod_produto] = item.quantidade || 1;
       });
-
-      // Se o pedido já foi feito com cartão, preencher os dados simbólicos
-      if (pedidoSelecionado.metodo_pagamento === "CREDITO") {
-        // Você pode adicionar lógica aqui para preencher dadosCartao se tiver salvo anteriormente
-        setDadosCartao(prev => ({
-          ...prev,
-          parcelas: pedidoSelecionado.parcelas?.toString() || "1"
-        }));
-      }
     }
-  }, [pedidoSelecionado]);
+
+    setFormEditar({
+      codCliente: pedido.cod_cliente || "",
+      codEnderecoCliente: pedido.cod_endereco_cliente || "",
+      pedidoTipos: tiposArray,
+      codProdutos: itensPedido.map((i) => i.cod_produto),
+      quantidade: quantidadeObj,
+      descricao: pedido.descricao || "",
+      valorTotal: pedido.valor_total || "",
+      valor_adicional: pedido.valor_adicional || 0,
+      metodoPagamento: pedido.metodo_pagamento || "",
+      parcelas: pedido.parcelas || 0,
+      prazo: pedido.prazo || "",
+      enderecoInstManu: {
+        cidade: pedido.manu_inst_cidade || "",
+        cep: pedido.manu_inst_cep || "",
+        bairro: pedido.manu_inst_bairro || "",
+        rua_numero: pedido.manu_inst_rua || "",
+      },
+    });
+  }, [pedido]);
 
   // Handler para o submit que inclui os dados do cartão
   const handleSubmitComCartao = async (e) => {
@@ -193,7 +169,7 @@ export default function EditarPedidos({
     // Se for cartão, mostra os dados simbólicos
     if (formEditar.metodoPagamento === "CREDITO" && mostrarCartao) {
       const ultimos4Digitos = dadosCartao.numero.slice(-4).replace(/\s/g, "");
-      
+
       console.log("Dados do pedido com cartão (simulado):", {
         ...formEditar,
         dadosPagamentoCartao: {
@@ -239,9 +215,10 @@ export default function EditarPedidos({
         // Se desmarcou INSTALACAO ou MANUTENCAO, limpar endereço de serviço
         if (!checked && (value === "INSTALACAO" || value === "MANUTENCAO")) {
           // Só limpa se NENHUM dos dois tipos estiver selecionado
-          const temInstalacaoOuManutencao = 
-            novosTipos.includes("INSTALACAO") || novosTipos.includes("MANUTENCAO");
-          
+          const temInstalacaoOuManutencao =
+            novosTipos.includes("INSTALACAO") ||
+            novosTipos.includes("MANUTENCAO");
+
           if (!temInstalacaoOuManutencao) {
             novoEstado = {
               ...novoEstado,
@@ -343,7 +320,7 @@ export default function EditarPedidos({
     if (e && e.preventDefault) {
       e.preventDefault();
     }
-    
+
     console.log("Formulário de envio:", formEditar);
 
     try {
@@ -365,24 +342,29 @@ export default function EditarPedidos({
       if (formEditar.pedidoTipos.includes("PRODUTO")) {
         // Converter quantidade para o formato que o backend espera
         formEditar.codProdutos.forEach((codProduto) => {
-          quantidadeFormatada[codProduto] = formEditar.quantidade[codProduto] || 1;
+          quantidadeFormatada[codProduto] =
+            formEditar.quantidade[codProduto] || 1;
         });
         codProdutosParaEnviar = formEditar.codProdutos.map(Number);
-        
+
         // Validar se há produtos selecionados quando o tipo inclui PRODUTO
         if (codProdutosParaEnviar.length === 0) {
-          alert("Selecione pelo menos um produto quando o tipo inclui Venda de Produto");
+          alert(
+            "Selecione pelo menos um produto quando o tipo inclui Venda de Produto"
+          );
           return;
         }
       }
 
       // CORREÇÃO: Enviar pedido_tipos como ARRAY
       const dadosParaEnviar = {
-        cod_pedido: pedidoSelecionado.cod_pedido,
+        cod_pedido: pedido.cod_pedido,
         cod_cliente: Number(formEditar.codCliente),
-        cod_endereco_cliente: formEditar.pedidoTipos.includes("PRODUTO") && formEditar.codEnderecoCliente
-          ? Number(formEditar.codEnderecoCliente)
-          : null, // CORREÇÃO: enviar null se não for produto
+        cod_endereco_cliente:
+          formEditar.pedidoTipos.includes("PRODUTO") &&
+          formEditar.codEnderecoCliente
+            ? Number(formEditar.codEnderecoCliente)
+            : null, // CORREÇÃO: enviar null se não for produto
         pedido_tipos: formEditar.pedidoTipos,
         cod_produtos: codProdutosParaEnviar, // CORREÇÃO: array vazio se não for produto
         quantidade: quantidadeFormatada, // CORREÇÃO: objeto vazio se não for produto
@@ -390,12 +372,18 @@ export default function EditarPedidos({
         valor_total: parseFloat(formEditar.valorTotal) || 0,
         valor_adicional: parseFloat(formEditar.valor_adicional) || 0,
         metodo_pagamento: formEditar.metodoPagamento,
-        parcelas: formEditar.parcelas && formEditar.metodoPagamento === "CREDITO" ? formEditar.parcelas : null,
+        parcelas:
+          formEditar.parcelas && formEditar.metodoPagamento === "CREDITO"
+            ? formEditar.parcelas
+            : null,
         prazo: formEditar.prazo,
       };
 
       // CORREÇÃO: Só enviar endereço de serviço se INSTALACAO ou MANUTENCAO estiverem selecionados
-      if (formEditar.pedidoTipos.includes("INSTALACAO") || formEditar.pedidoTipos.includes("MANUTENCAO")) {
+      if (
+        formEditar.pedidoTipos.includes("INSTALACAO") ||
+        formEditar.pedidoTipos.includes("MANUTENCAO")
+      ) {
         dadosParaEnviar.cidade = formEditar.enderecoInstManu.cidade;
         dadosParaEnviar.cep = formEditar.enderecoInstManu.cep;
         dadosParaEnviar.bairro = formEditar.enderecoInstManu.bairro;
@@ -403,7 +391,10 @@ export default function EditarPedidos({
       }
 
       // CORREÇÃO: Só enviar endereço do cliente se PRODUTO estiver selecionado
-      if (formEditar.pedidoTipos.includes("PRODUTO") && clienteEditar.enderecos) {
+      if (
+        formEditar.pedidoTipos.includes("PRODUTO") &&
+        clienteEditar.enderecos
+      ) {
         const enderecoSelecionado = clienteEditar.enderecos.find(
           (e) => e.cod_endereco_cliente === formEditar.codEnderecoCliente
         );
@@ -490,6 +481,18 @@ export default function EditarPedidos({
     };
     fetchCliente();
   }, [buscaClienteEditar]);
+
+  // Se está carregando
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-3 text-gray-600">Carregando dados do pedido...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white">
@@ -749,26 +752,39 @@ export default function EditarPedidos({
           </div>
 
           {/* Parcelas */}
-          {formEditar.valorTotal > 0 && formEditar.metodoPagamento == "CREDITO" && (
-            <div>
-            <select
-              value={formEditar.parcelas}
-              onChange={handleChangeEditar}
-              name={"parcelas"}
-              className="form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 bg-gray-100"
-            >
-              <option value="" disabled>
-                Selecione a quantidade de parcelas
-              </option>
-              <option value="1">1x de R$ {(formEditar.valorTotal / 1).toFixed(2)} sem juros</option>
-              <option value="2">2x de R$ {(formEditar.valorTotal/2).toFixed(2)} sem juros</option>
-              <option value="3">3x de R$ {(formEditar.valorTotal/3).toFixed(2)} sem juros</option>
-              <option value="4">4x de R$ {(formEditar.valorTotal/4).toFixed(2)} sem juros</option>
-              <option value="5">5x de R$ {(formEditar.valorTotal/5).toFixed(2)} sem juros</option>
-              <option value="6">6x de R$ {(formEditar.valorTotal/6).toFixed(2)} sem juros</option>
-            </select>
-          </div>
-          )}
+          {formEditar.valorTotal > 0 &&
+            formEditar.metodoPagamento == "CREDITO" && (
+              <div>
+                <select
+                  value={formEditar.parcelas}
+                  onChange={handleChangeEditar}
+                  name={"parcelas"}
+                  className="form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 bg-gray-100"
+                >
+                  <option value="" disabled>
+                    Selecione a quantidade de parcelas
+                  </option>
+                  <option value="1">
+                    1x de R$ {(formEditar.valorTotal / 1).toFixed(2)} sem juros
+                  </option>
+                  <option value="2">
+                    2x de R$ {(formEditar.valorTotal / 2).toFixed(2)} sem juros
+                  </option>
+                  <option value="3">
+                    3x de R$ {(formEditar.valorTotal / 3).toFixed(2)} sem juros
+                  </option>
+                  <option value="4">
+                    4x de R$ {(formEditar.valorTotal / 4).toFixed(2)} sem juros
+                  </option>
+                  <option value="5">
+                    5x de R$ {(formEditar.valorTotal / 5).toFixed(2)} sem juros
+                  </option>
+                  <option value="6">
+                    6x de R$ {(formEditar.valorTotal / 6).toFixed(2)} sem juros
+                  </option>
+                </select>
+              </div>
+            )}
         </div>
 
         {/* Formulário de Cartão de Crédito (Apenas se selecionar CREDITO) */}
