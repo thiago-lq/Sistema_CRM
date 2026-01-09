@@ -10,6 +10,7 @@ export default function ListaClientes({
   handleExcluir,
   handleRecarregar,
   loading,
+  loadingEditar,
 }) {
   // Função para formatar data
   const formatarData = (dataString) => {
@@ -17,6 +18,18 @@ export default function ListaClientes({
     const data = new Date(dataString);
     return data.toLocaleDateString("pt-BR");
   };
+
+  // Se está carregando
+  if (loadingEditar) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-3 text-gray-600">Carregando dados do cliente...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white mt-3 rounded-lg shadow-sm">
@@ -110,7 +123,7 @@ export default function ListaClientes({
                     <div className="flex flex-col items-center justify-center">
                       <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                       <p className="mt-2 text-sm text-gray-500">
-                        Carregando pedidos...
+                        Carregando Clientes...
                       </p>
                     </div>
                   </td>

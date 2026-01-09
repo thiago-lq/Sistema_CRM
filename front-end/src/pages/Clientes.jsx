@@ -9,6 +9,7 @@ import { clientesIndex } from "../services/cliente/clientesIndex";
 import { clientesStore } from "../services/cliente/clientesStore";
 import { clientesUpdate } from "../services/cliente/clientesUpdate";
 import { clientesDelete } from "../services/cliente/clientesDelete";
+import { dadosCliente } from "../services/cliente/dadosCliente";
 
 export default function Clientes() {
   // Constantes que serão utilizadas no componente
@@ -18,6 +19,7 @@ export default function Clientes() {
   const [modo, setModo] = useState("lista");
   const [termoBusca, setTermoBusca] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingEditar, setLoadingEditar] = useState(false);
 
   // Constante da estrutura do formulário
   const [form, setForm] = useState({
@@ -213,26 +215,43 @@ export default function Clientes() {
   };
 
   // Função que inicia a edição de um cliente
-  const handleEditar = (cliente) => {
-    // Formata o cliente para o formulário de edição
-    const clienteFormatado = {
-      ...cliente,
-      // Se o cliente tem telefones, formata-os para o formulário de edição
-      telefones: cliente.telefones?.map((t) =>
-        // Se o telefone for uma string, formata-o para o formulário de edição
-        typeof t === "string" ? { telefone: t } : t
-      ) || [{ telefone: "" }],
-      // Se o cliente tem endereços, formata-os para o formulário de edição
-      enderecos: cliente.enderecos?.map((e) => ({
-        rua_numero: e.rua_numero || "",
-        bairro: e.bairro || "",
-        cep: e.cep || "",
-        cidade: e.cidade || "",
-      })) || [{ rua_numero: "", bairro: "", cep: "", cidade: "" }],
-    };
-    // Atualiza a constante de edição, e muda a página para a edição
-    setClienteEditar(clienteFormatado);
-    setModo("editar");
+  const handleEditar = async (cliente) => {
+    if (!cliente?.cod_cliente) {
+      setClienteEditar(null);
+      return;
+    }
+
+    setLoadingEditar(true);
+
+    try {
+      // busca
+      const dados = await dadosCliente(cliente.cod_cliente);
+
+      // formata AQUI, usando os dados retornados
+      const clienteFormatado = {
+        ...dados,
+
+        telefones: dados.telefones?.map((t) =>
+          typeof t === "string" ? { telefone: t } : t
+        ) || [{ telefone: "" }],
+
+        enderecos: dados.enderecos?.map((e) => ({
+          rua_numero: e.rua_numero || "",
+          bairro: e.bairro || "",
+          cep: e.cep || "",
+          cidade: e.cidade || "",
+        })) || [{ rua_numero: "", bairro: "", cep: "", cidade: "" }],
+      };
+
+      // seta o formulário já pronto
+      setClienteEditar(clienteFormatado);
+      setModo("editar");
+    } catch (error) {
+      console.error("Erro ao buscar dados do cliente:", error);
+      setClienteEditar(null);
+    } finally {
+      setLoadingEditar(false);
+    }
   };
 
   // Função que lida com o formulário de edição
@@ -296,6 +315,7 @@ export default function Clientes() {
     handleExcluir,
     handleRecarregar,
     loading,
+    loadingEditar,
   };
   const propsDetalhes = { setModo, clienteSelecionado };
   const propsCadastro = {
