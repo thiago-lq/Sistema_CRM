@@ -338,10 +338,11 @@ export default function Clientes() {
   };
 
   // Função que deleta um cliente
-  const handleExcluir = (id) => {
+  const handleExcluir = async (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este cliente?")) return;
+
     try {
-      clientesDelete(id);
+      await clientesDelete(id); // ✅ espera a Promise resolver
       notify.info("Cliente excluído com sucesso", {
         position: "top-right",
       });
@@ -354,7 +355,8 @@ export default function Clientes() {
       } else if (error.response?.status === 409) {
         notify.error("Erro ao excluir cliente", {
           position: "top-right",
-          description: "Não é possível excluir o cliente pois existem pedidos e registros associados a ele",
+          description:
+            "Não é possível excluir o cliente pois existem pedidos e registros associados a ele",
         });
       } else {
         notify.error("Erro inesperado", {
