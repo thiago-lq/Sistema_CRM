@@ -1,3 +1,4 @@
+import { notify } from "../utils/notify";
 import { useState, useEffect } from "react";
 import {
   CadastroClientes,
@@ -197,7 +198,9 @@ export default function Clientes() {
     e.preventDefault();
     try {
       await clientesStore(form); // Função que faz o cadastro para o back-end
-      alert("Cliente cadastrado com sucesso!");
+      notify.success("Cliente cadastrado com sucesso", {
+        position: "top-right",
+      });
       // Reseta o formulário
       setForm({
         nome: "",
@@ -208,9 +211,21 @@ export default function Clientes() {
         data_nascimento: "",
         enderecos: [{ rua_numero: "", bairro: "", cep: "", cidade: "" }],
       });
-    } catch (err) {
-      console.error("Erro ao cadastrar:", err);
-      alert("Erro ao cadastrar cliente!");
+    } catch (error) {
+      if (error.response?.status === 422) {
+        notify.error("Erro ao cadastrar cliente", {
+          description:
+            "Verifique os campos obrigatórios ou se o cliente já existe no sistema.",
+        });
+      } else if (error.response?.status === 409) {
+        notify.error("Erro, cliente já cadastrado", {
+          description: "Os dados do cliente já existem no sistema.",
+        });
+      } else {
+        notify.error("Erro inesperado", {
+          description: "Tente novamente mais tarde.",
+        });
+      }
     }
   };
 
@@ -247,7 +262,16 @@ export default function Clientes() {
       setClienteEditar(clienteFormatado);
       setModo("editar");
     } catch (error) {
-      console.error("Erro ao buscar dados do cliente:", error);
+      if (error.response?.status === 404) {
+        notify.error("Cliente não encontrado", {
+          position: "top-right",
+        });
+      } else if (error.response?.status === 500) {
+        notify.error("Erro inesperado", {
+          description: "Tente novamente mais tarde.",
+          position: "top-right",
+        });
+      }
       setClienteEditar(null);
     } finally {
       setLoadingEditar(false);
@@ -272,13 +296,27 @@ export default function Clientes() {
     // Faz a requisição para o back-end
     try {
       await clientesUpdate(dadosEditar); // Função que faz a atualização para o back-end
-      alert("Cliente editado com sucesso!");
+      notify.success("Cliente editado com sucesso", {
+        position: "top-right",
+      });
+      setModo("lista");
+      handleRecarregar();
     } catch (err) {
-      console.error("Erro ao editar:", err);
-      alert("Erro ao editar cliente!");
+      if (err.response?.status === 409) {
+        notify.error("Erro, cliente já cadastrado", {
+          description: "Os dados do cliente já existem no sistema.",
+        });
+      } else if (err.response?.status === 422) {
+        notify.error("Erro ao cadastrar cliente", {
+          description:
+            "Verifique os campos obrigatórios ou se o cliente já existe no sistema.",
+        });
+      } else {
+        notify.error("Erro inesperado", {
+          description: "Tente novamente mais tarde.",
+        });
+      }
     }
-    setModo("lista");
-    handleRecarregar();
   };
 
   // Função que lida com o formulário de edição
@@ -302,7 +340,29 @@ export default function Clientes() {
   // Função que deleta um cliente
   const handleExcluir = (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este cliente?")) return;
-    clientesDelete(id);
+    try {
+      clientesDelete(id);
+      notify.info("Cliente excluído com sucesso", {
+        position: "top-right",
+      });
+      handleRecarregar();
+    } catch (error) {
+      if (error.response?.status === 404) {
+        notify.error("Cliente não encontrado", {
+          position: "top-right",
+        });
+      } else if (error.response?.status === 409) {
+        notify.error("Erro ao excluir cliente", {
+          position: "top-right",
+          description: "Não é possível excluir o cliente pois existem pedidos e registros associados a ele",
+        });
+      } else {
+        notify.error("Erro inesperado", {
+          position: "top-right",
+          description: "Tente novamente mais tarde.",
+        });
+      }
+    }
   };
 
   const propsLista = {
@@ -322,6 +382,7 @@ export default function Clientes() {
     handleChange,
     handleSubmit,
     form,
+    setForm,
     setModo,
     adicionarCampoTelefone,
     removerCampoTelefone,

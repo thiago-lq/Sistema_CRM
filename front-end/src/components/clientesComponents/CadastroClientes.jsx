@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 export default function CadastroClientes({
   handleSubmit,
   handleChange,
   form,
+  setForm,
   setModo,
   adicionarCampoTelefone,
   removerCampoTelefone,
@@ -13,39 +14,65 @@ export default function CadastroClientes({
   maxCamposEndereco,
   minCamposEndereco,
 }) {
+  
   // Constante que armazena o tipo de pessoa que está sendo cadastrado
   const [pessoa, setPessoa] = useState("");
+  useEffect(() => {
+    if (pessoa === "fisica") {
+      // Física → limpa CNPJ e mantém CPF e data
+      setForm((prev) => ({
+        ...prev,
+        cnpj: "",
+      }));
+    } else if (pessoa === "juridica") {
+      // Jurídica → limpa CPF e data
+      setForm((prev) => ({
+        ...prev,
+        cpf: "",
+        data_nascimento: "",
+      }));
+    } else {
+      // Nenhum selecionado → limpa tudo
+      setForm((prev) => ({
+        ...prev,
+        cpf: "",
+        cnpj: "",
+        data_nascimento: "",
+      }));
+    }
+  }, [pessoa, setForm]);
   return (
     <div className="p-2">
-      {/* Componente que vai ser renderizado no componente principal */}
-      <div className="flex flex-row justify-between items-center">
-        <button
-          onClick={() => setModo("lista")}
-          className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition hover:cursor-pointer"
-        >
-          Voltar
-        </button>
-        {/* Select para o tipo de pessoa */}
-        <div>
-          <select
-            value={pessoa}
-            onChange={(e) => setPessoa(e.target.value)}
-            className="form-select"
-          >
-            <option value="" disabled>
-              Selecione o tipo de pessoa...
-            </option>
-            <option value="fisica">Pessoa Física</option>
-            <option value="juridica">Pessoa Jurídica</option>
-          </select>
-        </div>
-      </div>
-      <div className="flex flex-col justify-between mb-10 items-center w-full">
-        <p className="font-semibold text-3xl ">Cadastrar Cliente</p>
-        <p className="text-gray-500 mt-1">Preencha os dados abaixo</p>
-      </div>
       {/* Formulário de cadastro */}
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Componente que vai ser renderizado no componente principal */}
+        <div className="flex flex-row justify-between items-center">
+          <button
+            onClick={() => setModo("lista")}
+            className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition hover:cursor-pointer"
+          >
+            Voltar
+          </button>
+          {/* Select para o tipo de pessoa */}
+          <div>
+            <select
+              value={pessoa}
+              onChange={(e) => setPessoa(e.target.value)}
+              className="form-select"
+              required
+            >
+              <option value="" disabled>
+                Selecione o tipo de pessoa...
+              </option>
+              <option value="fisica">Pessoa Física</option>
+              <option value="juridica">Pessoa Jurídica</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex flex-col justify-between mb-10 items-center w-full">
+          <p className="font-semibold text-3xl ">Cadastrar Cliente</p>
+          <p className="text-gray-500 mt-1">Preencha os dados abaixo</p>
+        </div>
         <div className="grid grid-cols-4 gap-5 px-5">
           <div>
             <label className="block text-sm font-medium mb-1">Nome</label>
@@ -95,22 +122,22 @@ export default function CadastroClientes({
               />
             </div>
           )}
-          { pessoa === "fisica" && (
+          {pessoa === "fisica" && (
             <div className="flex items-center justify-center">
-            <div className="relative">
-              <label className="block text-sm font-medium mb-1">
-                Data de Nascimento
-              </label>
-              <input
-                type="date"
-                name="data_nascimento"
-                value={form.data_nascimento}
-                onChange={handleChange}
-                className="p-2 border rounded w-max"
-                required
-              />
+              <div className="relative">
+                <label className="block text-sm font-medium mb-1">
+                  Data de Nascimento
+                </label>
+                <input
+                  type="date"
+                  name="data_nascimento"
+                  value={form.data_nascimento}
+                  onChange={handleChange}
+                  className="p-2 border rounded w-max"
+                  required
+                />
+              </div>
             </div>
-          </div>
           )}
         </div>
         <div className="flex px-5 flex-col mt-10 w-max gap-3">

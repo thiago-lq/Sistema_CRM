@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 
 class ClienteController extends Controller
 {
@@ -207,7 +208,7 @@ class ClienteController extends Controller
             // Valida se o cnpj é não nulo, string, existe no banco de dados e com no máximo 14 caracteres
             'cnpj' => 'nullable|size:14|unique:clientes,cnpj_cliente',
             // Valida se o email é não nulo, string, com no máximo 100 caracteres e é um email válido
-            'email' => 'required|email|max:100',
+            'email' => 'required|email|max:100|unique:clientes,email',
             // Valida se o nome é não nulo, string, com no máximo 100 caracteres
             'nome' => 'required|string|max:100',
             // Valida se a data de nascimento é não nula e é uma data válida
@@ -267,29 +268,25 @@ class ClienteController extends Controller
 
             // Commita a transação e retorna os dados do cliente com sucesso
             return response()->json(['message' => 'Cliente cadastrado com sucesso!', 'cod_cliente' => $codCliente, 'telefones' => $telefones], 201);
-        } catch (\Exception $e) {
+        } catch (QueryException $e) {
 
             // Rollback a transação e retorna uma mensagem de erro
             DB::rollBack();
-            return response()->json(['message' => 'Erro ao cadastrar o cliente', 'error' => $e->getMessage()], 500);
+            if ($e->getCode() === "23505") {
+                return response()->json(['message' => 'Dados do cliente já existentes'], 409);
+            }
+            return response()->json(['message' => 'Erro ao cadastrar o cliente'], 500);
         }
     }
 
         // Controlador que atualiza os dados de um cliente
-
         public function update(Request $request, $id) {
-        \Log::info("=== INICIANDO UPDATE CLIENTE ===");
-        \Log::info("ID do cliente: " . $id);
-        \Log::info("Dados recebidos no request: " . json_encode($request->all()));
-        
         try {
-            \Log::info("Iniciando validação...");
-            
             // Valida os dados do cliente
             $request->validate([
                 'cpf' => 'nullable|size:11|unique:clientes,cpf_cliente,' . $id . ',cod_cliente',
                 'cnpj' => 'nullable|size:14|unique:clientes,cnpj_cliente,' . $id . ',cod_cliente',
-                'email' => 'required|email|max:100',
+                'email' => 'required|email|max:100|unique:clientes,email,' . $id . ',cod_cliente',
                 'nome' => 'required|string|max:100',
                 'data_nascimento' => 'nullable|date',
                 'telefones.*.telefone' => 'required|string|size:11',
@@ -298,8 +295,6 @@ class ClienteController extends Controller
                 'enderecos.*.bairro' => 'required|string|max:100',
                 'enderecos.*.rua_numero' => 'required|string|max:100',
             ]);
-
-            \Log::info("✅ Validação passou com sucesso");
 
             // Verifica se o request contém os dados do cliente
             $cpf = $request->input('cpf');
@@ -310,48 +305,19 @@ class ClienteController extends Controller
             $telefones = $request->input('telefones');
             $enderecos = $request->input('enderecos', []);
 
-            \Log::info("📋 Dados extraídos:");
-            \Log::info("CPF: " . ($cpf ?? 'NULL'));
-            \Log::info("CNPJ: " . ($cnpj ?? 'NULL'));
-            \Log::info("Email: " . $email);
-            \Log::info("Nome: " . $nome);
-            \Log::info("Data Nascimento: " . ($dataNascimento ?? 'NULL'));
-            \Log::info("Telefones: " . json_encode($telefones));
-            \Log::info("Endereços: " . json_encode($enderecos));
-            \Log::info("Quantidade de telefones: " . count($telefones));
-            \Log::info("Quantidade de endereços: " . count($enderecos));
-
             // Verifica se os telefones não estão vazios e são um array de strings
             if (!empty($telefones)) {
-                \Log::info("🔍 Analisando estrutura dos telefones:");
-                \Log::info("Tipo de telefones: " . gettype($telefones));
-                \Log::info("Primeiro elemento: " . json_encode($telefones[0] ?? 'vazio'));
-                \Log::info("É string o primeiro?: " . (is_string($telefones[0] ?? null) ? 'SIM' : 'NÃO'));
-                
                 if (is_string($telefones[0] ?? null)) {
-                    \Log::info("🔄 Convertendo telefones de string para array associativo");
                     $telefones = array_map(fn($t) => ['telefone' => $t], $telefones);
-                    \Log::info("Telefones após conversão: " . json_encode($telefones));
                 }
             }
-
-            \Log::info("🔄 Iniciando transação no banco de dados...");
             DB::beginTransaction();
 
             try {
-                \Log::info("📝 Atualizando tabela CLIENTES...");
-                \Log::info("SQL UPDATE: UPDATE CLIENTES SET CPF_CLIENTE = ?, CNPJ_CLIENTE = ?, EMAIL = ?, NOME = ?, DATA_NASCIMENTO = ? WHERE COD_CLIENTE = ?");
-                \Log::info("Valores: [" . ($cpf ?? 'NULL') . ", " . ($cnpj ?? 'NULL') . ", " . $email . ", " . $nome . ", " . ($dataNascimento ?? 'NULL') . ", " . $id . "]");
-                
                 // Atualiza os dados do cliente
                 DB::update("UPDATE CLIENTES SET CPF_CLIENTE = ?, CNPJ_CLIENTE = ?, EMAIL = ?, NOME = ?, DATA_NASCIMENTO = ? WHERE COD_CLIENTE = ?",
                 [$cpf, $cnpj, $email, $nome, $dataNascimento, $id]);
 
-                \Log::info("✅ CLIENTES atualizado com sucesso");
-
-                // 🚨 CORREÇÃO: Não deletar endereços antigos (para evitar erro de FK)
-                // Em vez disso, apenas adicionar os novos endereços
-                \Log::info("🏠 Inserindo " . count($enderecos) . " endereços (sem deletar os antigos)...");
                 $enderecosInseridos = 0;
                 
                 foreach($enderecos as $index => $end) {
@@ -364,59 +330,39 @@ class ClienteController extends Controller
                     ", [$id, $end['cidade'], $end['cep'], $end['bairro'], $end['rua_numero']]);
                     
                     if (empty($existing)) {
-                        \Log::info("Inserindo novo endereço " . ($index + 1) . ": " . json_encode($end));
                         DB::insert("INSERT INTO ENDERECOS_CLIENTES (COD_CLIENTE, CIDADE, CEP, BAIRRO, RUA_NUMERO) VALUES (?, ?, ?, ?, ?)",
                         [$id, $end['cidade'], $end['cep'], $end['bairro'], $end['rua_numero']]);
                         $enderecosInseridos++;
                     } else {
-                        \Log::info("Endereço " . ($index + 1) . " já existe, pulando: " . json_encode($end));
                     }
                 }
-                \Log::info("✅ " . $enderecosInseridos . " novos endereços inseridos com sucesso");
 
                 // Telefones podem ser deletados normalmente (provavelmente não têm FK)
-                \Log::info("🗑️ Deletando telefones antigos...");
                 DB::delete("DELETE FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
-                \Log::info("✅ Telefones antigos removidos");
 
                 // Insere os telefones do cliente
-                \Log::info("📞 Inserindo " . count($telefones) . " telefones...");
                 foreach($telefones as $index => $t) {
-                    \Log::info("Inserindo telefone " . ($index + 1) . ": " . json_encode($t));
                     DB::insert("INSERT INTO TELEFONES_CLIENTES (COD_CLIENTE, TELEFONE) VALUES (?, ?)", [$id, $t['telefone']]);
                 }
-                \Log::info("✅ Telefones inseridos com sucesso");
 
-                \Log::info("💾 Commit da transação...");
                 // Commita a transação e retorna uma mensagem de sucesso
                 DB::commit();
                 
-                \Log::info("🎉 Cliente atualizado com sucesso!");
                 return response()->json(['message' => 'Cliente atualizado com sucesso!'], 201);
 
-            } catch (\Exception $e) {
-                \Log::error("❌ Erro durante a transação: " . $e->getMessage());
-                \Log::error("📋 Stack trace: " . $e->getTraceAsString());
-                
-                // Rollback a transação e retorna uma mensagem de erro
-                \Log::info("↩️ Fazendo rollback da transação...");
-                DB::rollBack();
-                
-                \Log::error("❌ Erro final ao atualizar cliente: " . $e->getMessage());
-                return response()->json([
-                    'message' => 'Erro ao atualizar o cliente', 
-                    'error' => $e->getMessage()
-                ], 500);
+            } catch (QueryException $e) {
+
+            // Rollback a transação e retorna uma mensagem de erro
+            DB::rollBack();
+            if ($e->getCode() === "23505") {
+                return response()->json(['message' => 'Dados do cliente já existentes'], 409);
+            }
             }
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error("❌ Erro de validação: " . json_encode($e->errors()));
-            \Log::error("📋 Dados que falharam na validação: " . json_encode($request->all()));
             throw $e; // Laravel vai lidar com essa exceção automaticamente
             
         } catch (\Exception $e) {
-            \Log::error("❌ Erro inesperado antes da transação: " . $e->getMessage());
-            \Log::error("📋 Stack trace: " . $e->getTraceAsString());
             return response()->json([
                 'message' => 'Erro inesperado', 
                 'error' => $e->getMessage()
@@ -431,24 +377,24 @@ class ClienteController extends Controller
         DB::beginTransaction();
         
         try {
-            // ⭐ 1. Verifica se o cliente existe
+            // Verifica se o cliente existe
             $cliente = DB::select("SELECT * FROM CLIENTES WHERE COD_CLIENTE = ?", [$id]);
             
             if (empty($cliente)) {
                 return response()->json(['message' => 'Cliente não encontrado'], 404);
             }
 
-            // ⭐ 2. Verifica se existem pedidos associados ao cliente
+            // Verifica se existem pedidos associados ao cliente
             $pedidos = DB::select("SELECT * FROM PEDIDOS WHERE COD_CLIENTE = ?", [$id]);
             
             if (!empty($pedidos)) {
                 DB::rollBack();
                 return response()->json([
-                    'message' => 'Não é possível excluir o cliente pois existem pedidos associados a ele'
-                ], 422);
+                    'message' => 'Não é possível excluir o cliente pois existem pedidos e registros associados a ele'
+                ], 409);
             }
 
-            // ⭐ 3. Exclui os registros relacionados (na ordem correta)
+            // Exclui os registros relacionados (na ordem correta)
             
             // Primeiro exclui os telefones
             DB::delete("DELETE FROM TELEFONES_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
@@ -456,7 +402,7 @@ class ClienteController extends Controller
             // Depois exclui os endereços
             DB::delete("DELETE FROM ENDERECOS_CLIENTES WHERE COD_CLIENTE = ?", [$id]);
             
-            // ⭐ 4. Finalmente exclui o cliente
+            // Finalmente exclui o cliente
             $deleted = DB::delete("DELETE FROM CLIENTES WHERE COD_CLIENTE = ?", [$id]);
 
             DB::commit();
