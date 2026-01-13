@@ -211,6 +211,7 @@ export default function Clientes() {
         data_nascimento: "",
         enderecos: [{ rua_numero: "", bairro: "", cep: "", cidade: "" }],
       });
+      handleRecarregar();
     } catch (error) {
       if (error.response?.status === 422) {
         notify.error("Erro ao cadastrar cliente", {
@@ -339,8 +340,6 @@ export default function Clientes() {
 
   // Função que deleta um cliente
   const handleExcluir = async (id) => {
-    if (!window.confirm("Tem certeza que deseja excluir este cliente?")) return;
-
     try {
       await clientesDelete(id); // ✅ espera a Promise resolver
       notify.info("Cliente excluído com sucesso", {
@@ -370,6 +369,7 @@ export default function Clientes() {
   const propsLista = {
     termoBusca,
     setTermoBusca,
+    clienteSelecionado,
     setClienteSelecionado,
     setModo,
     clientes,

@@ -1,8 +1,10 @@
+import { useState } from "react";
+import  Modal  from "../../utils/Modal.jsx";
 import recarregar from "../../assets/recarregar.jpg";
-
 export default function ListaClientes({
   termoBusca,
   setTermoBusca,
+  clienteSelecionado,
   setClienteSelecionado,
   setModo,
   clientes,
@@ -18,6 +20,19 @@ export default function ListaClientes({
     const data = new Date(dataString);
     return data.toLocaleDateString("pt-BR");
   };
+
+  const [modalAberto, setModalAberto] = useState(false);
+
+  function abrirModal(cliente) {
+    setClienteSelecionado(cliente);
+    setModalAberto(true);
+  }
+
+  function confirmarExclusao() {
+    handleExcluir(clienteSelecionado.cod_cliente);
+    setModalAberto(false);
+    setClienteSelecionado(null);
+  }
 
   // Se está carregando
   if (loadingEditar) {
@@ -65,7 +80,7 @@ export default function ListaClientes({
               setClienteSelecionado(null);
               setModo("cadastro");
             }}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium"
+            className="bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white px-4 py-2 rounded-lg font-medium"
           >
             + Cadastrar Novo Cliente
           </button>
@@ -156,7 +171,7 @@ export default function ListaClientes({
                             setClienteSelecionado(item);
                             setModo("detalhes");
                           }}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                          className="bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
                         >
                           Ver
                         </button>
@@ -164,16 +179,23 @@ export default function ListaClientes({
                           onClick={() => {
                             handleEditar(item);
                           }}
-                          className="bg-amber-400 hover:bg-amber-500 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                          className="bg-amber-400 hover:bg-amber-500 hover:cursor-pointer text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
                         >
                           Editar
                         </button>
                         <button
-                          onClick={() => handleExcluir(item.cod_cliente)}
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                          onClick={() => abrirModal(item)}
+                          className="bg-red-600 hover:bg-red-700 hover:cursor-pointer text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
                         >
                           Excluir
                         </button>
+                        <Modal
+                          open={modalAberto}
+                          onClose={() => setModalAberto(false)}
+                          onConfirm={confirmarExclusao}
+                          titulo="Excluir cliente"
+                          descricao="Essa ação não poderá ser desfeita. Deseja continuar?"
+                        />
                       </div>
                     </td>
                   </tr>
