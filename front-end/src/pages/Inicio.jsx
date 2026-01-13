@@ -2,26 +2,65 @@ import { useState, useEffect } from "react";
 import { novosClientes } from "../services/cliente/novosClientes";
 import { novosPedidos } from "../services/pedido/novosPedidos";
 import { pedidosAtrasados } from "../services/pedido/pedidosAtrasados";
+import { notify } from "../utils/notify";
 
 export default function Inicio({ setTab }) {
   const [clientes, setClientes] = useState([]);
   const [pedidos, setPedidos] = useState([]);
-  const [Atrasados, setAtrasados] = useState([]);
+  const [atrasados, setAtrasados] = useState([]);
 
   useEffect(() => {
-    async function fetchDados() {
+    async function fetchDadosCliente() {
       try {
         const dadosClientes = await novosClientes();
-        const dadosPedidos = await novosPedidos();
-        const dadosPedidosAtrasados = await pedidosAtrasados();
         setClientes(dadosClientes);
-        setPedidos(dadosPedidos);
-        setAtrasados(dadosPedidosAtrasados);
       } catch (error) {
-        console.error("Erro ao buscar dados:", error);
+        if (error.response?.status === 500) {
+          notify.error("Erro ao buscar clientes");
+        } else {
+          notify.error("Erro inesperado", {
+            description: "Tente novamente mais tarde.",
+          });
+        }
       }
     }
-    fetchDados();
+    fetchDadosCliente();
+  }, []);
+
+  useEffect(() => {
+    async function fetchDadosPedido() {
+      try {
+        const dadosPedidos = await novosPedidos();
+        setPedidos(dadosPedidos);
+      } catch (error) {
+        if (error.response?.status === 500) {
+          notify.error("Erro ao buscar pedidos");
+        } else {
+          notify.error("Erro inesperado", {
+            description: "Tente novamente mais tarde.",
+          });
+        }
+      }
+    }
+    fetchDadosPedido();
+  }, []);
+
+  useEffect(() => {
+    async function fetchDadosPedidoAtrasado() {
+      try {
+        const dadosPedidosAtrasados = await pedidosAtrasados();
+        setAtrasados(dadosPedidosAtrasados);
+      } catch (error) {
+        if (error.response?.status === 500) {
+          notify.error("Erro ao buscar pedidos atrasado");
+        } else {
+          notify.error("Erro inesperado", {
+            description: "Tente novamente mais tarde.",
+          });
+        }
+      }
+    }
+    fetchDadosPedidoAtrasado();
   }, []);
 
   return (
@@ -101,7 +140,7 @@ export default function Inicio({ setTab }) {
               </div>
               <div className="text-center">
                 <div className="text-gray-600 mt-1">Pedidos atrasados:</div>
-                <div className="text-3xl font-bold text-red-600">{Atrasados.length}</div>
+                <div className="text-3xl font-bold text-red-600">{atrasados.length}</div>
               </div>
             </div>
           </div>

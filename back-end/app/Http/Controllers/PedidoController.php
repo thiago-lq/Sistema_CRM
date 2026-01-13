@@ -8,37 +8,48 @@ use Illuminate\Support\Facades\DB;
 class PedidoController extends Controller
 {
     // Controlador que busca todos os pedidos ou filtra por termo de busca
-    public function index(Request $request) {
-        // Recebe o termo de busca da query string
+    public function index(Request $request)
+    {
         $termoBusca = $request->query('termo', '');
-        
+
         $query = "
-        SELECT
-            -- Definição dos dados que irão vir na query, com as suas respectivas variáveis
-            p.COD_PEDIDO AS cod_pedido,
-            p.COD_CLIENTE AS cod_cliente,
-            p.VALOR_TOTAL AS valor_total,
-            pc.STATUS AS status_pagamento,
-            p.CREATED_AT AS created_at,
-            -- Agregação dos tipos em uma subquery para evitar duplicação
-            (
-                SELECT STRING_AGG(pt.NOME_TIPO, ', ')
-                FROM PEDIDOS_TIPOS pt 
-                WHERE pt.COD_PEDIDO = p.COD_PEDIDO
-            ) AS tipos_pedido
-        FROM PEDIDOS p 
-        LEFT JOIN PAGAMENTOS_CLIENTES pc ON pc.COD_PEDIDO = p.COD_PEDIDO
+            SELECT
+                p.COD_PEDIDO   AS cod_pedido,
+                p.COD_CLIENTE  AS cod_cliente,
+                p.VALOR_TOTAL  AS valor_total,
+                pc.STATUS      AS status_pagamento,
+                p.CREATED_AT   AS created_at,
+                STRING_AGG(pt.NOME_TIPO, ', ') AS tipos_pedido
+            FROM PEDIDOS p
+            LEFT JOIN PAGAMENTOS_CLIENTES pc 
+                ON pc.COD_PEDIDO = p.COD_PEDIDO
+            LEFT JOIN PEDIDOS_TIPOS pt 
+                ON pt.COD_PEDIDO = p.COD_PEDIDO
         ";
-        
-        // Adiciona WHERE se houver termo de busca
+
+        $bindings = [];
+
         if (!empty($termoBusca)) {
-            $query .= " WHERE p.COD_PEDIDO::text LIKE ? OR p.COD_CLIENTE::text LIKE ?";
-            $termoLike = '%' . $termoBusca . '%';
-            $pedido = DB::select($query . " ORDER BY p.COD_PEDIDO", [$termoLike, $termoLike]);
-        } else {
-            $query .= " ORDER BY p.COD_PEDIDO";
-            $pedido = DB::select($query);
+            $query .= "
+                WHERE 
+                    p.COD_PEDIDO::text LIKE ?
+                    OR p.COD_CLIENTE::text LIKE ?
+            ";
+            $termoLike = "%{$termoBusca}%";
+            $bindings = [$termoLike, $termoLike];
         }
+
+        $query .= "
+            GROUP BY 
+                p.COD_PEDIDO,
+                p.COD_CLIENTE,
+                p.VALOR_TOTAL,
+                pc.STATUS,
+                p.CREATED_AT
+            ORDER BY p.COD_PEDIDO
+        ";
+
+        $pedido = DB::select($query, $bindings);
 
         return response()->json($pedido);
     }
@@ -95,145 +106,145 @@ class PedidoController extends Controller
         return response()->json($pedido[0]);
     }
 
-    // Controlador que cadastra um pedido
-    public function store(Request $request) {
-        // Validação dos dados enviados do pedido
+    public function store(Request $request)
+    {
+        // =========================
+        // VALIDAÇÃO
+        // =========================
         $request->validate([
-            // Valida se o código do cliente é não nulo, inteiro e existe no banco de dados
             'cod_cliente' => 'required|integer|exists:clientes,cod_cliente',
-            // Valida se os códigos dos produtos são necessários de acordo com o tipo do pedido
-            'cod_produtos' => 'nullable|required_if:pedido_tipos.*,PRODUTO|array',
-            // Valida se os códigos dos produtos são números inteiros e existem no banco de dados
-            'cod_produtos.*' => 'integer|exists:produtos,cod_produto',
-            // Valida se o código do endereço do cliente pode ser nulo, se é necessário de acordo com o tipo do pedido
-            // inteiro, e se existe no banco de dados
-            'cod_endereco_cliente' => 'nullable|required_if:pedido_tipos.*,PRODUTO|integer|exists:enderecos_clientes,cod_endereco_cliente',
-            // Valida se o pedido_tipos é um array
+
             'pedido_tipos' => 'required|array',
-            // Válida se pedido_tipos não é nulo, string e é uma das 3 opções permitidas
             'pedido_tipos.*' => 'required|string|in:INSTALACAO,MANUTENCAO,PRODUTO',
-            // Valida se as quantidade é necessária de acordo com o tipo do pedido
-            'quantidade' => 'required_if:pedido_tipos.*,PRODUTO|array',
-            // Valida se as quantidade são números inteiros e maiores que 0
+
+            'cod_produtos' => 'nullable|array',
+            'cod_produtos.*' => 'integer|exists:produtos,cod_produto',
+
+            'quantidade' => 'nullable|array',
             'quantidade.*' => 'integer|min:1',
-            // Valida se a descrição é não nula, string, e com no máximo 500 caracteres
+
+            'cod_endereco_cliente' =>
+                'nullable|required_if:pedido_tipos.*,PRODUTO|integer|exists:enderecos_clientes,cod_endereco_cliente',
+
             'descricao' => 'required|string|max:500',
-            // Valida se o valor_total é não nulo, numérico, e com o valor máximo de 99.999.999,99
             'valor_total' => 'required|numeric|min:0|max:99999999.99',
-            // Valida se o valor_adicional é não nulo, numérico, e com o valor minimo de 0
             'valor_adicional' => 'nullable|numeric|min:0',
+
             'metodo_pagamento' => 'required|string|in:PIX,CREDITO,DEBITO,DINHEIRO,BOLETO',
             'parcelas' => 'nullable|integer',
-            // Valida se o prazo é não nulo, data
             'prazo' => 'required|date',
+
+            'cidade' => 'sometimes|required|string|max:100',
+            'cep' => 'sometimes|required|size:8',
+            'bairro' => 'sometimes|required|string|max:100',
+            'rua_numero' => 'sometimes|required|string|max:100',
         ]);
 
-        // Pega os dados do pedido para cadastrar
         $funcionario = $request->attributes->get('funcionario');
-        $codFuncionario = $funcionario->cod_funcionario; // Codigo do funcionário vem do middleware
-        // Os dados abaixo vem dos inputs do request enviado
-        $codCliente = $request->input('cod_cliente');
-        $codProdutos = $request->input('cod_produtos');
-        $codEnderecoCliente = $request->input('cod_endereco_cliente');
-        $pedidoTipos = $request->input('pedido_tipos');
-        $quantidade = $request->input('quantidade');
-        $descricao = $request->input('descricao');
-        $valorTotal = $request->input('valor_total');
-        $valorAdicional = $request->input('valor_adicional', 0);
-        $metodoPagamento = $request->input('metodo_pagamento');
-        $parcelas = $request->input('parcelas', 0);
-        $prazo = $request->input('prazo');
+        $pedidoTipos = $request->pedido_tipos;
 
-        // Pega o request input cod_produtos e converte por meio do array_map cada valor para inteiro
-        $codProdutos = array_map('intval', $request->input('cod_produtos'));
+        // =========================
+        // GERA COD_PEDIDO (SEM SELECT)
+        // =========================
+        $tentativas = 0;
 
-        // Gera um código aleatório para o pedido, verifica se o código já existe no banco de dados
         do {
             $codPedido = random_int(1, 999999);
-            $exists = DB::select("SELECT 1 FROM PEDIDOS WHERE COD_PEDIDO = ?", [$codPedido]);
-        } while (!empty($exists));
+            $tentativas++;
 
-        // Se o pedido tiver tipo de instalação ou manutenção, entra em mais validações
-        if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
-            // Valida se as cidades, cep, bairro e rua_numero são necessárias de acordo com o tipo do pedido
-            $request->validate([
-                // Valida se é string e com no máximo 100 caracteres
-                'cidade' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
-                // Valida se é string e com no máximo 8 caracteres
-                'cep' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|size:8',
-                // Valida se é string e com no máximo 100 caracteres
-                'bairro' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
-                // Valida se é string e com no máximo 100 caracteres
-                'rua_numero' => 'required_if:pedido_tipos,INSTALACAO,MANUTENCAO|string|max:100',
-            ]);
+            DB::beginTransaction();
 
-            $cidade = $request->input('cidade');
-            $cep = $request->input('cep');
-            $bairro = $request->input('bairro');
-            $ruaNumero = $request->input('rua_numero');
-        }
+            try {
+                // =========================
+                // INSERT PEDIDO (TENTA DIRETO)
+                // =========================
+                DB::insert("
+                    INSERT INTO pedidos
+                    (cod_pedido, cod_cliente, cod_endereco_cliente, cod_funcionario,
+                    descricao, valor_total, valor_adicional, metodo_pagamento, parcelas, prazo)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ", [
+                    $codPedido,
+                    $request->cod_cliente,
+                    $request->cod_endereco_cliente,
+                    $funcionario->cod_funcionario,
+                    $request->descricao,
+                    $request->valor_total,
+                    $request->valor_adicional ?? 0,
+                    $request->metodo_pagamento,
+                    $request->parcelas ?? 0,
+                    $request->prazo
+                ]);
 
-        DB::beginTransaction();
-        // Inicia transação
-        try {
-            // Insere os dados do pedido no banco de dados
-            DB::insert("INSERT INTO PEDIDOS (COD_PEDIDO, COD_CLIENTE, COD_ENDERECO_CLIENTE, COD_FUNCIONARIO, DESCRICAO, 
-            VALOR_TOTAL, VALOR_ADICIONAL, METODO_PAGAMENTO, PARCELAS, PRAZO) VALUES (?, ?, ?, ?, ?, ?, ? , ?, ?, ?)", [$codPedido, 
-            $codCliente, $codEnderecoCliente, $codFuncionario, $descricao, $valorTotal, $valorAdicional, $metodoPagamento, $parcelas, $prazo]);
-            // Se o pedido tiver tipo de instalação ou manutenção, insere os dados do endereço no banco de dados
-            if (in_array('INSTALACAO', $pedidoTipos) || in_array('MANUTENCAO', $pedidoTipos)) {
-                DB::insert("INSERT INTO ENDERECOS_INST_MANU (COD_PEDIDO, CIDADE, CEP, BAIRRO, RUA_NUMERO)
-                VALUES (?, ?, ?, ?, ?)", [$codPedido, $cidade, $cep, $bairro, $ruaNumero]);
-            }
-            // Se o pedido tiver tipo de produto, insere os dados do produto no banco de dados
-            if (in_array('PRODUTO', $pedidoTipos)) {
-                // Verifica se há produtos
-                if (empty($codProdutos)) {
-                    return response()->json([
-                        'message' => 'Nenhum produto selecionado para pedido do tipo PRODUTO'
-                    ], 422);
-                }
-                
-                // Loop para pegar os códigos dos produtos
-                foreach ($codProdutos as $index => $codProduto) {
-                    // Verifica se a quantidade para este índice existe
-                    if (!isset($quantidade[$index])) {
-                        return response()->json([
-                            'erro' => "Quantidade não informada para o produto $codProduto"
-                        ], 422);
-                    }
-                    
-                    $quantidadeProduto = $quantidade[$index];
-                    
-                    // Valida se a quantidade é válida
-                    if ($quantidadeProduto < 1) {
-                        return response()->json([
-                            'erro' => "Quantidade inválida para o produto $codProduto"
-                        ], 422);
-                    }
-                    
-                    // Insere os dados em itens_produtos no banco de dados
-                    DB::insert("INSERT INTO ITENS_PRODUTOS (COD_PEDIDO, COD_PRODUTO, QUANTIDADE) VALUES (?, ?, ?)", [
-                        $codPedido, 
-                        $codProduto, 
-                        $quantidadeProduto
+                // =========================
+                // ENDEREÇO INST / MANU
+                // =========================
+                if (array_intersect(['INSTALACAO', 'MANUTENCAO'], $pedidoTipos)) {
+                    DB::insert("
+                        INSERT INTO enderecos_inst_manu
+                        (cod_pedido, cidade, cep, bairro, rua_numero)
+                        VALUES (?, ?, ?, ?, ?)
+                    ", [
+                        $codPedido,
+                        $request->cidade,
+                        $request->cep,
+                        $request->bairro,
+                        $request->rua_numero
                     ]);
                 }
+
+                // =========================
+                // ITENS (LOTE)
+                // =========================
+                if (in_array('PRODUTO', $pedidoTipos)) {
+                    $itens = [];
+
+                    foreach ($request->cod_produtos as $i => $produto) {
+                        $itens[] = [
+                            'cod_pedido' => $codPedido,
+                            'cod_produto' => $produto,
+                            'quantidade' => $request->quantidade[$i],
+                        ];
+                    }
+
+                    DB::table('itens_produtos')->insert($itens);
+                }
+
+                // =========================
+                // TIPOS (LOTE)
+                // =========================
+                $tipos = array_map(fn ($tipo) => [
+                    'cod_pedido' => $codPedido,
+                    'nome_tipo' => $tipo,
+                ], $pedidoTipos);
+
+                DB::table('pedidos_tipos')->insert($tipos);
+
+                DB::commit();
+
+                return response()->json([
+                    'message' => 'Pedido cadastrado com sucesso!',
+                    'cod_pedido' => $codPedido
+                ], 201);
+
+            } catch (\Illuminate\Database\QueryException $e) {
+                DB::rollBack();
+
+                // colisão de cod_pedido → tenta de novo
+                if ($e->getCode() === '23505' && $tentativas < 5) {
+                    continue;
+                }
+
+                throw $e;
             }
-            // Loop para pegar cada tipo pedido
-            foreach ($pedidoTipos as $pedidoTipo) {
-                // Insere os dados em pedidos_tipos no banco de dados
-                DB::insert("INSERT INTO PEDIDOS_TIPOS (COD_PEDIDO, NOME_TIPO) VALUES (?, ?)", [$codPedido, $pedidoTipo]);
-            }
-            // Commit a transação e retona o pedido com sucesso
-            DB::commit();
-            return response()->json(['message' => 'Pedido cadastrado com sucesso!', 'cod_pedido' => $codPedido], 201);
-        } catch (\Exception $e) {
-            // Rollback a transação e retorna o erro
-            DB::rollback();
-            return response()->json(['message' => 'Erro ao cadastrar o pedido', 'error' => $e->getMessage()], 500);
-        }
+
+        } while ($tentativas < 5);
+
+        return response()->json([
+            'message' => 'Falha ao gerar código do pedido'
+        ], 500);
     }
+
 
     public function novosPedidos() {
         try {

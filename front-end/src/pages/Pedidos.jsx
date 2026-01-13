@@ -67,7 +67,7 @@ export default function Pedidos() {
       }
       // Chama a função, e define um tempo de timeout
       carregarPedidos();
-    }, 1000);
+    }, 500);
     // Quando a função for deletada, o timeout é cancelado
     return () => clearTimeout(timeout);
     // Apenas executa quando o termoBusca for alterado
@@ -190,7 +190,6 @@ export default function Pedidos() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Formulário de envio:", form);
     try {
       // Converter quantidade de objeto para array
       const quantidadeArray = form.codProdutos.map(

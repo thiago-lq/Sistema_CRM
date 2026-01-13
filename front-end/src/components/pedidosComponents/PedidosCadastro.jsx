@@ -80,53 +80,41 @@ export default function FormularioCadastro({
       setCliente({});
       return;
     }
-
-    const fetchCliente = async () => {
-      try {
-        const dadosCliente = await clientesShow(buscaCliente);
-        setCliente(dadosCliente);
-        if (dadosCliente && dadosCliente.cod_cliente) {
-          handleChange({
-            target: {
-              name: "codCliente",
-              value: dadosCliente.cod_cliente,
-            },
-          });
+    const timeout = setTimeout(() => {
+      async function fetchCliente() {
+        try {
+          const dadosCliente = await clientesShow(buscaCliente);
+          setCliente(dadosCliente);
+          if (dadosCliente && dadosCliente.cod_cliente) {
+            handleChange({
+              target: {
+                name: "codCliente",
+                value: dadosCliente.cod_cliente,
+              },
+            });
+          }
+        } catch (error) {
+          console.error("Erro ao buscar cliente:", error);
+          setCliente({});
         }
-      } catch (error) {
-        console.error("Erro ao buscar cliente:", error);
-        setCliente({});
       }
-    };
-    fetchCliente();
+      fetchCliente();
+    }, 500);
+    return () => clearTimeout(timeout);
   }, [buscaCliente, handleChange]);
 
-  // Handler para o submit que inclui os dados do cartão
   const handleSubmitComCartao = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Se for cartão, mostra os dados simbólicos
-    if (form.metodoPagamento === "CREDITO" && mostrarCartao) {
-      const ultimos4Digitos = dadosCartao.numero.slice(-4).replace(/\s/g, "");
-      const dadosPagamento = {
-        ...form,
-        dadosPagamentoCartao: {
-          ultimos4Digitos: ultimos4Digitos || "SIMULADO",
-          parcelas: dadosCartao.parcelas,
-          bandeira: dadosCartao.numero.startsWith("4")
-            ? "Visa"
-            : dadosCartao.numero.startsWith("5")
-            ? "Mastercard"
-            : "Outra",
-        },
-      };
+  // Se for crédito, só valida parcelas
+  if (form.metodoPagamento === "CREDITO" && !form.parcelas) {
+    alert("Selecione a quantidade de parcelas");
+    return;
+  }
 
-      console.log("Dados do pedido com cartão (simulado):", dadosPagamento);
-
-    } else {
-      handleSubmit(e);
-    }
-  };
+  // SEMPRE envia
+  handleSubmit(e);
+};
 
   return (
     <div className="bg-white">
@@ -399,7 +387,9 @@ export default function FormularioCadastro({
                 <option value="" disabled>
                   Selecione a quantidade de parcelas
                 </option>
-                <option value="1">1x de R$ {(form.valorTotal / 1).toFixed(2) } sem juros</option>
+                <option value="1">
+                  1x de R$ {(form.valorTotal / 1).toFixed(2)} sem juros
+                </option>
                 <option value="2">
                   2x de R$ {(form.valorTotal / 2).toFixed(2)} sem juros
                 </option>
