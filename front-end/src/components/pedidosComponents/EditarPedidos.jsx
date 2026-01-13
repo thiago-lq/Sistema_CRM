@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { clientesShow } from "../../services/cliente/clientesShow";
 import { pedidosUpdate } from "../../services/pedido/pedidosUpdate";
 import { pedidosShow } from "../../services/pedido/pedidosShow";
-
+import { notify } from "../../utils/notify";
 export default function EditarPedidos({
   pedidoSelecionado,
   setAbaAtiva,
   produtos,
+  handleRecarregar,
 }) {
   const [clienteEditar, setClienteEditar] = useState({});
   const [buscaClienteEditar, setBuscaClienteEditar] = useState("");
@@ -103,8 +104,17 @@ export default function EditarPedidos({
         const dados = await pedidosShow(pedidoSelecionado.cod_pedido);
         setPedido(dados);
       } catch (error) {
-        console.error("Erro ao buscar dados do pedido:", error);
-        setPedido(null);
+        if (error.response?.status === 404) {
+          notify.error("Pedido não encontrado no sistema", {
+            position: "top-right",
+          });
+        } else if (error.response?.status === 500) {
+          notify.error("Erro ao buscar dados do pedido");
+        } else {
+          notify.error("Erro inesperado", {
+            description: "Tente novamente mais tarde.",
+          });
+        }
       } finally {
         setLoading(false);
       }
@@ -166,25 +176,15 @@ export default function EditarPedidos({
   const handleSubmitComCartao = async (e) => {
     e.preventDefault();
 
-    // Se for cartão, mostra os dados simbólicos
-    if (formEditar.metodoPagamento === "CREDITO" && mostrarCartao) {
-      const ultimos4Digitos = dadosCartao.numero.slice(-4).replace(/\s/g, "");
-
-      console.log("Dados do pedido com cartão (simulado):", {
-        ...formEditar,
-        dadosPagamentoCartao: {
-          ultimos4Digitos: ultimos4Digitos || "SIMULADO",
-          parcelas: dadosCartao.parcelas,
-          bandeira: dadosCartao.numero.startsWith("4")
-            ? "Visa"
-            : dadosCartao.numero.startsWith("5")
-            ? "Mastercard"
-            : "Outra",
-        },
+    // Se for crédito, apenas garante parcelas
+    if (formEditar.metodoPagamento === "CREDITO") {
+      console.log("Pagamento crédito (simulado):", {
+        metodoPagamento: "CREDITO",
+        parcelas: formEditar.parcelas,
       });
     }
 
-    // Chama a função original de submit
+    // Chama o submit real
     await handleSubmitEditar(e);
   };
 
@@ -321,20 +321,7 @@ export default function EditarPedidos({
       e.preventDefault();
     }
 
-    console.log("Formulário de envio:", formEditar);
-
     try {
-      // Validar dados antes de enviar
-      if (!formEditar.codCliente) {
-        alert("Cliente é obrigatório");
-        return;
-      }
-
-      if (formEditar.pedidoTipos.length === 0) {
-        alert("Selecione pelo menos um tipo de pedido");
-        return;
-      }
-
       // CORREÇÃO: Só processar produtos se PRODUTO estiver selecionado
       let quantidadeFormatada = {};
       let codProdutosParaEnviar = [];
@@ -346,14 +333,6 @@ export default function EditarPedidos({
             formEditar.quantidade[codProduto] || 1;
         });
         codProdutosParaEnviar = formEditar.codProdutos.map(Number);
-
-        // Validar se há produtos selecionados quando o tipo inclui PRODUTO
-        if (codProdutosParaEnviar.length === 0) {
-          alert(
-            "Selecione pelo menos um produto quando o tipo inclui Venda de Produto"
-          );
-          return;
-        }
       }
 
       // CORREÇÃO: Enviar pedido_tipos como ARRAY
@@ -405,33 +384,26 @@ export default function EditarPedidos({
           dadosParaEnviar.cli_cidade = enderecoSelecionado.cidade;
         }
       }
-
-      console.log("Dados para enviar CORRIGIDOS:", dadosParaEnviar);
-
       await pedidosUpdate(dadosParaEnviar);
-      alert("Pedido editado com sucesso!");
-
+      notify.success("Pedido editado com sucesso", {
+        position: "top-right",
+      });
       // Voltar para lista e recarregar
       setAbaAtiva("lista");
+      handleRecarregar();
     } catch (err) {
-      console.error("Erro completo ao editar:", err);
-      console.error("Resposta completa do erro:", err.response?.data);
-
-      let errorMessage = "Erro ao editar pedido: ";
-
-      if (err.response?.data?.errors) {
-        const errors = err.response.data.errors;
-        errorMessage = "Erros de validação:\n";
-        Object.keys(errors).forEach((key) => {
-          errorMessage += `• ${errors[key].join(", ")}\n`;
+      if (err.response?.status === 422) {
+        notify.error("Erro ao editar pedido", {
+          description:
+            "Verifique se os campos estão preenchidos corretamente.",
         });
-      } else if (err.response?.data?.message) {
-        errorMessage += err.response.data.message;
+      } else if (err.response?.status === 500) {
+        notify.error("Erro ao editar pedido");
       } else {
-        errorMessage += err.message || "Erro desconhecido no servidor";
+        notify.error("Erro inesperado", {
+          description: "Tente novamente mais tarde.",
+        });
       }
-
-      alert(errorMessage);
     }
   };
 
@@ -475,7 +447,22 @@ export default function EditarPedidos({
           }));
         }
       } catch (error) {
-        console.error("Erro ao buscar cliente:", error);
+        if (error.response?.status === 422) {
+          notify.error("Erro ao buscar cliente", {
+            description:
+              "Verifique se os campos CPF ou CNPJ estão preenchidos corretamente.",
+          });
+        } else if (error.response?.status === 404) {
+          notify.error("Cliente não encontrado no sistema", {
+            position: "top-right",
+          });
+        } else if (error.response?.status === 500) {
+          notify.error("Erro ao buscar cliente");
+        } else {
+          notify.error("Erro inesperado", {
+            description: "Tente novamente mais tarde.",
+          });
+        }
         setClienteEditar({});
       }
     };

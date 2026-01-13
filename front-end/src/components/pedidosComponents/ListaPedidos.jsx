@@ -1,8 +1,11 @@
+import { useState } from "react";
+import Modal from "../../utils/Modal.jsx";
 import recarregar from "../../assets/recarregar.jpg";
 
 export default function ListaPedidos({
   termoBusca,
   setTermoBusca,
+  pedidoSelecionado,
   setPedidoSelecionado,
   setAbaAtiva,
   pedidos,
@@ -51,8 +54,28 @@ export default function ListaPedidos({
     );
   };
 
+  const [modalAberto, setModalAberto] = useState(false);
+
+  function abrirModal(pedido) {
+    setPedidoSelecionado(pedido);
+    setModalAberto(true);
+  }
+
+  function confirmarExclusao() {
+    handleExcluir(pedidoSelecionado.cod_pedido);
+    setModalAberto(false);
+    setPedidoSelecionado(null);
+  }
+
   return (
     <div className="bg-white mt-3 rounded-lg shadow-sm">
+      <Modal
+        open={modalAberto}
+        onClose={() => setModalAberto(false)}
+        onConfirm={confirmarExclusao}
+        titulo="Excluir pedido"
+        descricao="Essa ação não poderá ser desfeita. Deseja continuar?"
+      />
       {/* Header com busca e recarregar */}
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-lg font-semibold text-gray-800">
@@ -62,12 +85,12 @@ export default function ListaPedidos({
           <button
             onClick={handleRecarregar}
             disabled={loading}
-            className="p-2 mt-1 hover:bg-gray-100 rounded-lg transition-all duration-300 disabled:opacity-50"
+            className="p-2 mt-1 rounded-lg transition-all duration-300 disabled:opacity-70"
           >
             <img
               src={recarregar}
               alt="Recarregar"
-              className="h-6 w-6 hover:opacity-70 hover:cursor-pointer"
+              className="h-6 w-6 hover:opacity-70 hover:cursor-pointer disabled:opacity-70 transition-all duration-300"
             />
           </button>
           <div className="relative w-64">
@@ -76,7 +99,7 @@ export default function ListaPedidos({
               placeholder="Pesquisar pedido..."
               value={termoBusca}
               onChange={(e) => setTermoBusca(e.target.value)}
-              className="pl-5 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm w-full"
+              className="pl-5 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-full"
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <span className="text-gray-400"></span>
@@ -151,10 +174,10 @@ export default function ListaPedidos({
                       <span
                         className={`text-sm font-medium ${
                           pedido.status_pagamento === true
-                            ? "text-green-900"
+                            ? "text-green-600"
                             : pedido.status_pagamento === false
-                            ? "text-yellow-800"
-                            : "text-gray-800"
+                            ? "text-yellow-600"
+                            : "text-gray-900"
                         }`}
                       >
                         {pedido.status_pagamento === true
@@ -171,21 +194,22 @@ export default function ListaPedidos({
                             setPedidoSelecionado(pedido);
                             setAbaAtiva("detalhes");
                           }}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md hover:cursor-pointer"
                         >
                           Ver
                         </button>
-                        <button onClick={() => {
-                          setPedidoSelecionado(pedido);
-                          setAbaAtiva("editar");
-                        }}
-                        className="bg-amber-400 hover:bg-amber-500 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                        <button
+                          onClick={() => {
+                            setPedidoSelecionado(pedido);
+                            setAbaAtiva("editar");
+                          }}
+                          className="bg-amber-400 hover:bg-amber-500 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md hover:cursor-pointer"
                         >
                           Editar
                         </button>
                         <button
-                          onClick={() => handleExcluir(pedido.cod_pedido)}
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                          onClick={() => abrirModal(pedido)}
+                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md hover:cursor-pointer"
                         >
                           Excluir
                         </button>

@@ -6,10 +6,11 @@ import {
   EditarPedidos,
 } from "../components/pedidosComponents";
 
+import { notify } from "../utils/notify";
+
 import { pedidosIndex } from "../services/pedido/pedidosIndex";
 import { pedidosStore } from "../services/pedido/pedidosStore";
 import { pedidosDelete } from "../services/pedido/pedidosDelete";
-
 import { produtosIndex } from "../services/produtosIndex";
 
 export default function Pedidos() {
@@ -54,7 +55,7 @@ export default function Pedidos() {
         // Verifica se há termo de busca
         if (termoBusca.trim().length > 0) {
           // é número, busca pelo ID do pedido
-          const dados = await pedidosIndex( { termo: termoBusca });
+          const dados = await pedidosIndex({ termo: termoBusca });
           setLoading(false);
           // Se dados existir de acordo com o ID, adiciona ao array, se não existir, cria um array vazio
           setPedidos(dados);
@@ -80,7 +81,7 @@ export default function Pedidos() {
     // Verifica se há termo de busca
     if (termoBusca.trim().length > 0) {
       // é número, busca pelo ID do pedido
-      const dados = await pedidosIndex( {termo: termoBusca });
+      const dados = await pedidosIndex({ termo: termoBusca });
       setLoading(false);
       // Se dados existir de acordo com o ID, adiciona ao array, se não existir, cria um array vazio
       setPedidos(dados);
@@ -223,7 +224,9 @@ export default function Pedidos() {
       };
 
       await pedidosStore(dadosParaEnviar);
-      alert("Pedido cadastrado com sucesso!");
+      notify.success("Pedido cadastrado com sucesso", {
+        position: "top-right",
+      });
 
       // Reset do form
       setForm({
@@ -250,18 +253,50 @@ export default function Pedidos() {
       setAbaAtiva("lista");
       handleRecarregar();
     } catch (err) {
-      console.error("Erro ao cadastrar:", err);
-      alert(
-        "Erro ao cadastrar pedido: " +
-          (err.response?.data?.message || err.message)
-      );
+      if (err.response?.status === 422) {
+        notify.error("Erro ao cadastrar o pedido", {
+          description: "Verifique se os campos estão preenchidos corretamente.",
+        });
+      } else if (err.response?.status === 500) {
+        notify.error("Erro ao cadastrar o pedido");
+      } else {
+        notify.error("Erro inesperado", {
+          description: "Tente novamente mais tarde.",
+        });
+      }
     }
   };
 
   // Função que deleta um pedido
-  const handleExcluir = (id) => {
-    if (!window.confirm("Tem certeza que deseja excluir este pedido?")) return;
-    pedidosDelete(id);
+  const handleExcluir = async (id) => {
+    try {
+      await pedidosDelete(id);
+      notify.info("Pedido excluído com sucesso", {
+        position: "top-right",
+      });
+      handleRecarregar();
+    } catch (error) {
+      if (error.response?.status === 404) {
+        notify.error("Pedido não encontrado no sistema", {
+          position: "top-right",
+        });
+      } else if (error.response?.status === 422) {
+        notify.error("Erro ao excluir o pedido", {
+          position: "top-right",
+          description:
+            "Não é possível excluir o pedido pois existem pagamentos associados a ele",
+        });
+      } else if (error.response?.status === 500) {
+        notify.error("Erro ao excluir o pedido", {
+          position: "top-right",
+        });
+      } else {
+        notify.error("Erro inesperado", {
+          position: "top-right",
+          description: "Tente novamente mais tarde.",
+        });
+      }
+    }
   };
 
   // Função que carrega os dados dos produtos do back-end
@@ -304,6 +339,7 @@ export default function Pedidos() {
     setTermoBusca,
     pedidos,
     setAbaAtiva,
+    pedidoSelecionado,
     setPedidoSelecionado,
     handleExcluir,
     loading,
@@ -328,11 +364,12 @@ export default function Pedidos() {
     pedidoSelecionado,
     setAbaAtiva,
     produtos,
-  }
+    handleRecarregar,
+  };
 
   return (
     // Otimização: A div externa está responsável pelo fundo e margem
-    <div className=" bg-white">
+    <div className="bg-white">
       {/* LINHA CHAVE (1): Altere a classe max-w-lg (que limita a largura total do conteúdo) para um valor maior como max-w-3xl, max-w-4xl, ou até max-w-full se quiser que ele use toda a largura disponível.
        */}
       <div className="max-w-3/4 mx-auto bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30">

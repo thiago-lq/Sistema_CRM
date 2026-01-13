@@ -1,5 +1,5 @@
 import { useState } from "react";
-import  Modal  from "../../utils/Modal.jsx";
+import Modal from "../../utils/Modal.jsx";
 import recarregar from "../../assets/recarregar.jpg";
 export default function ListaClientes({
   termoBusca,
@@ -48,6 +48,13 @@ export default function ListaClientes({
 
   return (
     <div className="bg-white mt-3 rounded-lg shadow-sm">
+      <Modal
+        open={modalAberto}
+        onClose={() => setModalAberto(false)}
+        onConfirm={confirmarExclusao}
+        titulo="Excluir cliente"
+        descricao="Essa ação não poderá ser desfeita. Deseja continuar?"
+      />
       {/* Componente que vai ser renderizado no componente principal */}
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-lg font-semibold text-gray-800">Clientes</h2>
@@ -55,12 +62,12 @@ export default function ListaClientes({
           <button
             onClick={handleRecarregar}
             disabled={loading}
-            className="p-2 mt-1 hover:bg-gray-100 rounded-lg transition-all duration-300 disabled:opacity-50"
+            className="p-2 mt-1 rounded-lg transition-all duration-300 disabled:opacity-70"
           >
             <img
               src={recarregar}
               alt="Recarregar"
-              className="h-6 w-6 hover:opacity-70 hover:cursor-pointer"
+              className="h-6 w-6 hover:opacity-70 hover:cursor-pointer disabled:opacity-70 transition-all duration-300"
             />
           </button>
           <div className="relative w-64">
@@ -69,7 +76,7 @@ export default function ListaClientes({
               placeholder="Pesquisar cliente..."
               value={termoBusca}
               onChange={(e) => setTermoBusca(e.target.value)}
-              className="pl-5 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm w-full"
+              className="pl-5 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-full"
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <span className="text-gray-400"></span>
@@ -80,7 +87,8 @@ export default function ListaClientes({
               setClienteSelecionado(null);
               setModo("cadastro");
             }}
-            className="bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white px-4 py-2 rounded-lg font-medium"
+            className="bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer hover:shadow-md transition-all duration-300
+             text-white px-4 py-2 rounded-lg font-medium"
           >
             + Cadastrar Novo Cliente
           </button>
@@ -171,7 +179,8 @@ export default function ListaClientes({
                             setClienteSelecionado(item);
                             setModo("detalhes");
                           }}
-                          className="bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                          className="bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white text-xs px-3 py-1 
+                          rounded transition-all duration-300 hover:shadow-md"
                         >
                           Ver
                         </button>
@@ -179,23 +188,18 @@ export default function ListaClientes({
                           onClick={() => {
                             handleEditar(item);
                           }}
-                          className="bg-amber-400 hover:bg-amber-500 hover:cursor-pointer text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                          className="bg-amber-400 hover:bg-amber-500 hover:cursor-pointer text-white text-xs px-3 py-1 
+                          rounded transition-all duration-300 hover:shadow-md"
                         >
                           Editar
                         </button>
                         <button
                           onClick={() => abrirModal(item)}
-                          className="bg-red-600 hover:bg-red-700 hover:cursor-pointer text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                          className="bg-red-600 hover:bg-red-700 hover:cursor-pointer text-white text-xs px-3 py-1 rounded 
+                          transition-all duration-300 hover:shadow-md"
                         >
                           Excluir
                         </button>
-                        <Modal
-                          open={modalAberto}
-                          onClose={() => setModalAberto(false)}
-                          onConfirm={confirmarExclusao}
-                          titulo="Excluir cliente"
-                          descricao="Essa ação não poderá ser desfeita. Deseja continuar?"
-                        />
                       </div>
                     </td>
                   </tr>

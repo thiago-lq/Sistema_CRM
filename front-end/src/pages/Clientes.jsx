@@ -348,7 +348,7 @@ export default function Clientes() {
       handleRecarregar();
     } catch (error) {
       if (error.response?.status === 404) {
-        notify.error("Cliente não encontrado", {
+        notify.error("Cliente não encontrado no sistema", {
           position: "top-right",
         });
       } else if (error.response?.status === 409) {
@@ -357,15 +357,18 @@ export default function Clientes() {
           description:
             "Não é possível excluir o cliente pois existem pedidos e registros associados a ele",
         });
+      } else if (error.response?.status === 500) {
+        notify.error("Erro ao excluir cliente", {
+          position: "top-right",
+        });
       } else {
         notify.error("Erro inesperado", {
           position: "top-right",
           description: "Tente novamente mais tarde.",
         });
-      }
-    }
+      };
+    };
   };
-
   const propsLista = {
     termoBusca,
     setTermoBusca,

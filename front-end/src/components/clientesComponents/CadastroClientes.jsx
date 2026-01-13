@@ -49,7 +49,8 @@ export default function CadastroClientes({
         <div className="flex flex-row justify-between items-center">
           <button
             onClick={() => setModo("lista")}
-            className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition hover:cursor-pointer"
+            className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-300 
+            hover:cursor-pointer"
           >
             Voltar
           </button>
@@ -58,7 +59,8 @@ export default function CadastroClientes({
             <select
               value={pessoa}
               onChange={(e) => setPessoa(e.target.value)}
-              className="form-select"
+              className="form-select border border-gray-300 rounded-lg p-1 hover:cursor-pointer hover:bg-gray-100 transition-all 
+              duration-300 focus:ring-black focus:border-black"
               required
             >
               <option value="" disabled>
@@ -124,7 +126,7 @@ export default function CadastroClientes({
           )}
           {pessoa === "fisica" && (
             <div className="flex items-center justify-center">
-              <div className="relative">
+              <div className="relative ">
                 <label className="block text-sm font-medium mb-1">
                   Data de Nascimento
                 </label>
@@ -133,7 +135,7 @@ export default function CadastroClientes({
                   name="data_nascimento"
                   value={form.data_nascimento}
                   onChange={handleChange}
-                  className="p-2 border rounded w-max"
+                  className="p-2 border rounded w-max hover:bg-gray-100 transition-all duration-300"
                   required
                 />
               </div>
@@ -144,7 +146,8 @@ export default function CadastroClientes({
           <div className="mt-1.5">
             {form.telefones.length < maxCamposTelefone && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition"
+                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition-all 
+                duration-300"
                 type="button"
                 onClick={adicionarCampoTelefone}
               >
@@ -153,7 +156,8 @@ export default function CadastroClientes({
             )}
             {form.telefones.length > minCamposTelefone && (
               <button
-                className="bg-black text-white items-center mt-5.5 mx-2 rounded hover:opacity-60 hover:cursor-pointer transition"
+                className="bg-black text-white items-center mt-5.5 mx-2 rounded hover:opacity-60 hover:cursor-pointer transition-all 
+                duration-300"
                 type="button"
                 onClick={removerCampoTelefone}
               >
@@ -183,7 +187,8 @@ export default function CadastroClientes({
           <div className="space-x-3 mb-3">
             {form.enderecos.length < maxCamposEndereco && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition"
+                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition-all 
+                duration-300"
                 type="button"
                 onClick={adicionarCampoEndereco}
               >
@@ -192,7 +197,8 @@ export default function CadastroClientes({
             )}
             {form.enderecos.length > minCamposEndereco && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition"
+                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition-all 
+                duration-300"
                 type="button"
                 onClick={removerCampoEndereco}
               >

@@ -143,9 +143,8 @@ class PedidoController extends Controller
         $funcionario = $request->attributes->get('funcionario');
         $pedidoTipos = $request->pedido_tipos;
 
-        // =========================
         // GERA COD_PEDIDO (SEM SELECT)
-        // =========================
+
         $tentativas = 0;
 
         do {
@@ -155,9 +154,7 @@ class PedidoController extends Controller
             DB::beginTransaction();
 
             try {
-                // =========================
                 // INSERT PEDIDO (TENTA DIRETO)
-                // =========================
                 DB::insert("
                     INSERT INTO pedidos
                     (cod_pedido, cod_cliente, cod_endereco_cliente, cod_funcionario,
@@ -176,9 +173,7 @@ class PedidoController extends Controller
                     $request->prazo
                 ]);
 
-                // =========================
                 // ENDEREÇO INST / MANU
-                // =========================
                 if (array_intersect(['INSTALACAO', 'MANUTENCAO'], $pedidoTipos)) {
                     DB::insert("
                         INSERT INTO enderecos_inst_manu
@@ -193,9 +188,7 @@ class PedidoController extends Controller
                     ]);
                 }
 
-                // =========================
                 // ITENS (LOTE)
-                // =========================
                 if (in_array('PRODUTO', $pedidoTipos)) {
                     $itens = [];
 
@@ -210,9 +203,7 @@ class PedidoController extends Controller
                     DB::table('itens_produtos')->insert($itens);
                 }
 
-                // =========================
                 // TIPOS (LOTE)
-                // =========================
                 $tipos = array_map(fn ($tipo) => [
                     'cod_pedido' => $codPedido,
                     'nome_tipo' => $tipo,
@@ -223,9 +214,7 @@ class PedidoController extends Controller
                 DB::commit();
 
                 return response()->json([
-                    'message' => 'Pedido cadastrado com sucesso!',
-                    'cod_pedido' => $codPedido
-                ], 201);
+                    'message' => 'Pedido cadastrado com sucesso!'], 201);
 
             } catch (\Illuminate\Database\QueryException $e) {
                 DB::rollBack();

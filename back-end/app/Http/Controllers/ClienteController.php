@@ -29,7 +29,7 @@ class ClienteController extends Controller
                 $cnpj = $termoLimpo;
             } else {
                 // Se não for CPF/CNPJ válido, retorna erro
-                return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 400);
+                return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 422);
             }
         }
 
@@ -91,7 +91,7 @@ class ClienteController extends Controller
             } else if ($tamanho == 14) {
                 $cnpj = $idLimpo;
             } else {
-                return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 400);
+                return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 422);
             }
         }
 
@@ -100,7 +100,7 @@ class ClienteController extends Controller
         } else if ($cnpj) {
             $clientes = DB::select("SELECT COD_CLIENTE, NOME FROM CLIENTES WHERE CNPJ_CLIENTE = ?", [$cnpj]);
         } else {
-            return response()->json(['message' => 'Formato inválido'], 400);
+            return response()->json(['message' => 'Formato inválido'], 422);
         }
 
         // Verifica se encontrou algum cliente
@@ -267,7 +267,7 @@ class ClienteController extends Controller
             DB::commit();
 
             // Commita a transação e retorna os dados do cliente com sucesso
-            return response()->json(['message' => 'Cliente cadastrado com sucesso!', 'cod_cliente' => $codCliente, 'telefones' => $telefones], 201);
+            return response()->json(['message' => 'Cliente cadastrado com sucesso!'], 201);
         } catch (QueryException $e) {
 
             // Rollback a transação e retorna uma mensagem de erro

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { clientesShow } from "../../services/cliente/clientesShow";
-
+import { notify } from "../../utils/notify";
 export default function FormularioCadastro({
   handleSubmit,
   handleChange,
@@ -94,7 +94,22 @@ export default function FormularioCadastro({
             });
           }
         } catch (error) {
-          console.error("Erro ao buscar cliente:", error);
+          if (error.response?.status === 422) {
+            notify.error("Erro ao buscar cliente", {
+              description:
+                "Verifique se os campo CNPJ ou CPF estão preenchidos corretamente.",
+            });
+          } else if (error.response?.status === 404) {
+            notify.error("Cliente não encontrado no sistema", {
+              position: "top-right",
+            });
+          } else if (error.response?.status === 500) {
+            notify.error("Erro ao buscar cliente");
+          } else {
+            notify.error("Erro inesperado", {
+              description: "Tente novamente mais tarde.",
+            });
+          }
           setCliente({});
         }
       }
@@ -141,7 +156,7 @@ export default function FormularioCadastro({
                     value={item.value}
                     checked={form.pedidoTipos.includes(item.value)}
                     onChange={handleChange}
-                    className="w-4 h-4"
+                    className="w-4 h-4 hover:cursor-pointer transition-all duration-300"
                   />
                   {item.label}
                 </label>
@@ -156,7 +171,7 @@ export default function FormularioCadastro({
                   name="prazo"
                   value={form.prazo}
                   onChange={handleChange}
-                  className="p-2 border rounded w-max"
+                  className="p-2 border rounded w-max hover:bg-gray-100 transition-all duration-300"
                   required
                 />
               </div>
@@ -177,7 +192,6 @@ export default function FormularioCadastro({
               value={buscaCliente}
               onChange={(e) => setBuscaCliente(e.target.value)}
               className="w-75 p-2 border border-gray-300 rounded-md
-                       focus:ring-indigo-500 focus:border-indigo-500
                        appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
             {cliente && cliente.cod_cliente && (
@@ -190,8 +204,7 @@ export default function FormularioCadastro({
                   value={cliente.cod_cliente}
                   placeholder="Digite o código do cliente"
                   onChange={handleChange}
-                  className="w-75 p-2 border border-gray-300 rounded-md 
-                 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-100"
+                  className="w-75 p-2 border border-gray-300 rounded-md bg-gray-100"
                   disabled
                 />
               </div>
@@ -209,7 +222,7 @@ export default function FormularioCadastro({
               value={form.codEnderecoCliente ?? ""}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md 
-                         focus:ring-indigo-500 focus:border-indigo-500 hover:cursor-pointer"
+                          focus:ring-black focus:border-black hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
               required
             >
               <option disabled value="">
@@ -243,7 +256,7 @@ export default function FormularioCadastro({
                       value={p.cod_produto}
                       checked={form.codProdutos.includes(p.cod_produto)}
                       onChange={handleChange}
-                      className="w-4 h-4"
+                      className="w-4 h-4 hover:cursor-pointer transition-all duration-300"
                     />
                     {p.nome_produto} - R$ {p.valor_unitario}
                   </label>
@@ -259,8 +272,7 @@ export default function FormularioCadastro({
                       step="1"
                       required
                       onKeyDown={(e) => e.preventDefault()}
-                      className="w-15 p-2 border border-gray-300 rounded-md 
-                     focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-15 p-2 border border-gray-300 rounded-md"
                     />
                   )}
                 </div>
@@ -283,8 +295,7 @@ export default function FormularioCadastro({
                 placeholder="Rua e número"
                 value={form.enderecoInstManu.rua_numero}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md 
-                         focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full p-2 border border-gray-300 rounded-md"
                 required
               />
               <input
@@ -293,8 +304,7 @@ export default function FormularioCadastro({
                 placeholder="Bairro"
                 value={form.enderecoInstManu.bairro}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md 
-                         focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full p-2 border border-gray-300 rounded-md"
                 required
               />
               <input
@@ -303,8 +313,7 @@ export default function FormularioCadastro({
                 placeholder="CEP"
                 value={form.enderecoInstManu.cep}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md 
-                         focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full p-2 border border-gray-300 rounded-md"
                 required
               />
               <input
@@ -313,8 +322,7 @@ export default function FormularioCadastro({
                 placeholder="Cidade"
                 value={form.enderecoInstManu.cidade}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md 
-                         focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full p-2 border border-gray-300 rounded-md"
                 required
               />
             </div>
@@ -336,7 +344,7 @@ export default function FormularioCadastro({
               min="0"
               step="0.01"
               className="w-75 p-2 border border-gray-300 rounded-md 
-                 focus:ring-indigo-500 focus:border-indigo-500"
+                appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
           </div>
           <div>
@@ -347,8 +355,7 @@ export default function FormularioCadastro({
               type="number"
               name="valorTotal"
               value={form.valorTotal || "0.00"}
-              className="w-75 p-2 border border-gray-300 rounded-md 
-                 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-100"
+              className="w-75 p-2 border border-gray-300 rounded-md bg-gray-100"
               disabled
               readOnly
             />
@@ -362,7 +369,8 @@ export default function FormularioCadastro({
               value={form.metodoPagamento}
               onChange={handleChange}
               name="metodoPagamento"
-              className="form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 bg-gray-100"
+              className="form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2
+              hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
             >
               <option value="" disabled>
                 Selecione um método de pagamento
@@ -382,9 +390,10 @@ export default function FormularioCadastro({
                 value={form.parcelas}
                 onChange={handleChange}
                 name={"parcelas"}
-                className="form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 bg-gray-100"
+                className="form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 
+                hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
               >
-                <option value="" disabled>
+                <option value="0" disabled>
                   Selecione a quantidade de parcelas
                 </option>
                 <option value="1">
@@ -421,7 +430,7 @@ export default function FormularioCadastro({
               <button
                 type="button"
                 onClick={() => setMostrarCartao(!mostrarCartao)}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-blue-600 hover:text-blue-800 hover:cursor-pointer transition-all duration-300"
               >
                 {mostrarCartao ? "Ocultar" : "Mostrar formulário"}
               </button>

@@ -16,7 +16,8 @@ export default function EditarClientes({
     <div className="p-2">
       <button
         onClick={() => setModo("lista")}
-        className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition hover:cursor-pointer"
+        className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-300 
+        hover:cursor-pointer"
       >
         Voltar
       </button>
@@ -76,7 +77,7 @@ export default function EditarClientes({
                   name="data_nascimento"
                   value={clienteEditar.data_nascimento}
                   onChange={handleChangeEditar}
-                  className="p-2 border rounded-lg max-w"
+                  className="p-2 border rounded-lg max-w hover:bg-gray-100 transition-all duration-300"
                   required
                 />
               </div>
@@ -100,7 +101,8 @@ export default function EditarClientes({
           <div className="mt-1.5 space-x-3">
             {clienteEditar.telefones.length < maxCamposTelefone && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition"
+                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
+                duration-300"
                 type="button"
                 onClick={adicionarCampoTelefone}
               >
@@ -109,7 +111,8 @@ export default function EditarClientes({
             )}
             {clienteEditar.telefones.length > minCamposTelefone && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition"
+                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
+                duration-300"
                 type="button"
                 onClick={removerCampoTelefone}
               >
@@ -139,7 +142,8 @@ export default function EditarClientes({
           <div className="space-x-3 my-5">
             {clienteEditar.enderecos.length < maxCamposEndereco && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition"
+                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
+                duration-300"
                 type="button"
                 onClick={adicionarCampoEndereco}
               >
@@ -148,7 +152,7 @@ export default function EditarClientes({
             )}
             {clienteEditar.enderecos.length > minCamposEndereco && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition"
+                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all duration-300"
                 type="button"
                 onClick={removerCampoEndereco}
               >
