@@ -1,21 +1,34 @@
+// App.jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from "sonner";
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import PaginaInicial from './pages/PaginaInicial';
-import Login from './pages/Login'
-import NavBar from './components/NavBar';
+
+import Login from './pages/Login';
+import PaginaInicial from './pages/PaginaInicial';  // ← agora é o hub
+import Pedidos from './pages/Pedidos';
+import Clientes from './pages/Clientes';
+
+import ProtectedLayout from './routes/ProtectedLayout';  // novo (opcional, veja abaixo)
 
 function App() {
   return (
-    // Encapsulamento de rotas possíveis
     <BrowserRouter>
       <Toaster richColors />
+
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route element={<NavBar />} >
-        <Route path="/PaginaInicial" element={<PaginaInicial />} />
+
+        {/* Rotas logadas – com layout compartilhado (opcional) */}
+        <Route element={<ProtectedLayout />}>
+          <Route path="/PaginaInicial" element={<PaginaInicial />} />
+          <Route path="/Pedidos" element={<Pedidos />} />
+          <Route path="/Clientes" element={<Clientes />} />
+
+          {/* Alternativa: redireciona raiz logada direto pro hub */}
+          {/* <Route path="/" element={<PaginaInicial />} /> */}
         </Route>
       </Routes>
     </BrowserRouter>
   );
 }
+
 export default App;
