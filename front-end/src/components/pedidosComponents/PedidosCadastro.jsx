@@ -95,13 +95,15 @@ export default function FormularioCadastro({
           }
         } catch (error) {
           if (error.response?.status === 422) {
-            notify.error("Erro ao buscar cliente", {
+            notify.error("Erro, número de identificação inválido", {
               description:
                 "Verifique se os campo CNPJ ou CPF estão preenchidos corretamente.",
+              position: "top-right",
             });
           } else if (error.response?.status === 404) {
-            notify.error("Cliente não encontrado no sistema", {
+            notify.error("Erro, cliente não encontrado no sistema", {
               position: "top-right",
+              description: "Verifique se o cliente existe no sistema.",
             });
           } else if (error.response?.status === 500) {
             notify.error("Erro ao buscar cliente");
@@ -119,17 +121,17 @@ export default function FormularioCadastro({
   }, [buscaCliente, handleChange]);
 
   const handleSubmitComCartao = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // Se for crédito, só valida parcelas
-  if (form.metodoPagamento === "CREDITO" && !form.parcelas) {
-    alert("Selecione a quantidade de parcelas");
-    return;
-  }
+    // Se for crédito, só valida parcelas
+    if (form.metodoPagamento === "CREDITO" && !form.parcelas) {
+      alert("Selecione a quantidade de parcelas");
+      return;
+    }
 
-  // SEMPRE envia
-  handleSubmit(e);
-};
+    // SEMPRE envia
+    handleSubmit(e);
+  };
 
   return (
     <div className="bg-white">

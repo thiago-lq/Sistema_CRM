@@ -62,8 +62,7 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
     if (typeof pedido.itens_pedido === "string") {
       try {
         return JSON.parse(pedido.itens_pedido);
-      } catch (e) {
-        console.error("Erro ao parsear itens do pedido:", e);
+      } catch {
         return [];
       }
     }

@@ -44,7 +44,7 @@ export default function Login() {
   return (
     // Componente que será renderizada no componente principal
     <div>
-      <div className="flex items-center justify-center min-h-[calc(100vh-80px)] bg-gray-100 mt-12">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-300 via-white to-gray-400">
         <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-gray-800 mb-2">

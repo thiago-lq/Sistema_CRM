@@ -448,13 +448,15 @@ export default function EditarPedidos({
         }
       } catch (error) {
         if (error.response?.status === 422) {
-          notify.error("Erro ao buscar cliente", {
+          notify.error("Erro, número de identificação inválido", {
             description:
               "Verifique se os campos CPF ou CNPJ estão preenchidos corretamente.",
+            position: "top-right",
           });
         } else if (error.response?.status === 404) {
           notify.error("Cliente não encontrado no sistema", {
             position: "top-right",
+            description: "Verifique se o cliente existe no sistema.",
           });
         } else if (error.response?.status === 500) {
           notify.error("Erro ao buscar cliente");
@@ -544,6 +546,7 @@ export default function EditarPedidos({
               className="w-75 p-2 border border-gray-300 rounded-md
                        focus:ring-indigo-500 focus:border-indigo-500
                        appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              required
             />
             {clienteEditar && clienteEditar.cod_cliente && (
               <div>
@@ -556,6 +559,7 @@ export default function EditarPedidos({
                   className="w-75 p-2 border border-gray-300 rounded-md 
                  focus:ring-indigo-500 focus:border-indigo-500 bg-gray-100"
                   disabled
+                  required
                 />
               </div>
             )}

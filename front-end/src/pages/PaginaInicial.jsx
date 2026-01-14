@@ -67,7 +67,7 @@ export default function PaginaInicial() {
   }, []);
   return (
     <div>
-      <div className="min-h-screen bg-gradient-to-br from-gray-300 via-white to-gray-400 p-8">
+      <div className="min-h-screen p-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16 mt-25">
