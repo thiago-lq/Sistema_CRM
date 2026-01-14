@@ -214,7 +214,7 @@ export default function Clientes() {
       handleRecarregar();
     } catch (error) {
       if (error.response?.status === 422) {
-        notify.error("Erro ao cadastrar cliente", {
+        notify.error("Erro, dados enviados inválidos", {
           description:
             "Verifique os campos obrigatórios ou se o cliente já existe no sistema.",
         });
@@ -222,6 +222,8 @@ export default function Clientes() {
         notify.error("Erro, cliente já cadastrado", {
           description: "Os dados do cliente já existem no sistema.",
         });
+      } else if (error.response?.status === 500) {
+        notify.error("Erro ao cadastrar cliente");
       } else {
         notify.error("Erro inesperado", {
           description: "Tente novamente mais tarde.",
@@ -308,10 +310,12 @@ export default function Clientes() {
           description: "Os dados do cliente já existem no sistema.",
         });
       } else if (err.response?.status === 422) {
-        notify.error("Erro ao cadastrar cliente", {
+        notify.error("Erro, dados enviados inválidos", {
           description:
             "Verifique os campos obrigatórios ou se o cliente já existe no sistema.",
         });
+      } else if (err.response?.status === 500) {
+        notify.error("Erro ao editar cliente");
       } else {
         notify.error("Erro inesperado", {
           description: "Tente novamente mais tarde.",
@@ -366,8 +370,8 @@ export default function Clientes() {
           position: "top-right",
           description: "Tente novamente mais tarde.",
         });
-      };
-    };
+      }
+    }
   };
   const propsLista = {
     termoBusca,

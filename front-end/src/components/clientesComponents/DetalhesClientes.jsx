@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { dadosCliente } from "../../services/cliente/dadosCliente";
+import { notify } from "../../utils/notify";
 
 export default function DetalhesClientes({ clienteSelecionado, setModo }) {
   const [cliente, setCliente] = useState(null);
@@ -19,7 +20,17 @@ export default function DetalhesClientes({ clienteSelecionado, setModo }) {
       const dados = await dadosCliente(clienteSelecionado.cod_cliente);
       setCliente(dados);
     } catch (error) {
-      console.error("Erro ao buscar dados do cliente:", error);
+      if (error.response.status === 404) {
+        notify.error("Cliente não encontrado no sistema", {
+          position: "top-right",
+        });
+      } else if (error.response.status === 500) {
+        notify.error("Erro ao buscar dados do cliente");
+      } else {
+        notify.error("Erro inesperado", {
+          description: "Tente novamente mais tarde.",
+        });
+      }
       setCliente(null);
     } finally {
       setLoading(false);
