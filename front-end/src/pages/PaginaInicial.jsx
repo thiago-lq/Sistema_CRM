@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { novosClientes } from "../services/cliente/novosClientes";
 import { novosPedidos } from "../services/pedido/novosPedidos";
 import { pedidosAtrasados } from "../services/pedido/pedidosAtrasados";
@@ -7,7 +7,6 @@ import { notify } from "../utils/notify";
 
 // Página inicial do sistema, com a navbar
 export default function PaginaInicial() {
-  const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
   const [pedidos, setPedidos] = useState([]);
   const [atrasados, setAtrasados] = useState([]);
@@ -83,9 +82,9 @@ export default function PaginaInicial() {
           {/* Cards Grid */}
           <div className="grid grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Clientes Card */}
+            <Link to="/Clientes">
             <div
               className="group p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-gray-100"
-              onClick={() => navigate("Clientes")}
             >
               <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
                 <svg
@@ -126,11 +125,11 @@ export default function PaginaInicial() {
                 </svg>
               </div>
             </div>
-
+            </Link>
             {/* Pedidos Card */}
+            <Link to="/Pedidos">
             <div
               className="group p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-gray-100"
-              onClick={() => navigate("Pedidos")}
             >
               <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
                 <svg
@@ -171,6 +170,7 @@ export default function PaginaInicial() {
                 </svg>
               </div>
             </div>
+            </Link>
           </div>
 
           {/* Quick Stats */}

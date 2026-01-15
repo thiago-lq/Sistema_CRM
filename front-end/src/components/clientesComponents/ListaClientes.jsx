@@ -121,13 +121,13 @@ export default function ListaClientes({
                 </th>
                 <th
                   scope="col"
-                  className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Telefone
                 </th>
                 <th
                   scope="col"
-                  className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Data de criação
                 </th>
@@ -157,23 +157,23 @@ export default function ListaClientes({
                     key={item.cod_cliente}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
-                    <td className="py-3 px-4 text-sm text-gray-700">
+                    <td className="py-3 px-4 text-sm text-gray-700 text-center">
                       {item.cod_cliente}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-700">
+                    <td className="py-3 px-4 text-sm text-gray-700 text-center">
                       {item.nome}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-700">
+                    <td className="py-3 px-4 text-sm text-gray-700 text-center">
                       {item.email}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-700">
+                    <td className="py-3 px-4 text-sm text-gray-700 text-center">
                       {item.telefones[0]}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-700">
+                    <td className="py-3 px-4 text-sm text-gray-700 text-center">
                       {formatarData(item.created_at)}
                     </td>
                     <td className="py-3 px-4 text-sm">
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 justify-center">
                         <button
                           onClick={() => {
                             setClienteSelecionado(item);

@@ -35,7 +35,7 @@ export default function ListaPedidos({
 
     const tiposArray = tipos.split(", ");
     return (
-      <div className="flex gap-1 flex-wrap">
+      <div className="flex flex-wrap gap-3 text-center justify-center">
         {tiposArray.map((tipo, index) => (
           <span
             key={index}
@@ -126,10 +126,10 @@ export default function ListaPedidos({
                 <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Data de criação
                 </th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Valor Total
                 </th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -155,24 +155,24 @@ export default function ListaPedidos({
                     key={pedido.cod_pedido}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
-                    <td className="py-3 px-2 text-sm font-medium text-gray-900">
+                    <td className="py-3 px-2 text-sm font-medium text-gray-900 text-center">
                       #{pedido.cod_pedido}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-700">
+                    <td className="py-3 px-4 text-sm text-gray-700 text-center">
                       Cliente {pedido.cod_cliente}
                     </td>
-                    <td className="py-3 px-4 text-sm">
+                    <td className="text-sm text-center">
                       {renderizarTipos(pedido.tipos_pedido)}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-700">
+                    <td className="py-3 px-4 text-sm text-gray-700 text-center">
                       {formatarData(pedido.created_at)}
                     </td>
-                    <td className="py-3 px-4 text-sm font-semibold text-gray-900">
+                    <td className="py-3 px-4 text-sm font-semibold text-gray-900 text-center">
                       {formatarMoeda(pedido.valor_total)}
                     </td>
                     <td className="py-3 px-4 text-sm">
                       <span
-                        className={`text-sm font-medium ${
+                        className={`text-sm font-medium text-center ${
                           pedido.status_pagamento === true
                             ? "text-green-600"
                             : pedido.status_pagamento === false
@@ -187,8 +187,8 @@ export default function ListaPedidos({
                           : "Processando"}
                       </span>{" "}
                     </td>
-                    <td className="py-3 px-4 text-sm">
-                      <div className="flex gap-2">
+                    <td className="py-3 px-4 text-sm text-center">
+                      <div className="flex gap-2 justify-center">
                         <button
                           onClick={() => {
                             setPedidoSelecionado(pedido);
