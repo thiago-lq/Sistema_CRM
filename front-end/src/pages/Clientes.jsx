@@ -151,7 +151,7 @@ export default function Clientes() {
       }
       // Chama a função, e define um tempo de timeout
       carregarClientes();
-    }, 500);
+    }, 1000);
 
     // Quando a função for deletada, o timeout é cancelado
     return () => clearTimeout(timeout);

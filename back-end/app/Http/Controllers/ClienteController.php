@@ -48,11 +48,6 @@ class ClienteController extends Controller
             ORDER BY c.COD_CLIENTE");
         }
 
-        // Se não encontrar nenhum cliente, retorna uma mensagem de erro
-        if (!$result) {
-            return response()->json(['message' => 'Nenhum cliente encontrado'], 404);
-        }
-
         // Cria um array de clientes, onde a chave é o ID do cliente
         $clientes = [];
         // Percorre cada cliente no resultado da consulta, como se fosse uma linha "row"
@@ -73,7 +68,7 @@ class ClienteController extends Controller
                 $clientes[$id]['telefones'][] = $row->telefone;
             }
         }
-        return response()->json(array_values($clientes), 200);
+        return response()->json($clientes, 200);
     }
 
     // Controlador que busca um cliente pelo seu ID

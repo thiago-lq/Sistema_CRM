@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import PaginaInicial from './pages/PaginaInicial';  // ← agora é o hub
 import Pedidos from './pages/Pedidos';
 import Clientes from './pages/Clientes';
+import Registros from './pages/Registros';
 
 import ProtectedLayout from './routes/ProtectedLayout';  // novo (opcional, veja abaixo)
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/PaginaInicial" element={<PaginaInicial />} />
           <Route path="/Pedidos" element={<Pedidos />} />
           <Route path="/Clientes" element={<Clientes />} />
+          <Route path="/Registros" element={<Registros />} />
 
           {/* Alternativa: redireciona raiz logada direto pro hub */}
           {/* <Route path="/" element={<PaginaInicial />} /> */}

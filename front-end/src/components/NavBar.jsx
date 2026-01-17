@@ -1,8 +1,9 @@
 // components/NavBar.jsx
 import empresa  from "../assets/icone_empresa.png";
-import cliente  from "../assets/icone_clientes.png";
+import clientes  from "../assets/icone_clientes.png";
 import pedidos  from "../assets/icone_pedidos.png";
 import logout   from "../assets/icone_logout.png";
+import registros from "../assets/icone_registros.png";
 
 import { useNavigate } from "react-router-dom";   // ← importe Outlet aqui!
 import { useState, useEffect, useRef } from "react";
@@ -66,12 +67,14 @@ export default function NavBar() {
             <img src={pedidos} alt="pedidos" className="h-[2rem]" />
             <span className="text-xs mt-1 font-medium">PEDIDOS</span>
           </button>
-
           <button onClick={() => navigate("/Clientes")} className={LinkStyle}>
-            <img src={cliente} alt="clientes" className="h-[2rem]" />
+            <img src={clientes} alt="clientes" className="h-[2rem]" />
             <span className="text-xs mt-1 font-medium">CLIENTES</span>
           </button>
-
+          <button onClick={() => navigate("/Registros")} className={LinkStyle}>
+            <img src={registros} alt="clientes" className="h-[2rem]"/>
+            <span className="text-xs mt-1 font-medium">REGISTROS</span>
+          </button>
           <button onClick={() => navigate("/")} className={LinkStyle}>
             <img src={logout} alt="logout" className="h-[2rem]" />
             <span className="text-xs mt-1 font-medium">SAIR</span>

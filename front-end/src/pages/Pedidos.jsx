@@ -68,7 +68,7 @@ export default function Pedidos() {
       }
       // Chama a função, e define um tempo de timeout
       carregarPedidos();
-    }, 500);
+    }, 1000);
     // Quando a função for deletada, o timeout é cancelado
     return () => clearTimeout(timeout);
     // Apenas executa quando o termoBusca for alterado

@@ -51,7 +51,7 @@ class PedidoController extends Controller
 
         $pedido = DB::select($query, $bindings);
 
-        return response()->json($pedido);
+        return response()->json($pedido, 200);
     }
 
         public function show($id) {

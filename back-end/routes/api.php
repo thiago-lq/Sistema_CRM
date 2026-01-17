@@ -40,4 +40,11 @@ Route::middleware('auth.funcionario')->group(function() {
 
     // Rotas de Produtos
     Route::get('/produtos', [ProdutoController::class, 'index']);
+
+    // Rotas de Registros
+    Route::get('/registros', [RelatorioController::class, 'index']);
+    Route::get('/registros/{id}', [RelatorioController::class, 'show']);
+    Route::post('/registros', [RelatorioController::class, 'store']);
+    Route::put('/registros/{id}', [RelatorioController::class, 'update']);
+    Route::delete('/registros/{id}', [RelatorioController::class, 'destroy']);
 });
