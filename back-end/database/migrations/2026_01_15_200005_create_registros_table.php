@@ -47,7 +47,7 @@ return new class extends Migration
             CREATE OR REPLACE FUNCTION atualizar_updated_at_registros()
             RETURNS TRIGGER AS \$\$
             BEGIN
-                NEW.UPDATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo;
+                NEW.UPDATED_AT := CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo';
                 RETURN NEW;
             END;
             \$\$ LANGUAGE plpgsql;
