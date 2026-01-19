@@ -92,86 +92,6 @@ export default function EditarPedidos({
     }
   };
 
-  useEffect(() => {
-    const fetchPedido = async () => {
-      if (!pedidoSelecionado?.cod_pedido) {
-        setPedido(null);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const dados = await pedidosShow(pedidoSelecionado.cod_pedido);
-        setPedido(dados);
-      } catch (error) {
-        if (error.response?.status === 404) {
-          notify.error("Pedido não encontrado no sistema", {
-            position: "top-right",
-          });
-        } else if (error.response?.status === 500) {
-          notify.error("Erro ao buscar dados do pedido");
-        } else {
-          notify.error("Erro inesperado", {
-            description: "Tente novamente mais tarde.",
-          });
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPedido();
-  }, [pedidoSelecionado?.cod_pedido]);
-
-  useEffect(() => {
-    if (!pedido) return;
-
-    if (pedido.cod_pedido === pedidoProcessadoRef.current) return;
-
-    pedidoProcessadoRef.current = pedido.cod_pedido;
-
-    const tiposArray = pedido.tipos_pedido
-      ? pedido.tipos_pedido.split(", ").map((t) => t.trim())
-      : [];
-
-    let itensPedido = [];
-    let quantidadeObj = {};
-
-    if (pedido.itens_pedido) {
-      if (typeof pedido.itens_pedido === "string") {
-        itensPedido = JSON.parse(pedido.itens_pedido);
-      } else if (Array.isArray(pedido.itens_pedido)) {
-        itensPedido = pedido.itens_pedido;
-      } else if (typeof pedido.itens_pedido === "object") {
-        itensPedido = Object.values(pedido.itens_pedido);
-      }
-
-      itensPedido.forEach((item) => {
-        quantidadeObj[item.cod_produto] = item.quantidade || 1;
-      });
-    }
-
-    setFormEditar({
-      codCliente: pedido.cod_cliente || "",
-      codEnderecoCliente: pedido.cod_endereco_cliente || "",
-      pedidoTipos: tiposArray,
-      codProdutos: itensPedido.map((i) => i.cod_produto),
-      quantidade: quantidadeObj,
-      descricao: pedido.descricao || "",
-      valorTotal: pedido.valor_total || "",
-      valor_adicional: pedido.valor_adicional || 0,
-      metodoPagamento: pedido.metodo_pagamento || "",
-      parcelas: pedido.parcelas || 0,
-      prazo: pedido.prazo || "",
-      enderecoInstManu: {
-        cidade: pedido.manu_inst_cidade || "",
-        cep: pedido.manu_inst_cep || "",
-        bairro: pedido.manu_inst_bairro || "",
-        rua_numero: pedido.manu_inst_rua || "",
-      },
-    });
-  }, [pedido]);
-
   // Handler para o submit que inclui os dados do cartão
   const handleSubmitComCartao = async (e) => {
     e.preventDefault();
@@ -262,10 +182,10 @@ export default function EditarPedidos({
               codProdutos: prev.codProdutos.filter((v) => v !== value),
               quantidade: Object.fromEntries(
                 Object.entries(prev.quantidade).filter(
-                  ([k]) => Number(k) !== value
-                )
+                  ([k]) => Number(k) !== value,
+                ),
               ),
-            }
+            },
       );
       return;
     }
@@ -375,7 +295,7 @@ export default function EditarPedidos({
         clienteEditar.enderecos
       ) {
         const enderecoSelecionado = clienteEditar.enderecos.find(
-          (e) => e.cod_endereco_cliente === formEditar.codEnderecoCliente
+          (e) => e.cod_endereco_cliente === formEditar.codEnderecoCliente,
         );
         if (enderecoSelecionado) {
           dadosParaEnviar.cli_rua = enderecoSelecionado.rua_numero;
@@ -394,8 +314,7 @@ export default function EditarPedidos({
     } catch (err) {
       if (err.response?.status === 422) {
         notify.error("Erro ao editar pedido", {
-          description:
-            "Verifique se os campos estão preenchidos corretamente.",
+          description: "Verifique se os campos estão preenchidos corretamente.",
         });
       } else if (err.response?.status === 500) {
         notify.error("Erro ao editar pedido");
@@ -406,6 +325,89 @@ export default function EditarPedidos({
       }
     }
   };
+
+  useEffect(() => {
+    const fetchPedido = async () => {
+      if (!pedidoSelecionado?.cod_pedido) {
+        setPedido(null);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const dados = await pedidosShow(pedidoSelecionado.cod_pedido);
+        setPedido(dados);
+      } catch (error) {
+        if (error.response?.status === 404) {
+          notify.error("Pedido não encontrado no sistema", {
+            position: "top-right",
+          });
+        } else if (error.response?.status === 500) {
+          notify.error("Erro ao buscar dados do pedido", {
+            position: "top-right",
+          });
+        } else {
+          notify.error("Erro inesperado", {
+            description: "Tente novamente mais tarde.",
+            position: "top-right",
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPedido();
+  }, [pedidoSelecionado?.cod_pedido]);
+
+  useEffect(() => {
+    if (!pedido) return;
+
+    if (pedido.cod_pedido === pedidoProcessadoRef.current) return;
+
+    pedidoProcessadoRef.current = pedido.cod_pedido;
+
+    const tiposArray = pedido.tipos_pedido
+      ? pedido.tipos_pedido.split(", ").map((t) => t.trim())
+      : [];
+
+    let itensPedido = [];
+    let quantidadeObj = {};
+
+    if (pedido.itens_pedido) {
+      if (typeof pedido.itens_pedido === "string") {
+        itensPedido = JSON.parse(pedido.itens_pedido);
+      } else if (Array.isArray(pedido.itens_pedido)) {
+        itensPedido = pedido.itens_pedido;
+      } else if (typeof pedido.itens_pedido === "object") {
+        itensPedido = Object.values(pedido.itens_pedido);
+      }
+
+      itensPedido.forEach((item) => {
+        quantidadeObj[item.cod_produto] = item.quantidade || 1;
+      });
+    }
+
+    setFormEditar({
+      codCliente: pedido.cod_cliente || "",
+      codEnderecoCliente: pedido.cod_endereco_cliente || "",
+      pedidoTipos: tiposArray,
+      codProdutos: itensPedido.map((i) => i.cod_produto),
+      quantidade: quantidadeObj,
+      descricao: pedido.descricao || "",
+      valorTotal: pedido.valor_total || "",
+      valor_adicional: pedido.valor_adicional || 0,
+      metodoPagamento: pedido.metodo_pagamento || "",
+      parcelas: pedido.parcelas || 0,
+      prazo: pedido.prazo || "",
+      enderecoInstManu: {
+        cidade: pedido.manu_inst_cidade || "",
+        cep: pedido.manu_inst_cep || "",
+        bairro: pedido.manu_inst_bairro || "",
+        rua_numero: pedido.manu_inst_rua || "",
+      },
+    });
+  }, [pedido]);
 
   useEffect(() => {
     let total = parseFloat(formEditar.valor_adicional) || 0;
@@ -435,40 +437,42 @@ export default function EditarPedidos({
       setClienteEditar({});
       return;
     }
-
-    const fetchCliente = async () => {
-      try {
-        const dadosCliente = await clientesShow(buscaClienteEditar);
-        setClienteEditar(dadosCliente);
-        if (dadosCliente && dadosCliente.cod_cliente) {
-          setFormEditar((prev) => ({
-            ...prev,
-            codCliente: dadosCliente.cod_cliente,
-          }));
+    const timeout = setTimeout(() => {
+      async function fetchCliente() {
+        try {
+          const dadosCliente = await clientesShow(buscaClienteEditar);
+          setClienteEditar(dadosCliente);
+          if (dadosCliente && dadosCliente.cod_cliente) {
+            setFormEditar((prev) => ({
+              ...prev,
+              codCliente: dadosCliente.cod_cliente,
+            }));
+          }
+        } catch (error) {
+          if (error.response?.status === 422) {
+            notify.error("Erro, número de identificação inválido", {
+              description:
+                "Verifique se os campos CPF ou CNPJ estão preenchidos corretamente.",
+              position: "top-right",
+            });
+          } else if (error.response?.status === 404) {
+            notify.error("Cliente não encontrado no sistema", {
+              position: "top-right",
+              description: "Verifique se o cliente existe no sistema.",
+            });
+          } else if (error.response?.status === 500) {
+            notify.error("Erro ao buscar cliente");
+          } else {
+            notify.error("Erro inesperado", {
+              description: "Tente novamente mais tarde.",
+            });
+          }
+          setClienteEditar({});
         }
-      } catch (error) {
-        if (error.response?.status === 422) {
-          notify.error("Erro, número de identificação inválido", {
-            description:
-              "Verifique se os campos CPF ou CNPJ estão preenchidos corretamente.",
-            position: "top-right",
-          });
-        } else if (error.response?.status === 404) {
-          notify.error("Cliente não encontrado no sistema", {
-            position: "top-right",
-            description: "Verifique se o cliente existe no sistema.",
-          });
-        } else if (error.response?.status === 500) {
-          notify.error("Erro ao buscar cliente");
-        } else {
-          notify.error("Erro inesperado", {
-            description: "Tente novamente mais tarde.",
-          });
-        }
-        setClienteEditar({});
       }
-    };
-    fetchCliente();
+      fetchCliente();
+    }, 1000);
+    return () => clearTimeout(timeout);
   }, [buscaClienteEditar]);
 
   // Se está carregando

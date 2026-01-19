@@ -10,6 +10,10 @@ class RegistroController extends Controller
 {
     public function index(Request $request) {
         $termo = $request->query('termo');
+        $codCliente = null;
+        $cpf = null;
+        $cnpj = null;
+
 
         // Verifica se há termo de busca
         if ($termo) {
@@ -19,29 +23,45 @@ class RegistroController extends Controller
             
             if ($tamanho == 11) {
                 $cpf = $termoLimpo;
-                $codCliente = DB::select("SELECT COD_CLIENTE FROM CLIENTES WHERE CPF_CLIENTE = ?", [$cpf]);
             } else if ($tamanho == 14) {
                 $cnpj = $termoLimpo;
-                $codCliente = DB::select("SELECT COD_CLIENTE FROM CLIENTES WHERE CNPJ_CLIENTE = ?", [$cnpj]);
             } else {
                 // Se não for CPF/CNPJ válido, retorna erro
                 return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 422);
             }
         }
 
-        if ($codCliente) {
-            $registros = DB::select("SELECT r.COD_REGISTRO, r.COD_CLIENTE, r.COD_FUNCIONARIO, r.CREATED_AT, r.UPDATED_AT FROM REGISTROS r
-            WHERE r.COD_CLIENTE = ? ORDER BY r.COD_REGISTRO", [$codCliente]);
+        if ($cpf) {
+            $codCliente = DB::select("SELECT COD_CLIENTE FROM CLIENTES WHERE CPF_CLIENTE = ?", [$cpf]);
+            $codCliente = $codCliente[0]->cod_cliente ?? null;
+            $result = DB::select("SELECT COD_REGISTRO, COD_CLIENTE, COD_FUNCIONARIO, CREATED_AT, UPDATED_AT FROM REGISTROS 
+            WHERE COD_CLIENTE = ? ORDER BY COD_REGISTRO", [$codCliente]);
+        } else if ($cnpj) {
+            $codCliente = DB::select("SELECT COD_CLIENTE FROM CLIENTES WHERE CNPJ_CLIENTE = ?", [$cnpj]);
+            $codCliente = $codCliente[0]->cod_cliente ?? null;
+            $result = DB::select("SELECT COD_REGISTRO, COD_CLIENTE, COD_FUNCIONARIO, CREATED_AT, UPDATED_AT FROM REGISTROS 
+            WHERE COD_CLIENTE = ? ORDER BY COD_REGISTRO", [$codCliente]);
         } else {
-            // Busca os registros
-            $registros = DB::select("SELECT r.COD_REGISTRO, r.COD_CLIENTE, r.COD_FUNCIONARIO, r.CREATED_AT, r.UPDATED_AT FROM REGISTROS r
-            ORDER BY r.COD_REGISTRO");
+            $result = DB::select("SELECT COD_REGISTRO, COD_CLIENTE, COD_FUNCIONARIO, CREATED_AT, UPDATED_AT FROM REGISTROS"); 
         }
         
-        if (empty($registros)) {
-            return response()->json(['message' => 'Nenhum registro encontrado'], 404);
-        }
+        $registros = [];
 
+        foreach ($result as $row) {
+            $id = $row->cod_registro;
+            if (!isset($registros[$id])) {
+                $registros[$id] = [
+                    'cod_registro' => $row->cod_registro,
+                    'cod_cliente' => $row->cod_cliente,
+                    'cod_funcionario' => $row->cod_funcionario,
+                    'created_at' => $row->created_at,
+                    'updated_at' => $row->updated_at,
+                    'motivo' => [],
+                    'tipo_interacao' => '',
+                    'descricao' => '',
+                ];
+            }
+        }
         return response()->json($registros, 200);
     }
 
@@ -56,6 +76,27 @@ class RegistroController extends Controller
         return response()->json($registro[0], 200);
     }
 
+    public function buscaCliente($id) {
+        // Verifica se há termo de busca
+        if ($id) {
+            // Remove caracteres não numéricos
+            $termoLimpo = preg_replace('/[^0-9]/', '', $id);
+            $tamanho = strlen($termoLimpo);
+            
+            if ($tamanho == 11) {
+                $cpf = $termoLimpo;
+                $codCliente = DB::select("SELECT COD_CLIENTE FROM CLIENTES WHERE CPF_CLIENTE = ?", [$cpf]);
+            } else if ($tamanho == 14) {
+                $cnpj = $termoLimpo;
+                $codCliente = DB::select("SELECT COD_CLIENTE FROM CLIENTES WHERE CNPJ_CLIENTE = ?", [$cnpj]);
+            } else {
+                // Se não for CPF/CNPJ válido, retorna erro
+                return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 422);
+            }
+        }
+        return response()->json($codCliente, 200);
+    }
+
     public function store(Request $request) {
         $request->validate([
             'cod_cliente' => 'required|integer|exists:clientes,cod_cliente',
@@ -63,8 +104,7 @@ class RegistroController extends Controller
             'motivo.*' => 'required|string|in:COMPRAR PRODUTOS,FAZER INSTALACAO,MANUTENCAO EM CERCA ELÉTRICA,MANUTENCAO EM CONCERTINA,
             MANUTENCAO EM CAMERA,TROCA DE CABOS,TROCA DE CONECTORES,TROCA DE FONTE DE ENERGIA,TROCA DE DVR,MANUTENCAO EM DVR,TROCA DE HD,
             TROCA DE CENTRAL DE CHOQUE,MANUTENCAO EM CENTRAL,TROCA DE BATERIA DE CENTRAL,OUTRO',
-            'tipo_interacao' => 'required|array',
-            'tipo_interacao.*' => 'required|string|in:WHATSAPP,EMAIL,TELEFONE',
+            'tipo_interacao' => 'required|string|in:WHATSAPP,EMAIL,TELEFONE',
             'descricao' => 'required|string|max:500',
         ]);
 
@@ -101,8 +141,7 @@ class RegistroController extends Controller
             'motivo.*' => 'required|string|in:COMPRAR PRODUTOS,FAZER INSTALACAO,MANUTENCAO EM CERCA ELÉTRICA,MANUTENCAO EM CONCERTINA,
             MANUTENCAO EM CAMERA,TROCA DE CABOS,TROCA DE CONECTORES,TROCA DE FONTE DE ENERGIA,TROCA DE DVR,MANUTENCAO EM DVR,TROCA DE HD,
             TROCA DE CENTRAL DE CHOQUE,MANUTENCAO EM CENTRAL,TROCA DE BATERIA DE CENTRAL,OUTRO',
-            'tipo_interacao' => 'required|array',
-            'tipo_interacao.*' => 'required|string|in:WHATSAPP,EMAIL,TELEFONE',
+            'tipo_interacao' => 'required|string|in:WHATSAPP,EMAIL,TELEFONE',
             'descricao' => 'required|string|max:500',
         ]);
         $funcionario = $request->attributes->get('funcionario');

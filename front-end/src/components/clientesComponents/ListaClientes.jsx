@@ -215,7 +215,7 @@ export default function ListaClientes({
                       <p className="text-sm text-gray-400 mt-1">
                         {termoBusca
                           ? "Tente ajustar os termos da busca"
-                          : "Comece criando um novo pedido"}
+                          : "Comece cadastrando um novo cliente"}
                       </p>
                     </div>
                   </td>

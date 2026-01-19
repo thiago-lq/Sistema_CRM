@@ -409,7 +409,7 @@ class PedidoController extends Controller
                 DB::rollBack();
                 return response()->json([
                     'message' => 'Não é possível excluir o pedido pois existe um pagamento associado a ele'
-                ], 422);
+                ], 409);
             }
 
             //3. Exclui os registros relacionados (na ordem correta)

@@ -20,7 +20,6 @@ export default function Pedidos() {
   const [abaAtiva, setAbaAtiva] = useState("lista");
   const [loading, setLoading] = useState(false);
   const [termoBusca, setTermoBusca] = useState("");
-  const [descricao, setDescricao] = useState("");
   const [produtos, setProdutos] = useState([]);
 
   // Constante da estrutura do formulário
@@ -44,35 +43,6 @@ export default function Pedidos() {
       rua_numero: "",
     },
   });
-
-  // UseEffect para carregar os dados do back-end
-  useEffect(() => {
-    // Temporizador, para que o componente não seja renderizado a cada mudança de estado
-    const timeout = setTimeout(() => {
-      // Loading visual
-      setLoading(true);
-      async function carregarPedidos() {
-        // Verifica se há termo de busca
-        if (termoBusca.trim().length > 0) {
-          // é número, busca pelo ID do pedido
-          const dados = await pedidosIndex({ termo: termoBusca });
-          setLoading(false);
-          // Se dados existir de acordo com o ID, adiciona ao array, se não existir, cria um array vazio
-          setPedidos(dados);
-        } else {
-          // Não é número, busca todos os pedidos
-          const dados = await pedidosIndex();
-          setLoading(false);
-          setPedidos(dados);
-        }
-      }
-      // Chama a função, e define um tempo de timeout
-      carregarPedidos();
-    }, 1000);
-    // Quando a função for deletada, o timeout é cancelado
-    return () => clearTimeout(timeout);
-    // Apenas executa quando o termoBusca for alterado
-  }, [termoBusca]);
 
   // Função que recarrega os dados do back-end no front-end
   const handleRecarregar = async () => {
@@ -105,7 +75,7 @@ export default function Pedidos() {
       setForm((prev) =>
         checked
           ? { ...prev, [name]: [...prev[name], value] }
-          : { ...prev, [name]: prev[name].filter((v) => v !== value) }
+          : { ...prev, [name]: prev[name].filter((v) => v !== value) },
       );
       return;
     }
@@ -136,10 +106,10 @@ export default function Pedidos() {
               codProdutos: prev.codProdutos.filter((v) => v !== value),
               quantidade: Object.fromEntries(
                 Object.entries(prev.quantidade).filter(
-                  ([k]) => Number(k) !== value
-                )
+                  ([k]) => Number(k) !== value,
+                ),
               ),
-            }
+            },
       );
       return;
     }
@@ -194,7 +164,7 @@ export default function Pedidos() {
     try {
       // Converter quantidade de objeto para array
       const quantidadeArray = form.codProdutos.map(
-        (codProduto) => form.quantidade[codProduto] || 1
+        (codProduto) => form.quantidade[codProduto] || 1,
       );
 
       const dadosParaEnviar = {
@@ -280,7 +250,7 @@ export default function Pedidos() {
         notify.error("Pedido não encontrado no sistema", {
           position: "top-right",
         });
-      } else if (error.response?.status === 422) {
+      } else if (error.response?.status === 409) {
         notify.error("Erro ao excluir o pedido", {
           position: "top-right",
           description:
@@ -298,6 +268,35 @@ export default function Pedidos() {
       }
     }
   };
+
+  // UseEffect para carregar os dados do back-end
+  useEffect(() => {
+    // Temporizador, para que o componente não seja renderizado a cada mudança de estado
+    const timeout = setTimeout(() => {
+      // Loading visual
+      setLoading(true);
+      async function carregarPedidos() {
+        // Verifica se há termo de busca
+        if (termoBusca.trim().length > 0) {
+          // é número, busca pelo ID do pedido
+          const dados = await pedidosIndex({ termo: termoBusca });
+          setLoading(false);
+          // Se dados existir de acordo com o ID, adiciona ao array, se não existir, cria um array vazio
+          setPedidos(dados);
+        } else {
+          // Não é número, busca todos os pedidos
+          const dados = await pedidosIndex();
+          setLoading(false);
+          setPedidos(dados);
+        }
+      }
+      // Chama a função, e define um tempo de timeout
+      carregarPedidos();
+    }, 1000);
+    // Quando a função for deletada, o timeout é cancelado
+    return () => clearTimeout(timeout);
+    // Apenas executa quando o termoBusca for alterado
+  }, [termoBusca]);
 
   // Função que carrega os dados dos produtos do back-end
   useEffect(() => {
@@ -350,8 +349,6 @@ export default function Pedidos() {
     handleChange,
     handleSubmit,
     setAbaAtiva,
-    descricao,
-    setDescricao,
     produtos,
   };
 

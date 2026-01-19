@@ -129,35 +129,6 @@ export default function Clientes() {
     }
   };
 
-  // Uma escuta que carrega os dados do front-end
-  useEffect(() => {
-    // Temporizador, para que o componente não seja renderizado a cada mudança de estado
-    const timeout = setTimeout(() => {
-      // Loading visual
-      setLoading(true);
-      // Função que faz a requisição de acordo com o termo de busca
-      async function carregarClientes() {
-        if (termoBusca.trim().length > 0) {
-          // Faz a requisição de clientes com o termo de busca
-          const dados = await clientesIndex({ termo: termoBusca });
-          setLoading(false);
-          setClientes(dados);
-        } else {
-          // Faz a requisição de todos os clientes
-          const dados = await clientesIndex();
-          setLoading(false);
-          setClientes(dados);
-        }
-      }
-      // Chama a função, e define um tempo de timeout
-      carregarClientes();
-    }, 1000);
-
-    // Quando a função for deletada, o timeout é cancelado
-    return () => clearTimeout(timeout);
-    // Apenas executa quando o termoBusca for alterado
-  }, [termoBusca]);
-
   // Função que recarrega os dados dos clientes do back-end no front-end
   const handleRecarregar = async () => {
     setLoading(true);
@@ -250,7 +221,7 @@ export default function Clientes() {
         ...dados,
 
         telefones: dados.telefones?.map((t) =>
-          typeof t === "string" ? { telefone: t } : t
+          typeof t === "string" ? { telefone: t } : t,
         ) || [{ telefone: "" }],
 
         enderecos: dados.enderecos?.map((e) => ({
@@ -359,7 +330,7 @@ export default function Clientes() {
         notify.error("Erro ao excluir cliente", {
           position: "top-right",
           description:
-            "Não é possível excluir o cliente pois existem pedidos e registros associados a ele",
+            "Não é possível excluir o cliente pois existem pedidos ou registros associados a ele",
         });
       } else if (error.response?.status === 500) {
         notify.error("Erro ao excluir cliente", {
@@ -373,6 +344,36 @@ export default function Clientes() {
       }
     }
   };
+
+  // Uma escuta que carrega os dados do front-end
+  useEffect(() => {
+    // Temporizador, para que o componente não seja renderizado a cada mudança de estado
+    const timeout = setTimeout(() => {
+      // Loading visual
+      setLoading(true);
+      // Função que faz a requisição de acordo com o termo de busca
+      async function carregarClientes() {
+        if (termoBusca.trim().length > 0) {
+          // Faz a requisição de clientes com o termo de busca
+          const dados = await clientesIndex({ termo: termoBusca });
+          setLoading(false);
+          setClientes(dados);
+        } else {
+          // Faz a requisição de todos os clientes
+          const dados = await clientesIndex();
+          setLoading(false);
+          setClientes(dados);
+        }
+      }
+      // Chama a função, e define um tempo de timeout
+      carregarClientes();
+    }, 1000);
+
+    // Quando a função for deletada, o timeout é cancelado
+    return () => clearTimeout(timeout);
+    // Apenas executa quando o termoBusca for alterado
+  }, [termoBusca]);
+
   const propsLista = {
     termoBusca,
     setTermoBusca,

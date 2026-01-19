@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { pedidosShow } from "../../services/pedido/pedidosShow";
+import { notify } from "../../utils/notify";
 
 export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
   const [pedido, setPedido] = useState(null);
@@ -19,7 +20,20 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
         const dados = await pedidosShow(pedidoSelecionado.cod_pedido);
         setPedido(dados);
       } catch (error) {
-        console.error("Erro ao buscar dados do pedido:", error);
+        if (error.response?.status === 404) {
+          notify.error("Pedido não encontrado no sistema", {
+            position: "top-right",
+          });
+        } else if (error.response?.status === 500) {
+          notify.error("Erro ao buscar dados do pedido", {
+            position: "top-right",
+          });
+        } else {
+          notify.error("Erro inesperado", {
+            description: "Tente novamente mais tarde.",
+            position: "top-right",
+          });
+        }
         setPedido(null);
       } finally {
         setLoading(false);

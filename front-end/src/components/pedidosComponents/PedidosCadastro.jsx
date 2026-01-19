@@ -116,7 +116,7 @@ export default function FormularioCadastro({
         }
       }
       fetchCliente();
-    }, 500);
+    }, 1000);
     return () => clearTimeout(timeout);
   }, [buscaCliente, handleChange]);
 

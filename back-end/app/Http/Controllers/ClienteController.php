@@ -37,11 +37,11 @@ class ClienteController extends Controller
         if ($cpf) {
             $result = DB::select("SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE FROM CLIENTES c 
             LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
-            WHERE c.CPF_CLIENTE ILIKE ? ORDER BY c.COD_CLIENTE", ["%$cpf%"]);
+            WHERE c.CPF_CLIENTE = ? ORDER BY c.COD_CLIENTE", [$cpf]);
         } else if ($cnpj) {
             $result = DB::select("SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE FROM CLIENTES c 
             LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
-            WHERE c.CNPJ_CLIENTE ILIKE ? ORDER BY c.COD_CLIENTE", ["%$cnpj%"]);
+            WHERE c.CNPJ_CLIENTE = ? ORDER BY c.COD_CLIENTE", [$cnpj]);
         } else {
             $result = DB::select("SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE FROM CLIENTES c 
             LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
@@ -386,6 +386,16 @@ class ClienteController extends Controller
                 DB::rollBack();
                 return response()->json([
                     'message' => 'Não é possível excluir o cliente pois existem pedidos e registros associados a ele'
+                ], 409);
+            }
+
+            // Verifica se existem registros associados ao cliente
+            $registros = DB::select("SELECT * FROM REGISTROS WHERE COD_CLIENTE = ?", [$id]);
+
+            if (!empty($registros)) {
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'Não é possível excluir o cliente pois existem registros associados a ele'
                 ], 409);
             }
 
