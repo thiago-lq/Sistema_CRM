@@ -4,6 +4,7 @@ import { notify } from "../../utils/notify";
 
 export default function CadastroRegistros({
   form,
+  setForm,
   handleChange,
   handleSubmit,
   setAbaAtiva,
@@ -22,12 +23,10 @@ export default function CadastroRegistros({
           const dadosCliente = await buscaCliente(buscaClienteCadastro);
           setCliente(dadosCliente);
           if (dadosCliente && dadosCliente.cod_cliente) {
-            handleChange({
-              target: {
-                name: "codCliente",
-                value: dadosCliente.cod_cliente,
-              },
-            });
+            setForm((prev) => ({
+              ...prev,
+              codCliente: dadosCliente.cod_cliente,
+            }));
           }
         } catch (error) {
           if (error.response?.status === 422) {
@@ -54,7 +53,7 @@ export default function CadastroRegistros({
       fetchCliente();
     }, 1000);
     return () => clearTimeout(timeout);
-  }, [buscaClienteCadastro, handleChange]);
+  }, [buscaClienteCadastro, setForm]);
 
   return (
     <div className="bg-white px-5">

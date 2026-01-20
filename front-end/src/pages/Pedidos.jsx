@@ -346,6 +346,7 @@ export default function Pedidos() {
   };
   const propsCadastro = {
     form,
+    setForm,
     handleChange,
     handleSubmit,
     setAbaAtiva,

@@ -231,6 +231,7 @@ export default function Registros() {
 
   const propsCadastro = {
     form,
+    setForm,
     handleChange,
     handleSubmit,
     setAbaAtiva,

@@ -4,6 +4,7 @@ import { notify } from "../../utils/notify";
 export default function FormularioCadastro({
   handleSubmit,
   handleChange,
+  setForm,
   form,
   produtos,
 }) {
@@ -86,12 +87,10 @@ export default function FormularioCadastro({
           const dadosCliente = await clientesShow(buscaCliente);
           setCliente(dadosCliente);
           if (dadosCliente && dadosCliente.cod_cliente) {
-            handleChange({
-              target: {
-                name: "codCliente",
-                value: dadosCliente.cod_cliente,
-              },
-            });
+            setForm((prev) => ({
+              ...prev,
+              codCliente: dadosCliente.cod_cliente,
+            }));
           }
         } catch (error) {
           if (error.response?.status === 422) {
@@ -118,7 +117,7 @@ export default function FormularioCadastro({
       fetchCliente();
     }, 1000);
     return () => clearTimeout(timeout);
-  }, [buscaCliente, handleChange]);
+  }, [buscaCliente, setForm]);
 
   const handleSubmitComCartao = (e) => {
     e.preventDefault();
