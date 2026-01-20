@@ -10,7 +10,12 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureFuncionarioIsAuthenticated
 {
     public function handle(Request $request, Closure $next): Response
-    {   
+    {
+        // ✅ NÃO bloqueia preflight
+        if ($request->isMethod('OPTIONS')) {
+            return $next($request);
+        }
+
         $token = $request->bearerToken();
 
         if (!$token) {
@@ -27,6 +32,7 @@ class EnsureFuncionarioIsAuthenticated
 
         return $next($request);
     }
+
 
     private function validateSupabaseToken($token) {
         $client = new \GuzzleHttp\Client();

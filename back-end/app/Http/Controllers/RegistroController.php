@@ -153,7 +153,6 @@ class RegistroController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage(), $e->getTraceAsString());
             return response()->json(['message' => 'Erro ao cadastrar o registro'], 500);
         }
     }
