@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { buscaCliente } from "../../services/registro/buscaCliente";
 import { notify } from "../../utils/notify";
 
-export default function CadastroRegistros(
+export default function CadastroRegistros({
   form,
   handleChange,
   handleSubmit,
   setAbaAtiva,
-) {
+}) {
   const [buscaClienteCadastro, setBuscaClienteCadastro] = useState("");
   const [cliente, setCliente] = useState({});
 
@@ -57,24 +57,24 @@ export default function CadastroRegistros(
   }, [buscaClienteCadastro, handleChange]);
 
   return (
-    <div className="bg-white">
+    <div className="bg-white px-5">
+      <button
+        onClick={() => setAbaAtiva("lista")}
+        className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-300 
+            hover:cursor-pointer"
+      >
+        Voltar
+      </button>
       <div className="flex flex-col justify-between mb-10 items-center w-full">
         <p className="text-gray-500 mt-1">Preencha os dados abaixo</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <button
-          onClick={() => setAbaAtiva("lista")}
-          className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-300 
-            hover:cursor-pointer"
-        >
-          Voltar
-        </button>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Motivo do contato
           </label>
-          <div className="flex justify-between">
-            <div className="flex gap-10">
+          <div className="flex flex-col justify-between p-5 gap-10">
+            <div className="grid grid-cols-3">
               {[
                 { value: "COMPRAR PRODUTOS", label: "Comprar produtos" },
                 { value: "FAZER INSTALACAO", label: "Fazer instalação" },
@@ -118,7 +118,7 @@ export default function CadastroRegistros(
                     type="checkbox"
                     name="motivo"
                     value={item.value}
-                    checked={form.motivo.includes(item.value)}
+                    checked={form.motivo?.includes(item.value)}
                     onChange={handleChange}
                     className="w-4 h-4 hover:cursor-pointer transition-all duration-300"
                   />
@@ -162,6 +162,7 @@ export default function CadastroRegistros(
               <div>
                 <select
                   value={form.tipoInteracao}
+                  name={"tipoInteracao"}
                   onChange={handleChange}
                   className="form-select border border-gray-300 rounded-lg p-1 hover:cursor-pointer hover:bg-gray-100 transition-all 
               duration-300 focus:ring-black focus:border-black"

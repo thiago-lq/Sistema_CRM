@@ -13,11 +13,6 @@ export default function ListaRegistros({
   loading,
   handleRecarregar,
 }) {
-  const formatarData = (dataString) => {
-    if (!dataString) return "-";
-    const data = new Date(dataString);
-    return data.toLocalDateString("pt-BR");
-  };
 
   const [modalAberto, setModalAberto] = useState(false);
 
@@ -31,6 +26,18 @@ export default function ListaRegistros({
     setModalAberto(false);
     setRegistroSelecionado(null);
   }
+
+  function formatarDataHora(data) {
+  if (!data) return "";
+
+  const d = new Date(data);
+
+  return d.toLocaleString("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
+}
+
 
   return (
     <div className="bg-white mt-3 rounded-lg shadow-sm">
@@ -144,10 +151,10 @@ export default function ListaRegistros({
                       #{item.cod_funcionario}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-700 text-center">
-                      {formatarData(item.created_at)}
+                      {formatarDataHora(item.created_at)}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-700 text-center">
-                      {formatarData(item.updated_at)}
+                      {formatarDataHora(item.updated_at)}
                     </td>
                     <td className="py-3 px-4 text-sm text-center">
                       <div className="flex gap-2 justify-center">

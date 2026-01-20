@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 
 class RegistroController extends Controller
@@ -25,9 +26,6 @@ class RegistroController extends Controller
                 $cpf = $termoLimpo;
             } else if ($tamanho == 14) {
                 $cnpj = $termoLimpo;
-            } else {
-                // Se não for CPF/CNPJ válido, retorna erro
-                return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 422);
             }
         }
 
@@ -56,13 +54,10 @@ class RegistroController extends Controller
                     'cod_funcionario' => $row->cod_funcionario,
                     'created_at' => $row->created_at,
                     'updated_at' => $row->updated_at,
-                    'motivo' => [],
-                    'tipo_interacao' => '',
-                    'descricao' => '',
                 ];
             }
         }
-        return response()->json($registros, 200);
+        return response()->json(array_values($registros), 200);
     }
 
     public function show($id) {
@@ -100,36 +95,65 @@ class RegistroController extends Controller
     public function store(Request $request) {
         $request->validate([
             'cod_cliente' => 'required|integer|exists:clientes,cod_cliente',
-            'motivo' => 'required|array',
-            'motivo.*' => 'required|string|in:COMPRAR PRODUTOS,FAZER INSTALACAO,MANUTENCAO EM CERCA ELÉTRICA,MANUTENCAO EM CONCERTINA,
-            MANUTENCAO EM CAMERA,TROCA DE CABOS,TROCA DE CONECTORES,TROCA DE FONTE DE ENERGIA,TROCA DE DVR,MANUTENCAO EM DVR,TROCA DE HD,
-            TROCA DE CENTRAL DE CHOQUE,MANUTENCAO EM CENTRAL,TROCA DE BATERIA DE CENTRAL,OUTRO',
-            'tipo_interacao' => 'required|string|in:WHATSAPP,EMAIL,TELEFONE',
-            'descricao' => 'required|string|max:500',
+            'motivo' => 'required|array|min:1',
+            'motivo.*' => [
+                'required',
+                'string',
+                Rule::in([
+                    'COMPRAR PRODUTOS',
+                    'FAZER INSTALACAO',
+                    'MANUTENCAO EM CERCA ELETRICA',
+                    'MANUTENCAO EM CONCERTINA',
+                    'MANUTENCAO EM CAMERA',
+                    'TROCA DE CABOS',
+                    'TROCA DE CONECTORES',
+                    'TROCA DE FONTE DE ENERGIA',
+                    'TROCA DE DVR',
+                    'MANUTENCAO EM DVR',
+                    'TROCA DE HD',
+                    'TROCA DE CENTRAL DE CHOQUE',
+                    'MANUTENCAO EM CENTRAL',
+                    'TROCA DE BATERIA DE CENTRAL',
+                    'OUTRO',
+                ])
+            ],
+            'tipo_interacao' => ['required', Rule::in(['WHATSAPP', 'EMAIL', 'TELEFONE'])],
+            'descricao' => 'nullable|string|max:500',
         ]);
 
         $funcionario = $request->attributes->get('funcionario');
+        $codFuncionario = $funcionario->cod_funcionario;
+        $codCliente = $request->cod_cliente;
         $motivo = $request->motivo;
         $tipoInteracao = $request->tipo_interacao;
         $descricao = $request->descricao;
 
-        // Gera um ID aleatório para o registro
-        do {
-            $codRegistro = random_int(1, 999999);
-            $exists = DB::select("SELECT 1 FROM REGISTROS WHERE COD_REGISTRO = ?", [$codRegistro]);
-        } while (!empty($exists));
-
         DB::beginTransaction();
 
         try {
-            DB::insert("INSERT INTO REGISTROS (COD_REGISTRO, COD_CLIENTE, COD_FUNCIONARIO, MOTIVO, TIPO_INTERACAO, DESCRICAO) VALUES (?, ?, ?, ?, ?, ?)", 
-            [$codRegistro, $request->cod_cliente, $funcionario->cod_funcionario, $motivo, $tipoInteracao, $descricao]);
+            $registro = DB::select("INSERT INTO REGISTROS (COD_CLIENTE, COD_FUNCIONARIO, TIPO_INTERACAO, DESCRICAO) VALUES (?, ?, ?, ?)
+            RETURNING COD_REGISTRO", [$codCliente, $codFuncionario, $tipoInteracao, $descricao]);
+
+            $codRegistro = $registro[0]->cod_registro;
+
+            foreach ($motivo as $m) {
+                DB::insert("
+                    INSERT INTO MOTIVOS_REGISTRO (COD_REGISTRO, MOTIVO)
+                    VALUES (?, ?)
+                ", [
+                    $codRegistro,
+                    $m
+                ]);
+            }
+
 
             DB::commit();
 
             return response()->json(['message' => 'Registro cadastrado com sucesso!'], 201);
 
         } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e->getMessage(), $e->getTraceAsString());
             return response()->json(['message' => 'Erro ao cadastrar o registro'], 500);
         }
     }

@@ -9,67 +9,74 @@ use Illuminate\Database\QueryException;
 class ClienteController extends Controller
 {
 
-    // Controlador que busca os todos os clientes, ou busca um cliente específico pelo cpf ou cnpj
-
-    public function index(Request $request) {
-        // Verifica se o request contém o filtro de busca para cpf ou cnpj
+    public function index(Request $request)
+    {
         $termo = $request->query('termo');
         $cpf = null;
         $cnpj = null;
 
-        // Verifica se há termo de busca
         if ($termo) {
-            // Remove caracteres não numéricos
             $termoLimpo = preg_replace('/[^0-9]/', '', $termo);
             $tamanho = strlen($termoLimpo);
-            
-            if ($tamanho == 11) {
+
+            if ($tamanho === 11) {
                 $cpf = $termoLimpo;
-            } else if ($tamanho == 14) {
+            } else if ($tamanho === 14) {
                 $cnpj = $termoLimpo;
-            } else {
-                // Se não for CPF/CNPJ válido, retorna erro
-                return response()->json(['message' => 'CPF deve ter 11 dígitos ou CNPJ 14 dígitos'], 422);
             }
         }
 
-        // Busca os clientes pra cada caso, se for cpf, se for cnpj ou se não tiver filtro
         if ($cpf) {
-            $result = DB::select("SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE FROM CLIENTES c 
-            LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
-            WHERE c.CPF_CLIENTE = ? ORDER BY c.COD_CLIENTE", [$cpf]);
+            $result = DB::select("
+                SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE
+                FROM CLIENTES c
+                LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE
+                WHERE c.CPF_CLIENTE = ?
+                ORDER BY c.COD_CLIENTE
+            ", [$cpf]);
+
         } else if ($cnpj) {
-            $result = DB::select("SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE FROM CLIENTES c 
-            LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
-            WHERE c.CNPJ_CLIENTE = ? ORDER BY c.COD_CLIENTE", [$cnpj]);
+            $result = DB::select("
+                SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE
+                FROM CLIENTES c
+                LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE
+                WHERE c.CNPJ_CLIENTE = ?
+                ORDER BY c.COD_CLIENTE
+            ", [$cnpj]);
+
         } else {
-            $result = DB::select("SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE FROM CLIENTES c 
-            LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE 
-            ORDER BY c.COD_CLIENTE");
+            // 🔥 aqui estava o bug lógico
+            $result = DB::select("
+                SELECT c.COD_CLIENTE, c.NOME, c.EMAIL, c.CREATED_AT, t.TELEFONE
+                FROM CLIENTES c
+                LEFT JOIN TELEFONES_CLIENTES t ON c.COD_CLIENTE = t.COD_CLIENTE
+                ORDER BY c.COD_CLIENTE
+            ");
         }
 
-        // Cria um array de clientes, onde a chave é o ID do cliente
+        // Montagem do array (seu código está OK)
         $clientes = [];
-        // Percorre cada cliente no resultado da consulta, como se fosse uma linha "row"
+
         foreach ($result as $row) {
             $id = $row->cod_cliente;
-            // Verifica se o cliente já existe no array, se não existe, cria a estrutura básica para ele, se existe passa adiante
+
             if (!isset($clientes[$id])) {
                 $clientes[$id] = [
                     'cod_cliente' => $row->cod_cliente,
-                    'email' => $row->email,
                     'nome' => $row->nome,
+                    'email' => $row->email,
                     'created_at' => $row->created_at,
                     'telefones' => [],
                 ];
             }
-            // Verifica se a query retornou a coluna telefone ou se ela veio nula.
-            if (isset($row->telefone) && $row->telefone && !in_array($row->telefone, $clientes[$id]['telefones'])) {
+
+            if ($row->telefone && !in_array($row->telefone, $clientes[$id]['telefones'])) {
                 $clientes[$id]['telefones'][] = $row->telefone;
             }
         }
-        return response()->json($clientes, 200);
-    }
+
+        return response()->json(array_values($clientes), 200);
+    }   
 
     // Controlador que busca um cliente pelo seu ID
 
