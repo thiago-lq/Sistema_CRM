@@ -63,9 +63,25 @@ class RegistroController extends Controller
         return response()->json(array_values($registros), 200);
     }
 
-    public function show($id) {
-        $registro = DB::select("SELECT r.*, c.NOME FROM REGISTROS r LEFT JOIN CLIENTES c ON r.COD_CLIENTE = c.COD_CLIENTE
-        WHERE r.COD_REGISTRO = ?", [$id]);
+    public function show($id)
+    {
+        $registro = DB::select("
+            SELECT 
+                r.*, 
+                c.NOME,
+                f.NOME_FUNCIONARIO,
+                (
+                    SELECT STRING_AGG(m.MOTIVO, ', ')
+                    FROM MOTIVOS_REGISTRO m
+                    WHERE m.COD_REGISTRO = r.COD_REGISTRO
+                ) AS MOTIVO
+            FROM REGISTROS r 
+            LEFT JOIN CLIENTES c 
+                ON r.COD_CLIENTE = c.COD_CLIENTE
+            LEFT JOIN FUNCIONARIOS_CRM f 
+                ON r.COD_FUNCIONARIO = f.COD_FUNCIONARIO
+            WHERE r.COD_REGISTRO = ?
+        ", [$id]);
 
         if (empty($registro)) {
             return response()->json(['message' => 'Registro não encontrado'], 404);

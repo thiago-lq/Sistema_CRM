@@ -104,9 +104,15 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
       <div className="grid grid-cols-2 gap-4 text-sm">
         {/* Dados Básicos do Pedido */}
         <div className="space-y-3">
-          <div className="flex gap-1">
-            <p className="font-semibold text-gray-700">Cliente:</p>
-            <p>{pedido.cod_cliente || "-"}</p>
+          <div className="flex gap-5">
+            <div className="flex flex-wrap gap-1">
+              <p className="font-semibold text-gray-700">Cliente:</p>
+              <p>{pedido.cod_cliente || "-"}</p>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              <p className="font-semibold text-gray-700">Nome:</p>
+              <p>{pedido.cliente_nome || "-"}</p>
+            </div>
           </div>
           <div className="flex gap-30">
             <div>
@@ -121,32 +127,32 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
             </div>
           </div>
           <div className="flex gap-38">
-          <div>
-            <p className="font-semibold text-gray-700">Valor Total:</p>
-            <p className="font-bold text-gray-900">
-              {formatarMoeda(pedido.valor_total)}
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold text-gray-700">Método de Pagamento:</p>
-            <p className="font-bold text-gray-900">
-              {pedido.metodo_pagamento}
-            </p>
-          </div>
+            <div>
+              <p className="font-semibold text-gray-700">Valor Total:</p>
+              <p className="font-bold text-gray-900">
+                {formatarMoeda(pedido.valor_total)}
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-700">
+                Método de Pagamento:
+              </p>
+              <p className="font-bold text-gray-900">
+                {pedido.metodo_pagamento}
+              </p>
+            </div>
           </div>
           <div className="flex gap-31">
-          <div>
-            <p className="font-semibold text-gray-700">Valor Adicional:</p>
-            <p className="font-bold text-gray-900">
-              {formatarMoeda(pedido.valor_adicional)}
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold text-gray-700">Parcelas:</p>
-            <p className="font-bold text-gray-900">
-              {pedido.parcelas}
-            </p>
-          </div>
+            <div>
+              <p className="font-semibold text-gray-700">Valor Adicional:</p>
+              <p className="font-bold text-gray-900">
+                {formatarMoeda(pedido.valor_adicional)}
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-700">Parcelas:</p>
+              <p className="font-bold text-gray-900">{pedido.parcelas}</p>
+            </div>
           </div>
           <div>
             <p className="font-semibold text-gray-700">
@@ -171,8 +177,8 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
                       tipo === "PRODUTO"
                         ? "bg-blue-100 text-blue-800"
                         : tipo === "INSTALACAO"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-orange-100 text-orange-800"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-orange-100 text-orange-800"
                     }`}
                   >
                     {tipo}
@@ -194,15 +200,15 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
                 pedido.status_pagamento === true
                   ? "text-green-900"
                   : pedido.status_pagamento === false
-                  ? "text-yellow-800"
-                  : "text-gray-800"
+                    ? "text-yellow-800"
+                    : "text-gray-800"
               }`}
             >
               {pedido.status_pagamento === true
                 ? "Pago"
                 : pedido.status_pagamento === false
-                ? "Pendente"
-                : "Processando"}
+                  ? "Pendente"
+                  : "Processando"}
             </span>
           </div>
         </div>
@@ -249,7 +255,7 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
                       </td>
                       <td className="py-2 px-3 border-b text-right text-sm font-medium">
                         {formatarMoeda(
-                          item.quantidade * (item.preco_unitario || 0)
+                          item.quantidade * (item.preco_unitario || 0),
                         )}
                       </td>
                     </tr>

@@ -250,6 +250,7 @@ export default function Registros() {
     registroEditar,
     setRegistroEditar,
     handleChangeEditar,
+    setRegistro,
   };
 
   return (

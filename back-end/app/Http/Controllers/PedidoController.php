@@ -59,6 +59,7 @@ class PedidoController extends Controller
         SELECT
             -- Definição dos dados que irão vir na query, com as suas respectivas variáveis
             p.*,
+            c.NOME AS CLIENTE_NOME,
             e.CIDADE AS MANU_INST_CIDADE,
             e.CEP AS MANU_INST_CEP,
             e.BAIRRO AS MANU_INST_BAIRRO,
@@ -93,6 +94,7 @@ class PedidoController extends Controller
             ) AS itens_pedido
 
         FROM PEDIDOS p
+        LEFT JOIN CLIENTES c ON p.COD_CLIENTE = c.COD_CLIENTE
         LEFT JOIN ENDERECOS_INST_MANU e ON p.COD_PEDIDO = e.COD_PEDIDO 
         LEFT JOIN ENDERECOS_CLIENTES ec ON p.COD_ENDERECO_CLIENTE = ec.COD_ENDERECO_CLIENTE 
         LEFT JOIN PAGAMENTOS_CLIENTES pc ON pc.COD_PEDIDO = p.COD_PEDIDO
