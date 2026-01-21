@@ -39,8 +39,11 @@ class RegistroController extends Controller
             $codCliente = $codCliente[0]->cod_cliente ?? null;
             $result = DB::select("SELECT COD_REGISTRO, COD_CLIENTE, COD_FUNCIONARIO, CREATED_AT, UPDATED_AT FROM REGISTROS 
             WHERE COD_CLIENTE = ? ORDER BY COD_REGISTRO", [$codCliente]);
+        } else if (!$cpf && $termo || !$cnpj && $termo) {
+            $result = [];
         } else {
-            $result = DB::select("SELECT COD_REGISTRO, COD_CLIENTE, COD_FUNCIONARIO, CREATED_AT, UPDATED_AT FROM REGISTROS"); 
+            $result = DB::select("SELECT COD_REGISTRO, COD_CLIENTE, COD_FUNCIONARIO, CREATED_AT, UPDATED_AT FROM REGISTROS 
+            ORDER BY COD_REGISTRO");
         }
         
         $registros = [];
@@ -190,22 +193,33 @@ class RegistroController extends Controller
 
     public function destroy($id) {
         DB::beginTransaction();
+        
         try {
-            $registro = DB::select("SELECT * FROM REGISTROS WHERE COD_REGISTRO = ?", [$id]);
+            // Verifica se o registro existe
+            $registro = DB::selectOne("SELECT * FROM REGISTROS WHERE COD_REGISTRO = ?", [$id]);
             
-            if (empty($registro)) {
+            if (!$registro) {
+                DB::rollBack(); // IMPORTANTE: Rollback antes de retornar
                 return response()->json(['message' => 'Registro não encontrado'], 404);
             }
 
-            DB::delete("DELETE FROM REGISTROS WHERE COD_REGISTRO = ?", [$id]);
+            // Deleta os motivos relacionados
+            DB::delete("DELETE FROM MOTIVOS_REGISTRO WHERE COD_REGISTRO = ?", [$id]);
+
+            // Deleta o registro principal
+            $deleted = DB::delete("DELETE FROM REGISTROS WHERE COD_REGISTRO = ?", [$id]);
 
             DB::commit();
             
             return response()->json(['message' => 'Registro excluído com sucesso!'], 200);
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Erro ao excluir o registro'], 500);
+            DB::rollBack(); // Já tem isso, mas importante
+            
+            return response()->json([
+                'message' => 'Erro ao excluir o registro',
+                'error' => $e->getMessage() // Para debug
+            ], 500);
         }
     }
 }

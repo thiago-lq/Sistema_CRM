@@ -45,7 +45,7 @@ export default function ListaRegistros({
         open={modalAberto}
         onClose={() => setModalAberto(false)}
         onConfirm={confirmarExclusao}
-        titulo="Excluir [ENTIDADE]"
+        titulo="Excluir registro"
         descricao="Essa ação não poderá ser desfeita. Deseja continuar?"
       />
 
