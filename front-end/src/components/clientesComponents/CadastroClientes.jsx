@@ -142,8 +142,8 @@ export default function CadastroClientes({
             </div>
           )}
         </div>
-        <div className="flex px-5 flex-col mt-10 w-max gap-3">
-          <div className="mt-1.5">
+        <div className="flex px-5 flex-col w-full">
+          <div className="space-x-3 mb-3">
             {form.telefones.length < maxCamposTelefone && (
               <button
                 className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition-all 
@@ -156,7 +156,7 @@ export default function CadastroClientes({
             )}
             {form.telefones.length > minCamposTelefone && (
               <button
-                className="bg-black text-white items-center mt-5.5 mx-2 rounded hover:opacity-60 hover:cursor-pointer transition-all 
+                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition-all 
                 duration-300"
                 type="button"
                 onClick={removerCampoTelefone}

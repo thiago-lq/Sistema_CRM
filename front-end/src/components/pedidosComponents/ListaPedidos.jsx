@@ -85,7 +85,7 @@ export default function ListaPedidos({
           <button
             onClick={handleRecarregar}
             disabled={loading}
-            className="p-2 mt-1 rounded-lg transition-all duration-300 disabled:opacity-70"
+            className="p-2 mt-1 rounded-lg transition-all duration-300 disabled:opacity-70 disabled:animate-spin"
           >
             <img
               src={recarregar}
