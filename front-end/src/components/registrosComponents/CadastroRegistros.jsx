@@ -56,7 +56,7 @@ export default function CadastroRegistros({
   }, [buscaClienteCadastro, setForm]);
 
   return (
-    <div className="bg-white px-5">
+    <div className="bg-white">
       <button
         onClick={() => setAbaAtiva("lista")}
         className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-300 
@@ -65,14 +65,15 @@ export default function CadastroRegistros({
         Voltar
       </button>
       <div className="flex flex-col justify-between mb-10 items-center w-full">
+        <p className="font-semibold text-3xl ">Cadastrar registro</p>
         <p className="text-gray-500 mt-1">Preencha os dados abaixo</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Motivo do contato
-          </label>
           <div className="flex flex-col justify-between p-5 gap-10">
+            <label className="block text-lg font-medium text-gray-700">
+              Motivo do contato
+            </label>
             <div className="grid grid-cols-3">
               {[
                 { value: "COMPRAR PRODUTOS", label: "Comprar produtos" },
@@ -177,6 +178,7 @@ export default function CadastroRegistros({
               </div>
             </div>
             {/* Descrição */}
+            {form.motivo?.includes("OUTRO") && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Descrição do registro
@@ -195,12 +197,13 @@ export default function CadastroRegistros({
                 {form.descricao ? form.descricao.length : 0} / 500 palavras
               </p>
             </div>
+            )}
             {/* Botão salvar */}
-            <div className="mt-6">
+            <div className="flex justify-center my-5 items-center">
               <button
                 type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white 
-                       font-semibold py-2 px-4 rounded-lg transition-all mt-4 hover:cursor-pointer"
+                className=" bg-indigo-600 hover:bg-indigo-700 text-white 
+                       font-semibold py-2 px-4 rounded-2xl transition-all hover:cursor-pointer"
               >
                 Salvar Registro
               </button>

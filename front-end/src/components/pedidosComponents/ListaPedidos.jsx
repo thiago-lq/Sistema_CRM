@@ -78,8 +78,8 @@ export default function ListaPedidos({
       />
       {/* Header com busca e recarregar */}
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Lista de Pedidos
+        <h2 className="text-xl font-bold text-gray-800">
+          Pedidos
         </h2>
         <div className="flex gap-3 items-center">
           <button
@@ -127,7 +127,7 @@ export default function ListaPedidos({
                   Data de criação
                 </th>
                 <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Valor Total
+                  Valor total
                 </th>
                 <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
@@ -194,7 +194,7 @@ export default function ListaPedidos({
                             setPedidoSelecionado(pedido);
                             setAbaAtiva("detalhes");
                           }}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md hover:cursor-pointer"
+                          className="bg-sky-500 hover:bg-sky-500 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md hover:cursor-pointer"
                         >
                           Ver
                         </button>

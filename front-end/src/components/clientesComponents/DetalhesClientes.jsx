@@ -63,7 +63,7 @@ export default function DetalhesClientes({ clienteSelecionado, setModo }) {
         <div className="text-lg">
           {cliente.data_nascimento && (
             <div className="flex flex-wrap gap-2">
-              <p className="font-semibold text-gray-700">Data de Nascimento:</p>
+              <p className="font-semibold text-gray-700">Data de nascimento:</p>
               {cliente.data_nascimento}
             </div>
           )}
@@ -72,7 +72,7 @@ export default function DetalhesClientes({ clienteSelecionado, setModo }) {
 
       <div className="bg-white rounded-xl p-3 text-lg">
         <h2 className="text-2xl font-bold text-gray-800 mb-15 w-full text-center">
-          Detalhes do Cliente #{cliente.cod_cliente}
+          Detalhes do cliente #{cliente.cod_cliente}
         </h2>
         <div className="grid grid-cols-3 gap-3 text-gray-700">
           <div className="flex flex-wrap gap-2">
@@ -127,7 +127,7 @@ export default function DetalhesClientes({ clienteSelecionado, setModo }) {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <p className="font-semibold text-gray-700">
-                          Rua e Número:
+                          Rua e número:
                         </p>{" "}
                         {endereco.rua_numero}
                       </div>

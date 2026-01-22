@@ -420,7 +420,7 @@ export default function Clientes() {
   };
   // Componente que renderiza o componente principal
   return (
-    <div className="max-w-4/5 mx-auto p-5 bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30">
+    <div className="max-w-4/5 mx-auto p-5 bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30 mb-5">
       {modo === "lista" && <ListaClientes {...propsLista} />}
       {modo === "cadastro" && <CadastroClientes {...propsCadastro} />}
       {modo === "detalhes" && <DetalhesClientes {...propsDetalhes} />}

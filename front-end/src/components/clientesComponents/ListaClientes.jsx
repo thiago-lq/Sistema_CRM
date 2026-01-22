@@ -57,7 +57,7 @@ export default function ListaClientes({
       />
       {/* Componente que vai ser renderizado no componente principal */}
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-lg font-semibold text-gray-800">Clientes</h2>
+        <h2 className="text-xl font-bold text-gray-800">Clientes</h2>
         <div className="flex gap-3 items-center">
           <button
             onClick={handleRecarregar}
@@ -90,7 +90,7 @@ export default function ListaClientes({
             className="bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer hover:shadow-md transition-all duration-300
              text-white px-4 py-2 rounded-lg font-medium"
           >
-            + Cadastrar Novo Cliente
+            + Cadastrar novo cliente
           </button>
         </div>
       </div>
@@ -146,7 +146,7 @@ export default function ListaClientes({
                     <div className="flex flex-col items-center justify-center">
                       <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                       <p className="mt-2 text-sm text-gray-500">
-                        Carregando Clientes...
+                        Carregando clientes...
                       </p>
                     </div>
                   </td>
@@ -179,7 +179,7 @@ export default function ListaClientes({
                             setClienteSelecionado(item);
                             setModo("detalhes");
                           }}
-                          className="bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white text-xs px-3 py-1 
+                          className="bg-sky-500 hover:bg-sky-600 hover:cursor-pointer text-white text-xs px-3 py-1 
                           rounded transition-all duration-300 hover:shadow-md"
                         >
                           Ver

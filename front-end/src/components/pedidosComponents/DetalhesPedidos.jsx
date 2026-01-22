@@ -96,84 +96,83 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
   const subtotalItens = calcularSubtotalItens();
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mt-4">
-      <h2 className="text-xl font-semibold mb-4">
-        Detalhes do Pedido #{pedido.cod_pedido}
-      </h2>
+    <div className="bg-white p-6 mt-4">
+      <div className="w-full flex justify-between items-center mb-15">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">
+            Detalhes do pedido #{pedido.cod_pedido}
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 gap-4 text-lg">
+          <div className="flex flex-wrap gap-2">
+            <p className="font-semibold text-gray-700">Data de criação:</p>
+            <p>{formatoBrasileiro(pedido.created_at)}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <p className="font-semibold text-gray-700">Data de atualização:</p>
+            <p>{formatoBrasileiro(pedido.updated_at)}</p>
+          </div>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        {/* Dados Básicos do Pedido */}
-        <div className="space-y-3">
-          <div className="flex gap-5">
-            <div className="flex flex-wrap gap-1">
-              <p className="font-semibold text-gray-700">Cliente:</p>
-              <p>{pedido.cod_cliente || "-"}</p>
-            </div>
-            <div className="flex flex-wrap gap-1">
-              <p className="font-semibold text-gray-700">Nome:</p>
-              <p>{pedido.cliente_nome || "-"}</p>
-            </div>
+      <div className="grid grid-cols-2 gap-6 mb-6 text-lg">
+        {/* Dados Básicos do Pedido */} 
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <p className="text-gray-700 font-semibold">Cliente:</p>
+            <p>
+              #{pedido.cod_cliente} — {pedido.cliente_nome || "-"}
+            </p>
           </div>
-          <div className="flex gap-30">
-            <div>
-              <p className="font-semibold text-gray-700">Data de Criação:</p>
-              <p>{formatoBrasileiro(pedido.created_at)}</p>
-            </div>
-            <div>
-              <p className="font-semibold text-gray-700">
-                Data de atualização:
-              </p>
-              <p>{formatoBrasileiro(pedido.updated_at)}</p>
-            </div>
-          </div>
-          <div className="flex gap-38">
-            <div>
-              <p className="font-semibold text-gray-700">Valor Total:</p>
-              <p className="font-bold text-gray-900">
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-wrap gap-2">
+              <p className="font-semibold text-gray-700">Valor total:</p>
+              <p>
                 {formatarMoeda(pedido.valor_total)}
               </p>
             </div>
-            <div>
-              <p className="font-semibold text-gray-700">
-                Método de Pagamento:
-              </p>
-              <p className="font-bold text-gray-900">
-                {pedido.metodo_pagamento}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-31">
-            <div>
-              <p className="font-semibold text-gray-700">Valor Adicional:</p>
-              <p className="font-bold text-gray-900">
+            <div className="flex flex-wrap gap-2">
+              <p className="font-semibold text-gray-700">Valor adicional:</p>
+              <p>
                 {formatarMoeda(pedido.valor_adicional)}
               </p>
             </div>
-            <div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-wrap gap-2">
+              <p className="font-semibold text-gray-700">
+                Método de pagamento:
+              </p>
+              <p>
+                {pedido.metodo_pagamento}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
               <p className="font-semibold text-gray-700">Parcelas:</p>
-              <p className="font-bold text-gray-900">{pedido.parcelas}</p>
+              <p>{pedido.parcelas}</p>
             </div>
           </div>
-          <div>
+
+          <div className="flex flex-wrap gap-2">
             <p className="font-semibold text-gray-700">
-              Funcionário Responsável: {pedido.funcionario_nome}
+              Funcionário responsável:
             </p>
-            <p className="text-xs text-gray-500">
-              Código: {pedido.cod_funcionario}
-            </p>
+            <p>#{pedido.cod_funcionario} — {pedido.funcionario_nome}</p>
           </div>
         </div>
 
         {/* Status e Tipos */}
-        <div className="space-y-3">
-          <div>
-            <p className="font-semibold text-gray-700">Tipos do Pedido:</p>
-            <div className="flex gap-2 flex-wrap mt-1">
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <p className="font-semibold text-gray-700">Tipos do pedido:</p>
+            <div className="flex gap-2 flex-wrap">
               {pedido.tipos_pedido ? (
                 pedido.tipos_pedido.split(", ").map((tipo, idx) => (
                   <span
                     key={idx}
-                    className={`px-2 py-1 text-xs rounded-full ${
+                    className={`p-1 text-sm rounded-full font-medium ${
                       tipo === "PRODUTO"
                         ? "bg-blue-100 text-blue-800"
                         : tipo === "INSTALACAO"
@@ -189,51 +188,54 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
               )}
             </div>
           </div>
-          <div>
-            <p className="font-semibold text-gray-700">Prazo</p>
-            <span>{pedido.prazo}</span>
-          </div>
-          <div>
-            <p className="font-semibold text-gray-700">Status Pagamento:</p>
-            <span
-              className={`text-sm font-medium ${
-                pedido.status_pagamento === true
-                  ? "text-green-900"
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-wrap gap-2">
+              <p className="font-semibold text-gray-700">Prazo</p>
+              <p>{pedido.prazo}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <p className="font-semibold text-gray-700">Status pagamento:</p>
+              <span
+                className={`font-medium rounded-full p-0.5 ${
+                  pedido.status_pagamento === true
+                    ? "text-green-900 bg-green-100"
+                    : pedido.status_pagamento === false
+                      ? "text-yellow-800 bg-yellow-100"
+                      : "text-gray-800 bg-gray-100"
+                }`}
+              >
+                {pedido.status_pagamento === true
+                  ? "Pago"
                   : pedido.status_pagamento === false
-                    ? "text-yellow-800"
-                    : "text-gray-800"
-              }`}
-            >
-              {pedido.status_pagamento === true
-                ? "Pago"
-                : pedido.status_pagamento === false
-                  ? "Pendente"
-                  : "Processando"}
-            </span>
+                    ? "Pendente"
+                    : "Processando"}
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Itens do Pedido - AGORA FUNCIONANDO */}
-        <div className="md:col-span-2 mt-4">
-          <h3 className="font-semibold text-gray-700 mb-3">Itens do Pedido</h3>
+        <div className="col-span-2 mt-4">
+          <h3 className="font-semibold text-gray-700 mb-3">Itens do pedido</h3>
           {itens && itens.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white border border-gray-200">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="py-2 px-3 border-b text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="py-2 px-3 border-b text-left text-sm font-medium text-gray-500 uppercase">
                       Código
                     </th>
-                    <th className="py-2 px-3 border-b text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="py-2 px-3 border-b text-left text-sm font-medium text-gray-500 uppercase">
                       Produto
                     </th>
-                    <th className="py-2 px-3 border-b text-center text-xs font-medium text-gray-500 uppercase">
+                    <th className="py-2 px-3 border-b text-center text-sm font-medium text-gray-500 uppercase">
                       Quantidade
                     </th>
-                    <th className="py-2 px-3 border-b text-right text-xs font-medium text-gray-500 uppercase">
-                      Preço Unitário
+                    <th className="py-2 px-3 border-b text-right text-sm font-medium text-gray-500 uppercase">
+                      Preço unitário
                     </th>
-                    <th className="py-2 px-3 border-b text-right text-xs font-medium text-gray-500 uppercase">
+                    <th className="py-2 px-3 border-b text-right text-sm font-medium text-gray-500 uppercase">
                       Subtotal
                     </th>
                   </tr>
@@ -264,13 +266,10 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
                 <tfoot>
                   <tr className="bg-gray-50 font-semibold">
                     <td
-                      colSpan="3"
+                      colSpan="4"
                       className="py-2 px-3 border-b text-right text-sm"
                     >
-                      Subtotal dos Itens:
-                    </td>
-                    <td className="py-2 px-3 border-b text-right text-sm">
-                      {itens.length} item{itens.length !== 1 ? "s" : ""}
+                      Subtotal dos itens:
                     </td>
                     <td className="py-2 px-3 border-b text-right text-sm">
                       {formatarMoeda(subtotalItens)}
@@ -292,38 +291,38 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
         </div>
 
         {/* Endereços */}
-        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4">
+        <div className="col-span-2 grid grid-cols-2 gap-4 mt-4 border-2 border-gray-200 rounded-lg">
           {/* Endereço da Instalação/Manutenção */}
           <div className="bg-gray-50 p-3 rounded">
             <h3 className="font-semibold text-gray-700 mb-2">
-              Endereço da Instalação/Manutenção
+              Endereço da instalação/manutenção
             </h3>
-            <div className="text-sm space-y-1">
-              <p>
+            <div className="text-lg space-y-1">
+              <div className= "flex flex-wrap gap-2">
                 <span className="font-medium">Cidade:</span>{" "}
-                {pedido.manu_inst_cidade || "-"}
-              </p>
-              <p>
+                <p>{pedido.manu_inst_cidade || "-"}</p>
+              </div>
+              <div className= "flex flex-wrap gap-2">
                 <span className="font-medium">CEP:</span>{" "}
-                {pedido.manu_inst_cep || "-"}
-              </p>
-              <p>
+                <p>{pedido.manu_inst_cep || "-"}</p>
+              </div>
+              <div className= "flex flex-wrap gap-2">
                 <span className="font-medium">Bairro:</span>{" "}
-                {pedido.manu_inst_bairro || "-"}
-              </p>
-              <p>
+                <p>{pedido.manu_inst_bairro || "-"}</p>
+              </div>
+              <div className= "flex flex-wrap gap-2">
                 <span className="font-medium">Rua/Número:</span>{" "}
-                {pedido.manu_inst_rua || "-"}
-              </p>
+                <p>{pedido.manu_inst_rua || "-"}</p>
+              </div>
             </div>
           </div>
 
           {/* Endereço do entrega */}
-          <div className="bg-gray-50 p-3 rounded">
+          <div className="bg-gray-50 p-3">
             <h3 className="font-semibold text-gray-700 mb-2">
               Endereço de entrega
             </h3>
-            <div className="text-sm space-y-1">
+            <div className="text-lg space-y-1">
               <p>
                 <span className="font-medium">Cidade:</span>{" "}
                 {pedido.cli_cidade || "-"}
@@ -342,18 +341,20 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
               </p>
             </div>
           </div>
-          <p className="w-full gap-2">
-            <span className="font-medium">Descrição: </span>
-            {pedido.descricao || "-"}
-          </p>
         </div>
+      </div>
+      <div className="border-2 border-gray-200 rounded-lg p-4 mt-5 text-lg">
+        <span className="font-semibold text-gray-700">Descrição: </span>
+        <p className="w-full break-words whitespace-pre-wrap">
+          {pedido.descricao || "-"}
+        </p>
       </div>
 
       <button
         className="mt-6 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
         onClick={() => setAbaAtiva("lista")}
       >
-        Voltar para Lista
+        Voltar para lista
       </button>
     </div>
   );

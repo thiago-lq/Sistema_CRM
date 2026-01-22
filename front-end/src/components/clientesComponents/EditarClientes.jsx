@@ -22,7 +22,7 @@ export default function EditarClientes({
         Voltar
       </button>
       <div className="flex flex-col justify-between mb-10 items-center w-full">
-        <p className="font-semibold text-3xl ">Editar Clientes</p>
+        <p className="font-semibold text-3xl ">Editar clientes</p>
         <p className="text-gray-500 mt-1">
           Atualize os dados do cliente abaixo
         </p>
@@ -31,7 +31,7 @@ export default function EditarClientes({
         <div className="grid grid-cols-4 gap-4 px-5">
           <div>
             <label className="block text-sm font-medium mb-1">
-              Nome do Cliente
+              Nome do cliente
             </label>
             <input
               type="text"
@@ -70,7 +70,7 @@ export default function EditarClientes({
             <div className="flex items-center justify-center">
               <div className="relative">
                 <label className="block text-sm font-medium mb-1">
-                  Data de Nascimento
+                  Data de nascimento
                 </label>
                 <input
                   type="date"
@@ -165,7 +165,7 @@ export default function EditarClientes({
               <div key={index} className="grid grid-cols-4 space-x-3 w-full">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Rua e Número
+                    Rua e número
                   </label>
                   <input
                     type="text"
@@ -217,13 +217,13 @@ export default function EditarClientes({
             ))}
           </div>
         </div>
-        <div className="flex justify-center mt-10 mb-5 items-center">
+        <div className="flex justify-center my-5 mt-10 items-center">
           <button
             type="submit"
-            className="bg-black text-white px-6 py-2 rounded-2xl hover:cursor-pointer hover:opacity-60 transition-all
-            duration-300"
+            className=" bg-indigo-600 hover:bg-indigo-700 text-white 
+                       font-semibold py-2 px-4 rounded-2xl transition-all hover:cursor-pointer"
           >
-            Salvar
+            Editar cliente
           </button>
         </div>
       </form>

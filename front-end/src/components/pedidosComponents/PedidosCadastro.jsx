@@ -141,7 +141,7 @@ export default function FormularioCadastro({
         {/* Tipo de pedido */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tipo de Pedido
+            Tipo de pedido
           </label>
           <div className="flex justify-between">
             <div className="flex gap-10">
@@ -198,7 +198,7 @@ export default function FormularioCadastro({
             {cliente && cliente.cod_cliente && (
               <div>
                 <label className="text-lg text-gray-700 mx-10">
-                  Código do Cliente:
+                  Código do cliente:
                 </label>
                 <input
                   type="number"
@@ -216,7 +216,7 @@ export default function FormularioCadastro({
         {cliente && form.pedidoTipos.includes("PRODUTO") && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Endereço de Entrega
+              Endereço de entrega
             </label>
             <select
               name="codEnderecoCliente"
@@ -287,7 +287,7 @@ export default function FormularioCadastro({
           form.pedidoTipos.includes("MANUTENCAO")) && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Endereço de Serviço
+              Endereço de serviço
             </label>
             <div className="grid grid-cols-4 gap-5">
               <input
@@ -334,7 +334,7 @@ export default function FormularioCadastro({
         <div className="flex justify-between">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Valor Adicional (R$)
+              Valor adicional (R$)
             </label>
             <input
               type="number"
@@ -350,7 +350,7 @@ export default function FormularioCadastro({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Valor Total (R$)
+              Valor total (R$)
             </label>
             <input
               type="number"
@@ -426,7 +426,7 @@ export default function FormularioCadastro({
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center">
                 <span className="mr-2"></span>
-                <h3 className="font-medium">Informações do Cartão</h3>
+                <h3 className="font-medium">Informações do cartão</h3>
               </div>
               <button
                 type="button"
@@ -444,7 +444,7 @@ export default function FormularioCadastro({
                   <div className="flex items-start">
                     <div>
                       <p className="font-medium text-yellow-800">
-                        Ambiente de Demonstração
+                        Ambiente de demonstração
                       </p>
                       <p className="text-sm text-yellow-700">
                         Este formulário é apenas simbólico. Nenhuma transação
@@ -458,7 +458,7 @@ export default function FormularioCadastro({
                   {/* Número do Cartão */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
-                      Número do Cartão
+                      Número do cartão
                     </label>
                     <input
                       type="text"
@@ -474,7 +474,7 @@ export default function FormularioCadastro({
                   {/* Nome no Cartão */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
-                      Nome no Cartão
+                      Nome no cartão
                     </label>
                     <input
                       type="text"
@@ -530,7 +530,7 @@ export default function FormularioCadastro({
         {/* Descrição */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Descrição do Pedido
+            Descrição do pedido
           </label>
           <textarea
             name="descricao"
@@ -548,13 +548,13 @@ export default function FormularioCadastro({
         </div>
 
         {/* Botão salvar */}
-        <div className="mt-6">
+        <div className="flex justify-center my-5 items-center">
           <button
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white 
-                       font-semibold py-2 px-4 rounded-lg transition-all mt-4 hover:cursor-pointer"
+            className=" bg-indigo-600 hover:bg-indigo-700 text-white 
+                       font-semibold py-2 px-4 rounded-2xl transition-all hover:cursor-pointer"
           >
-            Salvar Pedido
+            Cadastrar pedido
           </button>
         </div>
       </form>

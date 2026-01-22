@@ -52,7 +52,7 @@ export default function ListaRegistros({
       {/* Cabeçalho com busca, recarregar e botão novo */}
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-lg font-semibold text-gray-800">
-          Lista de Registros
+          Lista de registros
         </h2>
         <div className="flex gap-3 items-center">
           <button
@@ -89,7 +89,7 @@ export default function ListaRegistros({
             className="bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer hover:shadow-md transition-all duration-300
             text-white px-4 py-2 rounded-lg font-medium"
           >
-            + Novo Registro
+            + Novo registro
           </button>
         </div>
       </div>
@@ -163,7 +163,7 @@ export default function ListaRegistros({
                             setRegistroSelecionado(item);
                             setAbaAtiva("detalhes");
                           }}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
+                          className="bg-sky-500 hover:bg-sky-600 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md"
                         >
                           Ver
                         </button>
