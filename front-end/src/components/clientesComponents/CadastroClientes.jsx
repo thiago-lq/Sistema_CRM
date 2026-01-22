@@ -75,7 +75,7 @@ export default function CadastroClientes({
           <p className="font-semibold text-3xl ">Cadastrar Cliente</p>
           <p className="text-gray-500 mt-1">Preencha os dados abaixo</p>
         </div>
-        <div className="grid grid-cols-4 gap-5 px-5">
+        <div className="grid grid-cols-4 gap-4 px-5">
           <div>
             <label className="block text-sm font-medium mb-1">Nome</label>
             <input
@@ -83,7 +83,7 @@ export default function CadastroClientes({
               name="nome"
               value={form.nome}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded-lg"
               required
             />
           </div>
@@ -94,7 +94,7 @@ export default function CadastroClientes({
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded-lg"
               required
             />
           </div>
@@ -106,7 +106,7 @@ export default function CadastroClientes({
                 name="cpf"
                 value={form.cpf}
                 onChange={handleChange}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-lg"
                 required
               />
             </div>
@@ -119,7 +119,7 @@ export default function CadastroClientes({
                 name="cnpj"
                 value={form.cnpj}
                 onChange={handleChange}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-lg"
                 required
               />
             </div>
@@ -135,18 +135,18 @@ export default function CadastroClientes({
                   name="data_nascimento"
                   value={form.data_nascimento}
                   onChange={handleChange}
-                  className="p-2 border rounded w-max hover:bg-gray-100 transition-all duration-300"
+                  className="p-2 border rounded-lg max-w hover:bg-gray-100 transition-all duration-300"
                   required
                 />
               </div>
             </div>
           )}
         </div>
-        <div className="flex px-5 flex-col w-full">
-          <div className="space-x-3 mb-3">
+        <div className="flex px-5 flex-col w-max mt-10 gap-3">
+          <div className="space-x-3 mt-1.5">
             {form.telefones.length < maxCamposTelefone && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition-all 
+                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
                 duration-300"
                 type="button"
                 onClick={adicionarCampoTelefone}
@@ -156,7 +156,7 @@ export default function CadastroClientes({
             )}
             {form.telefones.length > minCamposTelefone && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition-all 
+                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
                 duration-300"
                 type="button"
                 onClick={removerCampoTelefone}
@@ -165,7 +165,7 @@ export default function CadastroClientes({
               </button>
             )}
           </div>
-          <div className="grid grid-cols-3 space-x-10">
+          <div className="flex flex-row space-x-10">
             {form.telefones.map((t, index) => (
               <div key={index} className="flex flex-col w-full">
                 <label className="block text-sm font-medium mb-1">
@@ -176,7 +176,7 @@ export default function CadastroClientes({
                   name="telefone"
                   value={t.telefone}
                   onChange={(e) => handleChange(e, index, "telefones")}
-                  className="w-80 p-2 border rounded"
+                  className="w-80 p-2 border rounded-lg"
                   required
                 />
               </div>
@@ -184,10 +184,10 @@ export default function CadastroClientes({
           </div>
         </div>
         <div className="flex px-5 flex-col w-full">
-          <div className="space-x-3 mb-3">
+          <div className="space-x-3 my-5">
             {form.enderecos.length < maxCamposEndereco && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition-all 
+                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
                 duration-300"
                 type="button"
                 onClick={adicionarCampoEndereco}
@@ -197,7 +197,7 @@ export default function CadastroClientes({
             )}
             {form.enderecos.length > minCamposEndereco && (
               <button
-                className="bg-black text-white items-center mt-5.5 rounded hover:opacity-60 hover:cursor-pointer transition-all 
+                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
                 duration-300"
                 type="button"
                 onClick={removerCampoEndereco}
@@ -208,7 +208,7 @@ export default function CadastroClientes({
           </div>
           <div className="flex flex-col">
             {form.enderecos.map((end, index) => (
-              <div key={index} className="grid grid-cols-4 space-x-10 w-full">
+              <div key={index} className="grid grid-cols-4 space-x-3 w-full">
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Rua e Número
@@ -218,7 +218,7 @@ export default function CadastroClientes({
                     name="rua_numero"
                     value={end.rua_numero}
                     onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border rounded-lg"
                     required
                   />
                 </div>
@@ -231,7 +231,7 @@ export default function CadastroClientes({
                     name="bairro"
                     value={end.bairro}
                     onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border rounded-lg"
                     required
                   />
                 </div>
@@ -242,7 +242,7 @@ export default function CadastroClientes({
                     name="cep"
                     value={end.cep}
                     onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border rounded-lg"
                     required
                   />
                 </div>
@@ -255,7 +255,7 @@ export default function CadastroClientes({
                     name="cidade"
                     value={end.cidade}
                     onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border rounded-lg"
                     required
                   />
                 </div>
