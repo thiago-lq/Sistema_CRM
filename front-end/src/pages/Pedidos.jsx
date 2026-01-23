@@ -370,7 +370,7 @@ export default function Pedidos() {
     <div>
       {/* LINHA CHAVE (1): Altere a classe max-w-lg (que limita a largura total do conteúdo) para um valor maior como max-w-3xl, max-w-4xl, ou até max-w-full se quiser que ele use toda a largura disponível.
        */}
-      <div className="max-w-4/5 mx-auto bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30 mb-5">
+      <div className="w-[85%] mx-auto bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30 mb-5">
         {/* CONTROLES DE ABAS */}
         <div className="flex border-b border-gray-200 pt-5">
           <div

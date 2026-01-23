@@ -179,14 +179,34 @@ class RegistroController extends Controller
     public function update(Request $request, $id) {
         $request->validate([
             'cod_cliente' => 'required|integer|exists:clientes,cod_cliente',
-            'motivo' => 'required|array',
-            'motivo.*' => 'required|string|in:COMPRAR PRODUTOS,FAZER INSTALACAO,MANUTENCAO EM CERCA ELÉTRICA,MANUTENCAO EM CONCERTINA,
-            MANUTENCAO EM CAMERA,TROCA DE CABOS,TROCA DE CONECTORES,TROCA DE FONTE DE ENERGIA,TROCA DE DVR,MANUTENCAO EM DVR,TROCA DE HD,
-            TROCA DE CENTRAL DE CHOQUE,MANUTENCAO EM CENTRAL,TROCA DE BATERIA DE CENTRAL,OUTRO',
-            'tipo_interacao' => 'required|string|in:WHATSAPP,EMAIL,TELEFONE',
-            'descricao' => 'required|string|max:500',
+            'motivo' => 'required|array|min:1',
+            'motivo.*' => [
+                'required',
+                'string',
+                Rule::in([
+                    'COMPRAR PRODUTOS',
+                    'FAZER INSTALACAO',
+                    'MANUTENCAO EM CERCA ELETRICA',
+                    'MANUTENCAO EM CONCERTINA',
+                    'MANUTENCAO EM CAMERA',
+                    'TROCA DE CABOS',
+                    'TROCA DE CONECTORES',
+                    'TROCA DE FONTE DE ENERGIA',
+                    'TROCA DE DVR',
+                    'MANUTENCAO EM DVR',
+                    'TROCA DE HD',
+                    'TROCA DE CENTRAL DE CHOQUE',
+                    'MANUTENCAO EM CENTRAL',
+                    'TROCA DE BATERIA DE CENTRAL',
+                    'OUTRO',
+                ])
+            ],
+            'tipo_interacao' => ['required', Rule::in(['WHATSAPP', 'EMAIL', 'TELEFONE'])],
+            'descricao' => 'nullable|string|max:500',
         ]);
         $funcionario = $request->attributes->get('funcionario');
+        $codFuncionario = $funcionario->cod_funcionario;
+        $codCliente = $request->cod_cliente;
         $motivo = $request->motivo;
         $tipoInteracao = $request->tipo_interacao;
         $descricao = $request->descricao;
@@ -194,15 +214,28 @@ class RegistroController extends Controller
         DB::beginTransaction();
 
         try {
-            DB::update("UPDATE REGISTROS SET COD_CLIENTE = ?, COD_FUNCIONARIO = ?, MOTIVO = ?, TIPO_INTERACAO = ?, DESCRICAO = ? WHERE COD_REGISTRO = ?", [
-                $request->cod_cliente, $funcionario->cod_funcionario, $motivo, $tipoInteracao, $descricao, $id
+            DB::update("UPDATE REGISTROS SET COD_CLIENTE = ?, COD_FUNCIONARIO = ?, TIPO_INTERACAO = ?, DESCRICAO = ? WHERE COD_REGISTRO = ?", [
+                $codCliente, $codFuncionario, $tipoInteracao, $descricao, $id
             ]);
+
+            DB::delete("DELETE FROM MOTIVOS_REGISTRO WHERE COD_REGISTRO = ?", [$id]);
+
+            foreach ($motivo as $m) {
+                DB::insert("
+                    INSERT INTO MOTIVOS_REGISTRO (COD_REGISTRO, MOTIVO)
+                    VALUES (?, ?)
+                ", [
+                    $id,
+                    $m
+                ]);
+            }
 
             DB::commit();
 
             return response()->json(['message' => 'Registro atualizado com sucesso!'], 201);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json(['message' => 'Erro ao atualizar o registro'], 500);
         }
     }

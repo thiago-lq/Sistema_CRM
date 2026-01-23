@@ -11,13 +11,12 @@ import { registrosIndex } from "../services/registro/registrosIndex";
 import { registrosStore } from "../services/registro/registrosStore";
 import { registrosDelete } from "../services/registro/registrosDelete";
 import { registrosUpdate } from "../services/registro/registrosUpdate";
-
+import { registrosShow } from "../services/registro/registrosShow";
 
 export default function Registros() {
   // Constantes necessárias para o componente
   const [registros, setRegistros] = useState([]);
   const [registroSelecionado, setRegistroSelecionado] = useState(null);
-  const [registroEditar, setRegistroEditar] = useState(null);
   const [registro, setRegistro] = useState(null);
   const registroProcessadoRef = useRef(null);
   const [abaAtiva, setAbaAtiva] = useState("lista");
@@ -123,6 +122,7 @@ export default function Registros() {
   };
 
   const [formEditar, setFormEditar] = useState({
+    codRegistro: "", 
     codCliente: "",
     motivo: [],
     tipoInteracao: "",
@@ -151,6 +151,7 @@ export default function Registros() {
     e.preventDefault();
     try {
       const dadosParaEnviar = {
+        cod_registro: Number(formEditar.codRegistro),
         cod_cliente: Number(formEditar.codCliente),
         motivo: formEditar.motivo,
         tipo_interacao: formEditar.tipoInteracao,
@@ -199,6 +200,40 @@ export default function Registros() {
   }, [termoBusca]);
 
   useEffect(() => {
+    const fetchPedido = async () => {
+      if (!registroSelecionado?.cod_registro) {
+        setRegistro(null);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const dados = await registrosShow(registroSelecionado.cod_registro);
+        setRegistro(dados);
+      } catch (error) {
+        if (error.response?.status === 404) {
+          notify.error("Registro não encontrado no sistema", {
+            position: "top-right",
+          });
+        } else if (error.response?.status === 500) {
+          notify.error("Erro ao buscar dados do registro", {
+            position: "top-right",
+          });
+        } else {
+          notify.error("Erro inesperado", {
+            description: "Tente novamente mais tarde.",
+            position: "top-right",
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPedido();
+  }, [registroSelecionado?.cod_registro]);
+
+  useEffect(() => {
     if (!registro) return;
 
     if (registro.cod_registro === registroProcessadoRef.current) return;
@@ -210,6 +245,7 @@ export default function Registros() {
       : [];
 
     setFormEditar({
+      codRegistro: registro.cod_registro || "",
       codCliente: registro.cod_cliente || "",
       motivo: motivosArray,
       tipoInteracao: registro.tipo_interacao || "",
@@ -243,22 +279,19 @@ export default function Registros() {
   };
 
   const propsEditar = {
-    registroSelecionado,
     setAbaAtiva,
-    handleRecarregar,
     handleSubmitEditar,
-    registroEditar,
-    setRegistroEditar,
     handleChangeEditar,
-    setRegistro,
+    formEditar,
+    setFormEditar,
   };
 
   return (
-    <div className="max-w-4/5 mx-auto p-5 bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30 mb-5">
+    <div className="w-[85%] mx-auto p-5 bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30 mb-5">
       {abaAtiva === "lista" && <ListaRegistros {...propsLista} />}
       {abaAtiva === "cadastro" && <CadastroRegistros {...propsCadastro} />}
       {abaAtiva === "detalhes" && <DetalhesRegistros {...propsDetalhes} />}
       {abaAtiva === "editar" && <EditarRegistros {...propsEditar} />}
     </div>
-  )
+  );
 }
