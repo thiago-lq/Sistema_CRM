@@ -6,6 +6,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\RegistroController;
 use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\EnsureFuncionarioIsAuthenticated;
 
 // Rota de autenticação do supabase
@@ -38,4 +39,8 @@ Route::middleware('auth.funcionario')->group(function() {
     Route::put('/registros/{id}', [RegistroController::class, 'update']);
     Route::delete('/registros/{id}', [RegistroController::class, 'destroy']);
     Route::get('/buscaCliente/{id}', [RegistroController::class, 'buscaCliente']);
+
+    // Rotas de Dashboard
+    Route::get('/ordemServicoStatusSemana', [DashboardController::class, 'ordemServicoStatusSemana']);
+    Route::get('/motivosContatoSemana', [DashboardController::class, 'motivosContatoSemana']);
 });
