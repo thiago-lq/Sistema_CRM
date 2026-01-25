@@ -5,8 +5,10 @@ import { notify } from "../utils/notify";
 import { ordemServicoStatusSemana } from "../services/dashboard/ordemServicoStatusSemana";
 import { motivosContatoSemana } from "../services/dashboard/motivosContatoSemana";
 
+import { DashboardSemana } from "../components/dashboardComponents";
+
 export default function Dashboard() {
-  const [abaAtiva, setAbaAtiva] = useState("lista");
+  const [abaAtiva, setAbaAtiva] = useState("semana");
   const [dados1Semana, setDados1Semana] = useState([]);
   const [dados2Semana, setDados2Semana] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -36,11 +38,11 @@ export default function Dashboard() {
     const timeout = setTimeout(() => {
       setLoading(true);
       async function carregarDados() {
-        const dados1 = await ordemServicoStatusSemana();
-        const dados2 = await motivosContatoSemana();
+          const dados1 = await ordemServicoStatusSemana();
+          const dados2 = await motivosContatoSemana();
 
-        setDados1Semana(dados1);
-        setDados2Semana(dados2);
+          setDados1Semana(dados1);
+          setDados2Semana(dados2);
 
         setLoading(false);
       }
@@ -49,20 +51,40 @@ export default function Dashboard() {
     return () => clearTimeout(timeout);
   }, []);
 
+  const propsSemana = {
+    dados1Semana,
+    handleRecarregar,
+    loading,
+  };
+
   return (
     <div className="w-[85%] mx-auto bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30 mb-5">
-        <div className="flex border-b border-gray-200 pt-5">
-            <div className={tabClasses("lista")} onClick={() => setAbaAtiva("lista")} style={{ flex: 1 }}>
-                Semanal
-            </div>
-            <div className={tabClasses("lista")} onClick={() => setAbaAtiva("lista")} style={{ flex: 1 }}>
-                Mensal
-            </div>
-            <div className={tabClasses("lista")} onClick={() => setAbaAtiva("lista")} style={{ flex: 1 }}>
-                Anual
-            </div>
+      <div className="flex border-b border-gray-200 pt-5">
+        <div
+          className={tabClasses("lista")}
+          onClick={() => setAbaAtiva("lista")}
+          style={{ flex: 1 }}
+        >
+          Semanal
         </div>
-        <div className="p-4"></div>
+        <div
+          className={tabClasses("lista")}
+          onClick={() => setAbaAtiva("lista")}
+          style={{ flex: 1 }}
+        >
+          Mensal
+        </div>
+        <div
+          className={tabClasses("lista")}
+          onClick={() => setAbaAtiva("lista")}
+          style={{ flex: 1 }}
+        >
+          Anual
+        </div>
+      </div>
+      <div className="p-4">
+        {abaAtiva === "semana" && <DashboardSemana {...propsSemana} />}
+      </div>
     </div>
-  )
+  );
 }

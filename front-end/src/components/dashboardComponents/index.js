@@ -1,0 +1,1 @@
+export { default as DashboardSemana } from "./DashboardSemana";

@@ -184,7 +184,7 @@ export default function ListaPedidos({
                           ? "Pago"
                           : pedido.status_pagamento === false
                           ? "Pendente"
-                          : "Processando"}
+                          : "Em andamento"}
                       </span>{" "}
                     </td>
                     <td className="py-3 px-4 text-sm text-center">

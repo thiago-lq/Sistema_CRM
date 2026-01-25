@@ -218,7 +218,7 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
                   ? "Pago"
                   : pedido.status_pagamento === false
                     ? "Pendente"
-                    : "Processando"}
+                    : "Em andamento"}
               </span>
             </div>
           </div>

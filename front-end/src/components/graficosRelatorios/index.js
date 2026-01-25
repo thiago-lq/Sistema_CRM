@@ -1,0 +1,1 @@
+export { default as GraficoBarrasSemana } from "./GraficoBarrasSemana";
