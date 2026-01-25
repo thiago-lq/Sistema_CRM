@@ -7,6 +7,7 @@ import PaginaInicial from './pages/PaginaInicial';  // ← agora é o hub
 import Pedidos from './pages/Pedidos';
 import Clientes from './pages/Clientes';
 import Registros from './pages/Registros';
+import Dashboard from './pages/Dashboard';
 
 import ProtectedLayout from './routes/ProtectedLayout';  // novo (opcional, veja abaixo)
 
@@ -24,7 +25,7 @@ function App() {
           <Route path="/Pedidos" element={<Pedidos />} />
           <Route path="/Clientes" element={<Clientes />} />
           <Route path="/Registros" element={<Registros />} />
-
+          <Route path="/Dashboard" element={<Dashboard />} /> 
           {/* Alternativa: redireciona raiz logada direto pro hub */}
           {/* <Route path="/" element={<PaginaInicial />} /> */}
         </Route>
