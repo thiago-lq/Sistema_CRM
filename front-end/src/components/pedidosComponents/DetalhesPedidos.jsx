@@ -116,27 +116,36 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
       </div>
 
       <div className="grid grid-cols-2 gap-6 mb-6 text-lg">
-        {/* Dados Básicos do Pedido */} 
+        {/* Dados Básicos do Pedido */}
         <div className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <p className="text-gray-700 font-semibold">Cliente:</p>
-            <p>
-              #{pedido.cod_cliente} — {pedido.cliente_nome || "-"}
-            </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-wrap gap-2">
+              <p className="text-gray-700 font-semibold">Cliente:</p>
+              <p>
+                #{pedido.cod_cliente} — {pedido.cliente_nome || "-"}
+              </p>
+            </div>
+            {pedido.cliente_cpf && (
+              <div className="flex flex-wrap gap-2">
+                <p className="text-gray-700 font-semibold">CPF:</p>
+                <p>#{pedido.cliente_cpf}</p>
+              </div>
+            )}
+            {pedido.cliente_cnpj && (
+              <div className="flex flex-wrap gap-2">
+                <p className="text-gray-700 font-semibold">CNPJ:</p>
+                <p>#{pedido.cliente_cnpj}</p>
+              </div>
+            )}
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-wrap gap-2">
               <p className="font-semibold text-gray-700">Valor total:</p>
-              <p>
-                {formatarMoeda(pedido.valor_total)}
-              </p>
+              <p>{formatarMoeda(pedido.valor_total)}</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <p className="font-semibold text-gray-700">Valor adicional:</p>
-              <p>
-                {formatarMoeda(pedido.valor_adicional)}
-              </p>
+              <p>{formatarMoeda(pedido.valor_adicional)}</p>
             </div>
           </div>
 
@@ -145,9 +154,7 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
               <p className="font-semibold text-gray-700">
                 Método de pagamento:
               </p>
-              <p>
-                {pedido.metodo_pagamento}
-              </p>
+              <p>{pedido.metodo_pagamento}</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <p className="font-semibold text-gray-700">Parcelas:</p>
@@ -159,7 +166,9 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
             <p className="font-semibold text-gray-700">
               Funcionário responsável:
             </p>
-            <p>#{pedido.cod_funcionario} — {pedido.funcionario_nome}</p>
+            <p>
+              #{pedido.cod_funcionario} — {pedido.funcionario_nome}
+            </p>
           </div>
         </div>
 
@@ -298,19 +307,19 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
               Endereço da instalação/manutenção
             </h3>
             <div className="text-lg space-y-1">
-              <div className= "flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
                 <span className="font-medium">Cidade:</span>{" "}
                 <p>{pedido.manu_inst_cidade || "-"}</p>
               </div>
-              <div className= "flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
                 <span className="font-medium">CEP:</span>{" "}
                 <p>{pedido.manu_inst_cep || "-"}</p>
               </div>
-              <div className= "flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
                 <span className="font-medium">Bairro:</span>{" "}
                 <p>{pedido.manu_inst_bairro || "-"}</p>
               </div>
-              <div className= "flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
                 <span className="font-medium">Rua/Número:</span>{" "}
                 <p>{pedido.manu_inst_rua || "-"}</p>
               </div>

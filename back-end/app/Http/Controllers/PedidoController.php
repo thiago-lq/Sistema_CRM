@@ -60,6 +60,8 @@ class PedidoController extends Controller
             -- Definição dos dados que irão vir na query, com as suas respectivas variáveis
             p.*,
             c.NOME AS CLIENTE_NOME,
+            c.CPF_CLIENTE AS CLIENTE_CPF,
+            c.CNPJ_CLIENTE AS CLIENTE_CNPJ,
             e.CIDADE AS MANU_INST_CIDADE,
             e.CEP AS MANU_INST_CEP,
             e.BAIRRO AS MANU_INST_BAIRRO,
