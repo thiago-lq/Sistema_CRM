@@ -8,18 +8,28 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement);
 
-export default function GraficoBarrasSemana({ dados1Semana, loading }) {
+export default function GraficoBarrasSemana({ dados3Semana, loading }) {
 
   const data = {
-    labels: dados1Semana.map((item) => item.status),
+    labels: dados3Semana.map((item) => item.motivo),
     datasets: [
       {
         label: "Quantidade de pedidos",
-        data: dados1Semana.map((item) => item.total),
+        data: dados3Semana.map((item) => item.total),
         backgroundColor: "rgba(59, 130, 246, 0.7)",
       },
     ],
   };
+
+  const options = {
+    indexAxis: "y",
+    responsive: true,
+    plugins: {
+        legend: {
+            position: "top",
+        },
+    },
+  }
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm border-2 border-gray-300">
@@ -32,8 +42,8 @@ export default function GraficoBarrasSemana({ dados1Semana, loading }) {
         </div>
       ) : (
         <div>
-          <h2 className="font-semibold mb-2 text-lg">Pedidos por status</h2>
-          <Bar data={data} />
+          <h2 className="font-semibold mb-2 text-lg">Motivos de contato</h2>
+          <Bar data={data} options={options} />
         </div>
       )}
     </div>

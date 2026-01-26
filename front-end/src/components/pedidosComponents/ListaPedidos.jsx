@@ -170,7 +170,7 @@ export default function ListaPedidos({
                     <td className="py-3 px-4 text-sm font-semibold text-gray-900 text-center">
                       {formatarMoeda(pedido.valor_total)}
                     </td>
-                    <td className="py-3 px-4 text-sm">
+                    <td className="py-3 px-4 text-sm text-center">
                       <span
                         className={`text-sm font-medium text-center ${
                           pedido.status_pagamento === true

@@ -42,5 +42,6 @@ Route::middleware('auth.funcionario')->group(function() {
 
     // Rotas de Dashboard
     Route::get('/ordemServicoStatusSemana', [DashboardController::class, 'ordemServicoStatusSemana']);
+    Route::get('/tabelaOrdemServicoSemana', [DashboardController::class, 'tabelaOrdemServicoSemana']);
     Route::get('/motivosContatoSemana', [DashboardController::class, 'motivosContatoSemana']);
 });
