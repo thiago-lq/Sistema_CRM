@@ -1,4 +1,4 @@
-import { GraficoBarrasSemana } from "../graficosRelatorios";
+import { GraficoPizzaSemana } from "../graficosRelatorios";
 import { TabelaOrdemServicoSemana } from "../graficosRelatorios";
 import { GraficoBarras2Semana } from "../graficosRelatorios";
 
@@ -11,7 +11,7 @@ export default function DashboardSemana({
 }) {
   return (
     <div className="bg-white mt-3 rounded-lg space-y-15">
-      <div>{<GraficoBarrasSemana dados1Semana={dados1Semana} loading={loading} />}</div>
+      <div>{<GraficoPizzaSemana dados1Semana={dados1Semana} loading={loading} />}</div>
       <div>{<TabelaOrdemServicoSemana dados2Semana={dados2Semana} loading={loading} />}</div>
       <div>{<GraficoBarras2Semana dados3Semana={dados3Semana} loading={loading} />}</div>
     </div>

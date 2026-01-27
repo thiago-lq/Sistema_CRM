@@ -2,90 +2,88 @@ export default function TabelaOrdemServicoSemana({ dados2Semana, loading }) {
   // Função para formatar data
   const formatarData = (dataString) => {
     if (!dataString) return "-";
-    const data = new Date(dataString);
-    return data.toLocaleDateString("pt-BR");
+    return new Date(dataString).toLocaleDateString("pt-BR");
+  };
+
+  const statusConfig = {
+    true: {
+      label: "Pago",
+      class: "bg-green-100 text-green-700 ring-green-600/20",
+    },
+    false: {
+      label: "Pendente",
+      class: "bg-yellow-100 text-yellow-700 ring-yellow-600/20",
+    },
+    default: {
+      label: "Em andamento",
+      class: "bg-blue-100 text-blue-700 ring-blue-600/20",
+    },
   };
 
   return (
-    <div className="overflow-hidden rounded-lg shadow-sm border-2 border-gray-300">
-      <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
-        <h2 className="text-lg font-semibold text-gray-700">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* Header */}
+      <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-gray-800">
           Pedidos da semana
         </h2>
       </div>
-      <div className="overflow-auto max-h-96">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ID
-              </th>
-              <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Prazo
-              </th>
-              <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Data de pagamento
-              </th>
-              <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
+
+      {/* Tabela */}
+      <div className="overflow-auto max-h-[420px]">
+        <table className="min-w-full text-sm">
+          <thead className="sticky top-0 bg-gray-50 z-10">
+            <tr className="text-gray-500 uppercase text-xs tracking-wider">
+              <th className="px-4 py-3 text-center">ID</th>
+              <th className="px-4 py-3 text-center">Prazo</th>
+              <th className="px-4 py-3 text-center">Data de status</th>
+              <th className="px-4 py-3 text-center">Status</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+
+          <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr>
-                <td colSpan="4" className="py-8 text-center">
-                  <div className="flex flex-col items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Carregando dados...
-                    </p>
+                <td colSpan="4" className="py-12">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-gray-500">Carregando dados...</span>
                   </div>
                 </td>
               </tr>
             ) : dados2Semana?.length > 0 ? (
-              dados2Semana.map((item) => (
-                <tr
-                  key={item.cod_pedido}
-                  className="hover:bg-gray-50 transition-colors duration-150"
-                >
-                  <td className="py-3 px-2 text-sm font-medium text-gray-900 text-center">
-                    #{item.cod_pedido}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-700 text-center">
-                    {formatarData(item.prazo)}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-700 text-center">
-                    {formatarData(item.data_hora_pagamento)}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-700 text-center">
-                    <span
-                      className={`text-sm font-medium text-center ${
-                        item.status === true
-                          ? "text-green-600"
-                          : item.status === false
-                            ? "text-yellow-600"
-                            : "text-gray-900"
-                      }`}
-                    >
-                      {item.status === true
-                        ? "Pago"
-                        : item.status === false
-                          ? "Pendente"
-                          : "Em andamento"}
-                    </span>{" "}
-                  </td>
-                </tr>
-              ))
+              dados2Semana.map((item) => {
+                const status =
+                  statusConfig[item.status] || statusConfig.default;
+
+                return (
+                  <tr
+                    key={item.cod_pedido}
+                    className="hover:bg-gray-50 transition"
+                  >
+                    <td className="px-4 py-3 text-center font-medium text-gray-800">
+                      #{item.cod_pedido}
+                    </td>
+                    <td className="px-4 py-3 text-center text-gray-600">
+                      {formatarData(item.prazo)}
+                    </td>
+                    <td className="px-4 py-3 text-center text-gray-600">
+                      {formatarData(item.data_hora_pagamento)}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ring-1 ${status.class}`}
+                      >
+                        {status.label}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
-                <td colSpan="4" className="py-8 text-center">
-                  <div className="flex flex-col items-center justify-center text-gray-400">
-                    <span className="text-4xl mb-2"></span>
-                    <p className="text-lg font-medium text-gray-500">
-                      Nenhum pedido encontrado
-                    </p>
-                  </div>
+                <td colSpan="4" className="py-12 text-center text-gray-500">
+                  Nenhum pedido encontrado
                 </td>
               </tr>
             )}
