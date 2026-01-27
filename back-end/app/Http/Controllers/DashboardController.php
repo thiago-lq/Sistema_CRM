@@ -86,4 +86,18 @@ class DashboardController extends Controller
         ");
         return response()->json($result, 200);
     }
+
+    public function interacaoPorCanalMes() {
+        $result = DB::select("
+            SELECT
+                r.TIPO_INTERACAO AS canal,
+                COUNT(*) AS total
+            FROM REGISTROS r
+            WHERE r.CREATED_AT >= NOW() - INTERVAL '30 DAYS'
+            GROUP BY CANAL
+            ORDER BY total DESC;
+        ");
+
+        return response()->json($result, 200);
+    }
 }

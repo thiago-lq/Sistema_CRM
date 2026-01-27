@@ -43,8 +43,8 @@ export default function ListaPedidos({
               tipo === "PRODUTO"
                 ? "bg-blue-100 text-blue-800"
                 : tipo === "INSTALACAO"
-                ? "bg-green-100 text-green-800"
-                : "bg-orange-100 text-orange-800"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-orange-100 text-orange-800"
             }`}
           >
             {tipo}
@@ -78,19 +78,19 @@ export default function ListaPedidos({
       />
       {/* Header com busca e recarregar */}
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-bold text-gray-800">
-          Pedidos
-        </h2>
+        <h2 className="text-xl font-bold text-gray-800">Pedidos</h2>
         <div className="flex gap-3 items-center">
           <button
             onClick={handleRecarregar}
             disabled={loading}
-            className="p-2 mt-1 rounded-lg transition-all duration-300 disabled:opacity-70 disabled:animate-spin"
+            className="p-2 mt-1 rounded-lg"
           >
             <img
               src={recarregar}
               alt="Recarregar"
-              className="h-6 w-6 hover:opacity-70 hover:cursor-pointer disabled:opacity-70 transition-all duration-300"
+              className={`h-10 w-10 transition-all duration-300 ${
+                loading ? "animate-spin opacity-70" : "hover:opacity-70"
+              }`}
             />
           </button>
           <div className="relative w-64">
@@ -176,15 +176,15 @@ export default function ListaPedidos({
                           pedido.status_pagamento === true
                             ? "text-green-600"
                             : pedido.status_pagamento === false
-                            ? "text-yellow-600"
-                            : "text-gray-900"
+                              ? "text-yellow-600"
+                              : "text-gray-900"
                         }`}
                       >
                         {pedido.status_pagamento === true
                           ? "Pago"
                           : pedido.status_pagamento === false
-                          ? "Pendente"
-                          : "Em andamento"}
+                            ? "Pendente"
+                            : "Em andamento"}
                       </span>{" "}
                     </td>
                     <td className="py-3 px-4 text-sm text-center">

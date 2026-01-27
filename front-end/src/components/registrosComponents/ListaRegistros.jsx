@@ -13,7 +13,6 @@ export default function ListaRegistros({
   loading,
   handleRecarregar,
 }) {
-
   const [modalAberto, setModalAberto] = useState(false);
 
   function abrirModal(registro) {
@@ -28,16 +27,15 @@ export default function ListaRegistros({
   }
 
   function formatarDataHora(data) {
-  if (!data) return "";
+    if (!data) return "";
 
-  const d = new Date(data);
+    const d = new Date(data);
 
-  return d.toLocaleString("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-  });
-}
-
+    return d.toLocaleString("pt-BR", {
+      dateStyle: "short",
+      timeStyle: "short",
+    });
+  }
 
   return (
     <div className="bg-white mt-3 rounded-lg shadow-sm">
@@ -58,12 +56,14 @@ export default function ListaRegistros({
           <button
             onClick={handleRecarregar}
             disabled={loading}
-            className="p-2 mt-1 rounded-lg transition-all duration-300 disabled:opacity-70 disabled:animate-spin"
+            className="p-2 mt-1 rounded-lg"
           >
             <img
               src={recarregar}
               alt="Recarregar"
-              className="h-6 w-6 hover:opacity-70 hover:cursor-pointer disabled:opacity-70 transition-all duration-300"
+              className={`h-10 w-10 transition-all duration-300 ${
+                loading ? "animate-spin opacity-70" : "hover:opacity-70"
+              }`}
             />
           </button>
 

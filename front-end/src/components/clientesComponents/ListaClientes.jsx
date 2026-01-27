@@ -62,12 +62,14 @@ export default function ListaClientes({
           <button
             onClick={handleRecarregar}
             disabled={loading}
-            className="p-2 mt-1 rounded-lg transition-all duration-300 disabled:opacity-70 disabled:animate-spin"
+            className="p-2 mt-1 rounded-lg"
           >
             <img
               src={recarregar}
               alt="Recarregar"
-              className="h-6 w-6 hover:opacity-70 hover:cursor-pointer disabled:opacity-70 transition-all duration-300"
+              className={`h-6 w-6 transition-all duration-300 ${
+                loading ? "animate-spin opacity-70" : "hover:opacity-70"
+              }`}
             />
           </button>
           <div className="relative w-64">
