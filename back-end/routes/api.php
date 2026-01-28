@@ -47,5 +47,6 @@ Route::middleware('auth.funcionario')->group(function() {
     Route::get('/interacaoPorCanalMes', [DashboardController::class, 'interacaoPorCanalMes']);
     Route::get('/clientesContatosMes', [DashboardController::class, 'clientesContatosMes']);
     Route::get('/funcionariosRegistrosMes', [DashboardController::class, 'funcionariosRegistrosMes']);
-    Route::get('/pedidosSemestral', [DashboardController::class, 'pedidosSemestral']);
+    Route::get('/pedidosAnual', [DashboardController::class, 'pedidosAnual']);
+    Route::get('/qualidadeDeServicoAnual', [DashboardController::class, 'qualidadeDeServicoAnual']);
 });

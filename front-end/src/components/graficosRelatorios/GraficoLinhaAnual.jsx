@@ -21,46 +21,20 @@ ChartJS.register(
 );
 
 export default function GraficoLinhaAnual({ dados1Anual, loading }) {
-  // Validação
-  if (loading) {
-    return (
-      <div className="bg-white/80 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-gray-200">
-        <div className="p-6 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-3 text-gray-600 text-sm">Carregando...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!dados1Anual || !dados1Anual.success) {
-    return (
-      <div className="bg-white/80 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-gray-200">
-        <div className="p-6 text-center">
-          <p className="text-red-500">Erro ao carregar dados</p>
-          <p className="text-gray-600 text-sm mt-2">
-            {dados1Anual?.message || 'Tente recarregar a página'}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   // Extrair dados
   const atual = dados1Anual.atual || [];
   const anterior = dados1Anual.anterior || [];
   const mesesNomes = dados1Anual.meses_nomes || [];
 
   // Labels (usar meses_nomes do backend ou gerar)
-  const labels = mesesNomes.length > 0 
-    ? mesesNomes 
-    : atual.map(item => item.mes_nome || `Mês ${item.mes}`);
+  const labels =
+    mesesNomes.length > 0
+      ? mesesNomes
+      : atual.map((item) => item.mes_nome || `Mês ${item.mes}`);
 
   // Valores
-  const valoresAtual = atual.map(item => item.total || 0);
-  const valoresAnterior = anterior.map(item => item.total || 0);
+  const valoresAtual = atual.map((item) => item.total || 0);
+  const valoresAnterior = anterior.map((item) => item.total || 0);
 
   // Calcular diferença percentual
   const percentualDiff = valoresAtual.map((atualVal, index) => {
@@ -110,56 +84,72 @@ export default function GraficoLinhaAnual({ dados1Anual, loading }) {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { 
+      legend: {
         position: "top",
         labels: {
           usePointStyle: true,
           padding: 20,
-        }
+        },
       },
       tooltip: {
-        mode: 'index',
+        mode: "index",
         intersect: false,
         callbacks: {
           label: function (context) {
-            const label = context.dataset.label || '';
+            const label = context.dataset.label || "";
             const value = context.parsed.y;
             const index = context.dataIndex;
-            
+
             if (context.dataset.label === "Semestre Atual") {
               const diff = percentualDiff[index];
               if (diff !== undefined && diff !== null) {
-                const sinal = diff >= 0 ? '+' : '';
+                const sinal = diff >= 0 ? "+" : "";
                 return `${label}: ${value} (${sinal}${diff}%)`;
               }
             }
             return `${label}: ${value}`;
-          }
-        }
+          },
+        },
       },
     },
     scales: {
       y: {
         beginAtZero: true,
         grid: {
-          color: 'rgba(0, 0, 0, 0.05)'
+          color: "rgba(0, 0, 0, 0.05)",
         },
-        title: { 
-          display: true, 
+        title: {
+          display: true,
           text: "Total de Pedidos",
         },
       },
       x: {
         grid: {
-          color: 'rgba(0, 0, 0, 0.05)'
+          color: "rgba(0, 0, 0, 0.05)",
         },
-        title: { 
-          display: true, 
+        title: {
+          display: true,
           text: "Mês",
         },
       },
     },
   };
+
+  // Validação
+  if (loading) {
+    return (
+      <div className="bg-white/80 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-gray-200">
+        <div className="p-6 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="mt-3 text-gray-600 text-sm">
+              Carregando dados do gráfico...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white/80 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-gray-200">

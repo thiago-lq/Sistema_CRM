@@ -1,20 +1,25 @@
 import { useState, useEffect } from "react";
 import recarregar from "../../assets/recarregar.jpg";
 
-import { GraficoLinhaSemestral } from "../graficosRelatorios";
+import { GraficoLinhaAnual } from "../graficosRelatorios";
+import { GraficoLinha2Anual } from "../graficosRelatorios";
 
-import { pedidosSemestral } from "../../services/dashboard/pedidosSemestral";
+import { pedidosAnual } from "../../services/dashboard/pedidosAnual";
+import { qualidadeDeServicoAnual } from "../../services/dashboard/qualidadeDeServicoAnual";
 
 export default function DashboardAnual({ loading, setLoading }) {
   const [dados1Anual, setDados1Anual] = useState([]);
+  const [dados2Anual, setDados2Anual] = useState([]);
 
   const handleRecarregar = async () => {
     setLoading(true);
 
-    const dados1 = await pedidosSemestral();
-    console.log(dados1);
+    const dados1 = await pedidosAnual();
+    const dados2 = await qualidadeDeServicoAnual();
+
 
     setDados1Anual(dados1);
+    setDados2Anual(dados2);
 
     setLoading(false);
   };
@@ -23,10 +28,11 @@ export default function DashboardAnual({ loading, setLoading }) {
     const timeout = setTimeout(() => {
       setLoading(true);
       async function carregarDados() {
-        const dados1 = await pedidosSemestral();
-        console.log(dados1);
+        const dados1 = await pedidosAnual();
+        const dados2 = await qualidadeDeServicoAnual();
 
         setDados1Anual(dados1)
+        setDados2Anual(dados2)
 
         setLoading(false);
       }
@@ -54,9 +60,10 @@ export default function DashboardAnual({ loading, setLoading }) {
         </button>
       </div>
       <div>
-        <GraficoLinhaSemestral dados1Anual={dados1Anual} loading={loading} />
+        <GraficoLinhaAnual dados1Anual={dados1Anual} loading={loading} />
       </div>
       <div>
+        <GraficoLinha2Anual dadosQualidade={dados2Anual} loading={loading} />
       </div>
       <div>
       </div>
