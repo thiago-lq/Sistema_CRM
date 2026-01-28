@@ -317,4 +317,207 @@ class DashboardController extends Controller
             ],
         ]);
     }
+
+    public function tendenciaDeInteracoes() {
+        try {
+            $hoje = now();
+
+            // Array dos últimos 12 meses
+            $mesesInfo = [];
+            $nomesMeses = [];
+
+            for ($i = 11; $i >= 0; $i--) {
+                $data = $hoje->copy()->subMonths($i);
+                $mesesInfo[] = [
+                    'mes_numero' => $data->month,
+                    'mes_nome' => $data->locale('pt_BR')->translatedFormat('M'),
+                    'ano_atual' => $data->year,
+                    'ano_anterior' => $data->year - 1,
+                    'mes_completo_atual' => $data->format('Y-m'),
+                    'mes_completo_anterior' => $data->copy()->subYear()->format('Y-m')
+                ];
+                $nomesMeses[] = $data->locale('pt_BR')->translatedFormat('M');
+            }
+
+            // 1. Buscar interações totais por mês (ano atual)
+            $interacoesAtual = [];
+            $interacoesAnterior = [];
+
+            foreach ($mesesInfo as $mesInfo) { // <-- CORRIGIDO: $mesInfo, não $mes
+                $totalAtual = DB::table('registros')
+                    ->whereRaw('EXTRACT(MONTH FROM CREATED_AT) = ?', [$mesInfo['mes_numero']]) // <-- $mesInfo
+                    ->whereRaw('EXTRACT(YEAR FROM CREATED_AT) = ?', [$mesInfo['ano_atual']]) // <-- $mesInfo
+                    ->count();
+                
+                $totalAnterior = DB::table('registros')
+                    ->whereRaw('EXTRACT(MONTH FROM CREATED_AT) = ?', [$mesInfo['mes_numero']]) // <-- $mesInfo
+                    ->whereRaw('EXTRACT(YEAR FROM CREATED_AT) = ?', [$mesInfo['ano_anterior']]) // <-- $mesInfo
+                    ->count();
+                
+                $interacoesAtual[] = [
+                    'mes' => $mesInfo['mes_numero'], // <-- $mesInfo
+                    'mes_nome' => $mesInfo['mes_nome'], // <-- $mesInfo
+                    'ano' => $mesInfo['ano_atual'], // <-- $mesInfo
+                    'total' => $totalAtual
+                ];
+
+                $interacoesAnterior[] = [
+                    'mes' => $mesInfo['mes_numero'], // <-- $mesInfo
+                    'mes_nome' => $mesInfo['mes_nome'], // <-- $mesInfo
+                    'ano' => $mesInfo['ano_anterior'], // <-- $mesInfo
+                    'total' => $totalAnterior
+                ];
+            }
+
+            // 2. Calcular crescimento mês a mês
+            $crescimentoMensal = []; // <-- CORRIGIDO: $crescimentoMensal, não $crescimentoMental
+            for ($i = 1; $i < count($interacoesAtual); $i++) {
+                $atual = $interacoesAtual[$i]['total'];
+                $anterior = $interacoesAtual[$i - 1]['total'];
+
+                $crescimento = $anterior > 0
+                    ? round((($atual - $anterior) / $anterior) * 100, 1)
+                    : ($atual > 0 ? 100 : 0);
+                
+                $crescimentoMensal[] = [ // <-- CORRIGIDO: $crescimentoMensal
+                    'de' => $interacoesAtual[$i - 1]['mes_nome'],
+                    'para' => $interacoesAtual[$i]['mes_nome'],
+                    'crescimento' => $crescimento
+                ];
+            }
+
+            // 3. Buscar crescimento por canal (últimos 6 meses vs 6 meses anteriores)
+            $seisMesesAtras = $hoje->copy()->subMonths(6);
+            $dozeMesesAtras = $hoje->copy()->subMonths(12);
+
+            // Últimos 6 meses
+            $canaisAtual = DB::table('registros')
+                ->select('tipo_interacao as canal', DB::raw('COUNT(*) AS total'))
+                ->where('created_at', '>=', $seisMesesAtras)
+                ->groupBy('tipo_interacao')
+                ->get()
+                ->keyBy('canal'); // <-- IMPORTANTE: keyBy('canal'), não keyBy('tipo_interacao')
+            
+            // 6 meses anteriores
+            $canaisAnterior = DB::table('registros')
+                ->select('tipo_interacao as canal', DB::raw('COUNT(*) AS total'))
+                ->where('created_at', '>=', $dozeMesesAtras)
+                ->where('created_at', '<', $seisMesesAtras)
+                ->groupBy('tipo_interacao')
+                ->get()
+                ->keyBy('canal'); // <-- IMPORTANTE: keyBy('canal')
+            
+            // 4. Calcular crescimento por canal
+            $crescimentoCanais = [];
+            $canalMaisCresceu = null;
+            $maiorCrescimento = 0;
+
+            // Juntar todos os canais únicos
+            $todosCanais = array_unique(
+                array_merge(
+                    $canaisAtual->keys()->toArray(),
+                    $canaisAnterior->keys()->toArray()
+                )
+            );
+
+            foreach ($todosCanais as $canal) {
+                $atual = $canaisAtual[$canal]->total ?? 0;
+                $anterior = $canaisAnterior[$canal]->total ?? 0;
+                
+                $crescimento = $anterior > 0 
+                    ? round((($atual - $anterior) / $anterior) * 100, 1)
+                    : ($atual > 0 ? 100 : 0);
+                
+                $crescimentoCanais[] = [
+                    'canal' => $canal,
+                    'total_atual' => $atual,
+                    'total_anterior' => $anterior,
+                    'crescimento' => $crescimento,
+                ];
+
+                // Verificar se é o canal que mais cresceu
+                if ($crescimento > $maiorCrescimento && $atual >= 10) { // Mínimo 10 interações
+                    $maiorCrescimento = $crescimento;
+                    $canalMaisCresceu = $crescimentoCanais[count($crescimentoCanais)-1];
+                }
+            }
+
+            // Ordenar canais por crescimento (decrescente)
+            usort($crescimentoCanais, function($a, $b) {
+                return $b['crescimento'] <=> $a['crescimento'];
+            });
+
+            // 5. Calcular métricas gerais
+            $totalUltimoMes = $interacoesAtual[count($interacoesAtual)-1]['total'] ?? 0;
+            $totalMesAnterior = $interacoesAtual[count($interacoesAtual)-2]['total'] ?? 0;
+            $crescimentoUltimoMes = $totalMesAnterior > 0 
+                ? round((($totalUltimoMes - $totalMesAnterior) / $totalMesAnterior) * 100, 1)
+                : ($totalUltimoMes > 0 ? 100 : 0);
+
+            $totalAnoAtual = array_sum(array_column($interacoesAtual, 'total'));
+            $totalAnoAnterior = array_sum(array_column($interacoesAnterior, 'total'));
+            $crescimentoAnual = $totalAnoAnterior > 0 
+                ? round((($totalAnoAtual - $totalAnoAnterior) / $totalAnoAnterior) * 100, 1)
+                : ($totalAnoAtual > 0 ? 100 : 0);
+
+            // 6. Tendência (linear regression simples)
+            $tendencia = $this->calcularTendencia($interacoesAtual);
+            
+            return response()->json([
+                'success' => true, // <-- Adicionei isso
+                'interacoes_atual' => $interacoesAtual,
+                'interacoes_anterior' => $interacoesAnterior,
+                'meses_nomes' => $nomesMeses,
+                'crescimento_mensal' => $crescimentoMensal, // <-- CORRIGIDO: $crescimentoMensal
+                'canais_crescimento' => $crescimentoCanais,
+                'canal_mais_cresceu' => $canalMaisCresceu,
+                'metricas' => [
+                    'total_ultimo_mes' => $totalUltimoMes,
+                    'crescimento_ultimo_mes' => $crescimentoUltimoMes,
+                    'total_ano_atual' => $totalAnoAtual,
+                    'total_ano_anterior' => $totalAnoAnterior,
+                    'crescimento_anual' => $crescimentoAnual,
+                    'tendencia' => $tendencia,
+                    'media_mensal' => count($interacoesAtual) > 0 
+                        ? round($totalAnoAtual / count($interacoesAtual), 1)
+                        : 0
+                ],
+                'message' => 'Dados de tendência carregados'
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Erro em tendenciaDeInteracoes: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Erro interno do servidor',
+                'message' => 'Erro ao carregar dados de tendência'
+            ], 500);
+        }
+    }
+
+    private function calcularTendencia($interacoes)
+    {
+        if (count($interacoes) < 3) {
+            return 'estavel';
+        }
+        
+        // Pegar últimos 3 meses
+        $ultimosMeses = array_slice($interacoes, -3);
+        $valores = array_column($ultimosMeses, 'total');
+        
+        // Calcular média móvel
+        $media = array_sum($valores) / count($valores);
+        $ultimoValor = end($valores);
+        
+        $diferencaPercentual = (($ultimoValor - $media) / $media) * 100;
+        
+        if ($diferencaPercentual > 10) {
+            return 'alta';
+        } elseif ($diferencaPercentual < -10) {
+            return 'baixa';
+        }
+        
+        return 'estavel';
+    }
 }

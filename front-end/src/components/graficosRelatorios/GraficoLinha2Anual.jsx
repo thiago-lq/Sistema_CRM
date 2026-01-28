@@ -8,6 +8,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
 
 ChartJS.register(
@@ -18,9 +19,10 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
+  Filler,
 );
 
-export default function GraficoQualidadeServico({ dadosQualidade, loading }) {
+export default function GraficoLinha2Anual({ dadosQualidade, loading }) {
 
   // Extrair dados
   const dados = dadosQualidade.dados || [];
