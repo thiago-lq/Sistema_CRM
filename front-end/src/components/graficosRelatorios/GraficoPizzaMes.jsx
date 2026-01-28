@@ -3,7 +3,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function GraficoPizzaMes({ dados1Mes, loading }) {
+export default function GraficoPizzaMes({ dados1Mensal, loading }) {
   const coresPorStatus = {
     WHATSAPP: "rgba(34, 197, 94, 0.8)", // verde
     EMAIL: "rgba(234, 179, 8, 0.8)", // amarelo
@@ -11,12 +11,12 @@ export default function GraficoPizzaMes({ dados1Mes, loading }) {
   };
 
   const data = {
-    labels: dados1Mes.map((item) => item.canal),
+    labels: dados1Mensal.map((item) => item.canal),
     datasets: [
       {
         label: "Porcentagem por canal",
-        data: dados1Mes.map((item) => item.total),
-        backgroundColor: dados1Mes.map((item) => coresPorStatus[item.canal] || "rgba(156, 163, 175, 0.8)"),
+        data: dados1Mensal.map((item) => item.total),
+        backgroundColor: dados1Mensal.map((item) => coresPorStatus[item.canal] || "rgba(156, 163, 175, 0.8)"),
         borderWidth: 0,
         hoverOffset: 12,
       },

@@ -54,7 +54,7 @@ export default function DashboardSemana({ loading, setLoading }) {
         <button
           onClick={handleRecarregar}
           disabled={loading}
-          className="p-2 mt-1 rounded-lg"
+          className="rounded-lg"
           title={loading ? "Atualizando dados..." : "Recarregar dados"}
         >
           <img

@@ -45,9 +45,13 @@ export default function TabelaOrdemServicoSemana({ dados2Semana, loading }) {
             {loading ? (
               <tr>
                 <td colSpan="4" className="py-12">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-gray-500">Carregando dados...</span>
+                  <div className="p-6 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto"></div>
+                      <p className="mt-3 text-gray-600 text-sm">
+                        Carregando dados da tabela...
+                      </p>
+                    </div>
                   </div>
                 </td>
               </tr>

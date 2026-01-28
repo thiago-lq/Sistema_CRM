@@ -88,7 +88,7 @@ export default function ListaPedidos({
             <img
               src={recarregar}
               alt="Recarregar"
-              className={`h-10 w-10 transition-all duration-300 ${
+              className={`h-8 w-8 transition-all duration-300 ${
                 loading ? "animate-spin opacity-70" : "hover:opacity-70"
               }`}
             />

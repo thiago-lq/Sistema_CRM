@@ -67,7 +67,7 @@ export default function ListaClientes({
             <img
               src={recarregar}
               alt="Recarregar"
-              className={`h-6 w-6 transition-all duration-300 ${
+              className={`h-8 w-8 transition-all duration-300 ${
                 loading ? "animate-spin opacity-70" : "hover:opacity-70"
               }`}
             />

@@ -100,4 +100,38 @@ class DashboardController extends Controller
 
         return response()->json($result, 200);
     }
+
+    public function clientesContatosMes() {
+        $result = DB::select("
+            SELECT
+                r.COD_CLIENTE AS cliente,
+                COUNT(*) AS total
+                FROM REGISTROS r
+                WHERE r.CREATED_AT >= NOW() - INTERVAL '30 DAYS'
+                GROUP BY r.COD_CLIENTE
+                ORDER BY total DESC
+                LIMIT 10
+        ");
+        return response()->json($result, 200);
+    }
+
+    public function funcionariosRegistrosMes() {
+        $result = DB::select("
+            SELECT
+                r.COD_FUNCIONARIO,
+                f.NOME_FUNCIONARIO AS nome,
+                COUNT(*) AS total,
+                SUM(CASE WHEN r.TIPO_INTERACAO = 'WHATSAPP' THEN 1 ELSE 0 END) AS whatsapp,
+                SUM(CASE WHEN r.TIPO_INTERACAO = 'EMAIL' THEN 1 ELSE 0 END) AS email,
+                SUM(CASE WHEN r.TIPO_INTERACAO = 'TELEFONE' THEN 1 ELSE 0 END) AS telefone
+            FROM REGISTROS r
+            LEFT JOIN FUNCIONARIOS_CRM f
+                ON r.COD_FUNCIONARIO = f.COD_FUNCIONARIO
+            WHERE r.CREATED_AT >= NOW() - INTERVAL '30 DAYS'
+            GROUP BY r.COD_FUNCIONARIO, f.NOME_FUNCIONARIO
+            ORDER BY total DESC;
+        ");
+
+        return response()->json($result, 200);
+    }
 }

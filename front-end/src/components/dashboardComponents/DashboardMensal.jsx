@@ -2,18 +2,28 @@ import { useState, useEffect } from "react";
 import recarregar from "../../assets/recarregar.jpg";
 
 import { interacaoPorCanalMes } from "../../services/dashboard/interacaoPorCanalMes";
+import { clientesContatosMes } from "../../services/dashboard/clientesContatosMes";
+import { funcionariosRegistrosMes } from "../../services/dashboard/funcionariosRegistrosMes";
 
 import { GraficoPizzaMes } from "../graficosRelatorios";
+import { GraficoColunaMes } from "../graficosRelatorios";
+import { GraficoColuna2Mes } from "../graficosRelatorios";
 
 export default function DashboardMensal({ loading, setLoading }) {
   const [dados1Mensal, setDados1Mensal] = useState([]);
+  const [dados2Mensal, setDados2Mensal] = useState([]);
+  const [dados3Mensal, setDados3Mensal] = useState([]);
 
   const handleRecarregar = async () => {
     setLoading(true);
 
     const dados1 = await interacaoPorCanalMes();
+    const dados2 = await clientesContatosMes();
+    const dados3 = await funcionariosRegistrosMes();
 
     setDados1Mensal(dados1);
+    setDados2Mensal(dados2);
+    setDados3Mensal(dados3);
 
     setLoading(false);
   };
@@ -23,8 +33,13 @@ export default function DashboardMensal({ loading, setLoading }) {
       setLoading(true);
       async function carregarDados() {
         const dados1 = await interacaoPorCanalMes();
+        const dados2 = await clientesContatosMes();
+        const dados3 = await funcionariosRegistrosMes();
+        console.log(dados3);
 
         setDados1Mensal(dados1);
+        setDados2Mensal(dados2);
+        setDados3Mensal(dados3);
 
         setLoading(false);
       }
@@ -39,7 +54,7 @@ export default function DashboardMensal({ loading, setLoading }) {
         <button
           onClick={handleRecarregar}
           disabled={loading}
-          className="p-2 mt-1 rounded-lg"
+          className="rounded-lg"
           title={loading ? "Atualizando dados..." : "Recarregar dados"}
         >
           <img
@@ -52,10 +67,14 @@ export default function DashboardMensal({ loading, setLoading }) {
         </button>
       </div>
       <div>
-        <GraficoPizzaMes dados1Mes={dados1Mensal} loading={loading} />
+        <GraficoPizzaMes dados1Mensal={dados1Mensal} loading={loading} />
       </div>
-      <div></div>
-      <div></div>
+      <div>
+        <GraficoColunaMes dados2Mensal={dados2Mensal} loading={loading} />
+      </div>
+      <div>
+        <GraficoColuna2Mes dados3Mensal={dados3Mensal} loading={loading} />
+      </div>
     </div>
   );
 }

@@ -9,13 +9,13 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
-export default function GraficoBarras2Semana({ dados3Semana, loading }) {
+export default function GraficoColuna2Mes({ dados3Mensal, loading }) {
   const data = {
-    labels: dados3Semana.map((item) => item.motivo),
+    labels: dados3Mensal?.map((item) => (item.nome)) || [],
     datasets: [
       {
-        label: "Quantidade de pedidos",
-        data: dados3Semana.map((item) => item.total),
+        label: "Quantidade de registros do funcionario",
+        data: dados3Mensal?.map((item) => item.total) || [],
         backgroundColor: "rgba(59, 130, 246, 0.7)",
         borderRadius: 10,
         barThickness: 22,
@@ -32,7 +32,16 @@ export default function GraficoBarras2Semana({ dados3Semana, loading }) {
       },
       tooltip: {
         callbacks: {
-          label: (ctx) => ` ${ctx.raw} pedidos`,
+          label: (ctx) => {
+            const index = ctx.dataIndex;
+            const item = dados3Mensal[index];
+            return [
+                `Total: ${item.total}`,
+                `Whatsapp: ${item.whatsapp}`,
+                `E-mails: ${item.email}`,
+                `Telefone: ${item.telefone}`,
+            ];
+          }
         },
       },
     },
@@ -67,7 +76,7 @@ export default function GraficoBarras2Semana({ dados3Semana, loading }) {
       ) : (
         <div>
           <h2 className="font-semibold mb-4 text-lg text-gray-800">
-            Motivos de contato
+            Registros dos funcionários
           </h2>
           <Bar data={data} options={options} />
         </div>
