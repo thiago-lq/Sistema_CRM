@@ -4,3 +4,4 @@ export { default as TabelaOrdemServicoSemana } from "./TabelaOrdemServicoSemana"
 export { default as GraficoPizzaMes } from "./GraficoPizzaMes";
 export { default as GraficoColunaMes } from "./GraficoColunaMes";
 export { default as GraficoColuna2Mes } from "./GraficoColuna2Mes";
+export { default as GraficoLinhaSemestral } from "./GraficoLinhaSemestral";

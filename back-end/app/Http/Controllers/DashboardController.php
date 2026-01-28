@@ -134,4 +134,76 @@ class DashboardController extends Controller
 
         return response()->json($result, 200);
     }
+
+    public function pedidosSemestral()
+    {
+        try {
+            $hoje = now();
+            
+            // Preparar array dos últimos 6 meses
+            $mesesInfo = [];
+            $nomesMeses = [];
+            
+            for ($i = 5; $i >= 0; $i--) {
+                $data = $hoje->copy()->subMonths($i);
+                $mesesInfo[] = [
+                    'mes_numero' => $data->month,
+                    'mes_nome' => $data->locale('pt_BR')->translatedFormat('M'),
+                    'ano_atual' => $data->year,
+                    'ano_anterior' => $data->year - 1
+                ];
+                $nomesMeses[] = $data->locale('pt_BR')->translatedFormat('M');
+            }
+            
+            // Inicializar arrays de resultados
+            $resultadoAtual = [];
+            $resultadoAnterior = [];
+            
+            // Para cada mês, buscar dados atual e anterior
+            foreach ($mesesInfo as $mesInfo) {
+                // Pedidos do mês atual (ano atual)
+                $atualCount = DB::table('pedidos')
+                    ->whereRaw('EXTRACT(MONTH FROM created_at) = ?', [$mesInfo['mes_numero']])
+                    ->whereRaw('EXTRACT(YEAR FROM created_at) = ?', [$mesInfo['ano_atual']])
+                    ->count();
+                
+                // Pedidos do mês equivalente no ano anterior
+                $anteriorCount = DB::table('pedidos')
+                    ->whereRaw('EXTRACT(MONTH FROM created_at) = ?', [$mesInfo['mes_numero']])
+                    ->whereRaw('EXTRACT(YEAR FROM created_at) = ?', [$mesInfo['ano_anterior']])
+                    ->count();
+                
+                $resultadoAtual[] = [
+                    'mes' => $mesInfo['mes_numero'],
+                    'mes_nome' => $mesInfo['mes_nome'],
+                    'total' => $atualCount
+                ];
+                
+                $resultadoAnterior[] = [
+                    'mes' => $mesInfo['mes_numero'],
+                    'mes_nome' => $mesInfo['mes_nome'],
+                    'total' => $anteriorCount
+                ];
+            }
+            
+            return response()->json([
+                'success' => true,
+                'atual' => $resultadoAtual,
+                'anterior' => $resultadoAnterior,
+                'meses_nomes' => $nomesMeses,
+                'message' => 'Dados carregados com sucesso'
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Erro em pedidosSemestral: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Erro interno do servidor',
+                'atual' => [],
+                'anterior' => [],
+                'message' => 'Erro ao carregar dados'
+            ], 500);
+        }
+    }
 }

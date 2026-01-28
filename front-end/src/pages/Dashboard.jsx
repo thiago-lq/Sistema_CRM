@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import { DashboardSemana } from "../components/dashboardComponents";
 import { DashboardMensal } from "../components/dashboardComponents";
+import { DashboardAnual } from "../components/dashboardComponents";
+
 
 export default function Dashboard() {
   const [abaAtiva, setAbaAtiva] = useState("semanal");
@@ -49,6 +51,7 @@ export default function Dashboard() {
       <div className="p-4">
         {abaAtiva === "semanal" && <DashboardSemana {...props} />}
         {abaAtiva === "mensal" && <DashboardMensal {...props} />}
+        {abaAtiva === "anual" && <DashboardAnual {...props} />}
       </div>
     </div>
   );
