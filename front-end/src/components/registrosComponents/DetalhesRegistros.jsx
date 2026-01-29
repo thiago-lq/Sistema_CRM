@@ -133,12 +133,14 @@ export default function DetalhesRegistros({
           </div>
         </div>
       </div>
-      <div className="border border-gray-200 rounded-lg p-4 mt-5">
-        <span className="font-semibold text-gray-700">Descrição: </span>
-        <p className="text-sm w-full break-words whitespace-pre-wrap">
-          {registro.descricao || "-"}
-        </p>
-      </div>
+      {registro.motivo.includes("OUTRO") && (
+        <div className="border border-gray-200 rounded-lg p-4 mt-5">
+          <span className="font-semibold text-gray-700">Descrição: </span>
+          <p className="text-sm w-full break-words whitespace-pre-wrap">
+            {registro.descricao || "-"}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

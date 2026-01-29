@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import recarregar from "../../assets/recarregar.jpg";
+import recarregar from "../../assets/recarregar.png";
 
 import { GraficoLinhaAnual } from "../graficosRelatorios";
 import { GraficoLinha2Anual } from "../graficosRelatorios";

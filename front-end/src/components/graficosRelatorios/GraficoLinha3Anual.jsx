@@ -23,18 +23,6 @@ ChartJS.register(
 );
 
 export default function GraficoLinha3Anual({ dados3Anual, loading }) {
-  if (!dados3Anual || !dados3Anual.success) {
-    return (
-      <div className="bg-white/80 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-gray-200">
-        <div className="p-6 text-center">
-          <p className="text-red-500">Erro ao carregar dados</p>
-          <p className="text-gray-600 text-sm mt-2">
-            {dados3Anual?.message || "Tente recarregar a página"}
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   // Extrair dados
   const atual = dados3Anual.interacoes_atual || [];

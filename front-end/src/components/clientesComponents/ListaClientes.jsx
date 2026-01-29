@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Modal from "../../utils/Modal.jsx";
-import recarregar from "../../assets/recarregar.jpg";
+import recarregar from "../../assets/recarregar.png";
 export default function ListaClientes({
   termoBusca,
   setTermoBusca,

@@ -8,7 +8,7 @@ import { GraficoPizzaSemana } from "../graficosRelatorios";
 import { TabelaOrdemServicoSemana } from "../graficosRelatorios";
 import { GraficoBarras2Semana } from "../graficosRelatorios";
 
-import recarregar from "../../assets/recarregar.jpg";
+import recarregar from "../../assets/recarregar.png";
 
 export default function DashboardSemana({ loading, setLoading }) {
   const [dados1Semana, setDados1Semana] = useState([]);

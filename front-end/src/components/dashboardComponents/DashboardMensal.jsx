@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import recarregar from "../../assets/recarregar.jpg";
+import recarregar from "../../assets/recarregar.png";
 
 import { interacaoPorCanalMes } from "../../services/dashboard/interacaoPorCanalMes";
 import { clientesContatosMes } from "../../services/dashboard/clientesContatosMes";
@@ -35,7 +35,6 @@ export default function DashboardMensal({ loading, setLoading }) {
         const dados1 = await interacaoPorCanalMes();
         const dados2 = await clientesContatosMes();
         const dados3 = await funcionariosRegistrosMes();
-        console.log(dados3);
 
         setDados1Mensal(dados1);
         setDados2Mensal(dados2);
