@@ -8,31 +8,25 @@ export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [funcionario, setFuncionario] = useState(null);
   const [loading, setLoading] = useState(true);
-  const buscandoFuncionarioRef = useRef(false); // 👈 Evita chamadas duplicadas
+  const buscandoFuncionarioRef = useRef(false);
 
-  // Busca dados REAIS do funcionário (com controle de concorrência)
+  // 🔹 Busca dados do funcionário (NUNCA bloqueia loading)
   const fetchFuncionarioData = useCallback(
     async (email, mostrarToast = false) => {
-      // Se já está buscando, não faz nada
-      if (buscandoFuncionarioRef.current) {
-        console.log("⚠️ Busca de funcionário já em andamento, ignorando...");
-        return;
-      }
+      if (buscandoFuncionarioRef.current) return;
 
       try {
         buscandoFuncionarioRef.current = true;
+
         const response = await api.get(`/api/funcionario?email=${email}`);
 
         if (response.data && !response.data.error) {
           setFuncionario(response.data);
 
-          // Toast SÓ se solicitado (após login manual)
           if (mostrarToast && response.data.nome_funcionario) {
             notify.success(
-              `Bem-vindo de volta, ${response.data.nome_funcionario}!`,
-              {
-                position: "top-right",
-              },
+              `Bem-vindo, ${response.data.nome_funcionario}!`,
+              { position: "top-right" }
             );
           }
         }
@@ -47,9 +41,10 @@ export default function AuthProvider({ children }) {
         buscandoFuncionarioRef.current = false;
       }
     },
-    [],
+    []
   );
 
+  // 🔹 Checa sessão UMA VEZ (não depende da API)
   const checkSession = useCallback(async () => {
     try {
       const {
@@ -64,57 +59,52 @@ export default function AuthProvider({ children }) {
       }
 
       setUser(session.user);
-      await fetchFuncionarioData(session.user.email, false);
+      setLoading(false); // 🔥 FINALIZA LOADING AQUI
+
+      // 🔸 Busca funcionário em background
+      fetchFuncionarioData(session.user.email, false);
     } catch (error) {
       console.error("Erro ao verificar sessão:", error);
       setUser(null);
       setFuncionario(null);
-    } finally {
       setLoading(false);
     }
   }, [fetchFuncionarioData]);
 
+  // 🔹 Listener de auth
   useEffect(() => {
     let subscription;
-    let ignore = false; // 👈 Flag para ignorar chamadas após desmontagem
 
     const setupAuth = async () => {
-      // 1. Primeiro verifica sessão
       await checkSession();
 
-      // 2. DEPOIS configura o listener
-      if (!ignore) {
-        subscription = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            // Ignora INITIAL_SESSION (já tratado no checkSession)
-            if (event === "INITIAL_SESSION") {
-              return;
-            }
+      subscription = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          if (event === "INITIAL_SESSION") return;
 
-            if (session) {
-              setUser(session.user);
-              await fetchFuncionarioData(session.user.email, false);
-            } else {
-              setUser(null);
-              setFuncionario(null);
-            }
+          if (session?.user) {
+            setUser(session.user);
             setLoading(false);
-          },
-        ).data.subscription;
-      }
+            fetchFuncionarioData(session.user.email, false);
+          } else {
+            setUser(null);
+            setFuncionario(null);
+            setLoading(false);
+          }
+        }
+      ).data.subscription;
     };
 
     setupAuth();
 
     return () => {
-      ignore = true;
       subscription?.unsubscribe();
     };
   }, [checkSession, fetchFuncionarioData]);
 
-  // Função de login - fluxo controlado
+  // 🔹 Login
   const login = async (email, password) => {
-    setLoading(true); // 👈 Mostra loading durante login
+    setLoading(true);
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -126,7 +116,8 @@ export default function AuthProvider({ children }) {
 
       if (data.user) {
         setUser(data.user);
-        await fetchFuncionarioData(data.user.email, true);
+        setLoading(false);
+        fetchFuncionarioData(data.user.email, true);
       }
 
       return data;
@@ -135,9 +126,9 @@ export default function AuthProvider({ children }) {
     }
   };
 
-  // Função de logout
+  // 🔹 Logout
   const logout = async () => {
-    setLoading(true); // 👈 Mostra loading durante logout
+    setLoading(true);
     await supabase.auth.signOut();
 
     setUser(null);
@@ -154,5 +145,9 @@ export default function AuthProvider({ children }) {
     isAuthenticated: !!user,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }

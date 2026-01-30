@@ -10,26 +10,42 @@ const api = axios.create({
   withCredentials: false,
 });
 
-// ✅ Interceptor de REQUISIÇÃO (já existe - mantém)
-api.interceptors.request.use(async (config) => {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+/**
+ * =========================
+ * Interceptor de REQUEST
+ * =========================
+ */
+api.interceptors.request.use(
+  async (config) => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-  if (session?.access_token) {
-    config.headers.Authorization = `Bearer ${session.access_token}`;
-  }
-  return config;
-});
+    // ⚠️ Se ainda não tem sessão, deixa a request seguir SEM token
+    if (session?.access_token) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
+    }
 
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
+/**
+ * =========================
+ * Interceptor de RESPONSE
+ * =========================
+ */
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      await supabase.auth.signOut();
+    const status = error.response?.status;
 
-      // 🔥 força reset total da navegação
-      window.location.replace("/");
+    // ❌ NÃO faz logout automático em 401
+    if (status === 401) {
+      console.warn(
+        " 401 recebido. Sessão mantida. Possível erro de permissão ou timing.",
+      );
     }
 
     return Promise.reject(error);
