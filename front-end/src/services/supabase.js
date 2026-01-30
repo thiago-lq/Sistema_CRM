@@ -11,14 +11,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Configuração para NÃO persistir sessão
 const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: false,
-    autoRefreshToken: false,
+    persistSession: true,          // ✅ OBRIGATÓRIO
+    autoRefreshToken: true,        // ✅ OBRIGATÓRIO
     detectSessionInUrl: false,
-    storage: {
-      getItem: () => Promise.resolve(null),
-      setItem: () => Promise.resolve(),
-      removeItem: () => Promise.resolve()
-    }
+    storage: sessionStorage        // ✅ sessão morre ao fechar aba
   }
 });
 

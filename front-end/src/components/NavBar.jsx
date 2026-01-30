@@ -2,12 +2,14 @@
 import empresa from "../assets/icone_empresa.png";
 import clientes from "../assets/icone_clientes.png";
 import pedidos from "../assets/icone_pedidos.png";
-import logout from "../assets/icone_logout.png";
+import logoutIcon from "../assets/icone_logout.png";
 import registros from "../assets/icone_registros.png";
 import dashboard from "../assets/icone_dashboard.png";
 
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+
+import useAuth from "../hooks/useAuth";
 
 const LinkStyle =
   "flex flex-col items-center p-1 rounded-lg text-gray-700 hover:opacity-60 hover:cursor-pointer transition-all duration-300";
@@ -19,6 +21,12 @@ export default function NavBar() {
   const lastScrollY = useRef(0);
   const timeoutRef = useRef(null);
   const menuRef = useRef(null);
+  const { logout } = useAuth(); // 👈 AQUI
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/", { replace: true });
+  };
 
   // Fechar menu ao clicar fora
   useEffect(() => {
@@ -79,10 +87,10 @@ export default function NavBar() {
               setMenuOpen(false);
             }}
           >
-            <img 
-              src={empresa} 
-              alt="empresa" 
-              className="h-10 sm:h-12 lg:h-[3rem]" 
+            <img
+              src={empresa}
+              alt="empresa"
+              className="h-10 sm:h-12 lg:h-[3rem]"
             />
           </button>
         </div>
@@ -125,10 +133,10 @@ export default function NavBar() {
             </div>
             <span className="text-xs mt-1 pr-1 font-medium">DASHBOARD</span>
           </button>
-          <button onClick={() => navigate("/")} className={LinkStyle}>
+          <button onClick={handleLogout} className={LinkStyle}>
             <div className="flex items-center justify-center h-8 w-8">
               <img
-                src={logout}
+                src={logoutIcon}
                 alt="logout"
                 className="h-full w-full object-contain"
               />
@@ -150,54 +158,93 @@ export default function NavBar() {
           {/* Menu Dropdown Mobile */}
           {menuOpen && (
             <div className="absolute top-full right-4 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 py-3 min-w-[180px] z-50 animate-fadeIn">
-              <button 
-                onClick={() => { navigate("/Clientes"); setMenuOpen(false); }} 
+              <button
+                onClick={() => {
+                  navigate("/Clientes");
+                  setMenuOpen(false);
+                }}
                 className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center justify-center h-7 w-7 mr-3">
-                  <img src={clientes} alt="clientes" className="h-full w-full object-contain" />
+                  <img
+                    src={clientes}
+                    alt="clientes"
+                    className="h-full w-full object-contain"
+                  />
                 </div>
-                <span className="text-sm font-medium text-gray-800">CLIENTES</span>
+                <span className="text-sm font-medium text-gray-800">
+                  CLIENTES
+                </span>
               </button>
-              
-              <button 
-                onClick={() => { navigate("/Pedidos"); setMenuOpen(false); }} 
+
+              <button
+                onClick={() => {
+                  navigate("/Pedidos");
+                  setMenuOpen(false);
+                }}
                 className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center justify-center h-7 w-7 mr-3">
-                  <img src={pedidos} alt="pedidos" className="h-full w-full object-contain" />
+                  <img
+                    src={pedidos}
+                    alt="pedidos"
+                    className="h-full w-full object-contain"
+                  />
                 </div>
-                <span className="text-sm font-medium text-gray-800">PEDIDOS</span>
+                <span className="text-sm font-medium text-gray-800">
+                  PEDIDOS
+                </span>
               </button>
-              
-              <button 
-                onClick={() => { navigate("/Registros"); setMenuOpen(false); }} 
+
+              <button
+                onClick={() => {
+                  navigate("/Registros");
+                  setMenuOpen(false);
+                }}
                 className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center justify-center h-7 w-7 mr-3">
                   <img src={registros} alt="registros" className="h-5" />
                 </div>
-                <span className="text-sm font-medium text-gray-800">REGISTROS</span>
+                <span className="text-sm font-medium text-gray-800">
+                  REGISTROS
+                </span>
               </button>
-              
-              <button 
-                onClick={() => { navigate("/Dashboard"); setMenuOpen(false); }} 
+
+              <button
+                onClick={() => {
+                  navigate("/Dashboard");
+                  setMenuOpen(false);
+                }}
                 className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center justify-center h-7 w-7 mr-3">
-                  <img src={dashboard} alt="dashboard" className="h-full w-full object-contain" />
+                  <img
+                    src={dashboard}
+                    alt="dashboard"
+                    className="h-full w-full object-contain"
+                  />
                 </div>
-                <span className="text-sm font-medium text-gray-800">DASHBOARD</span>
+                <span className="text-sm font-medium text-gray-800">
+                  DASHBOARD
+                </span>
               </button>
-              
+
               <div className="border-t border-gray-200 my-2"></div>
-              
-              <button 
-                onClick={() => { navigate("/"); setMenuOpen(false); }} 
+
+              <button
+                onClick={async () => {
+                  await handleLogout();
+                  setMenuOpen(false);
+                }}
                 className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors text-red-600"
               >
                 <div className="flex items-center justify-center h-7 w-7 mr-3">
-                  <img src={logout} alt="logout" className="h-full w-full object-contain" />
+                  <img
+                    src={logoutIcon}
+                    alt="logout"
+                    className="h-full w-full object-contain"
+                  />
                 </div>
                 <span className="text-sm font-medium">SAIR</span>
               </button>

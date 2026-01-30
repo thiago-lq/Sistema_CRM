@@ -1,10 +1,20 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import  useAuth  from '../../hooks/useAuth';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../services/supabase';
 
 export default function ProtectedRoute() {
-  const { isAuthenticated, loading } = useAuth();
+  const [allowed, setAllowed] = useState(null); // null = carregando
 
-  if (loading) {
+  useEffect(() => {
+    const check = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setAllowed(!!session);
+    };
+
+    check();
+  }, []);
+
+  if (allowed === null) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Carregando autenticação...</div>
@@ -12,11 +22,9 @@ export default function ProtectedRoute() {
     );
   }
 
-  // 🔴 SE NÃO ESTIVER AUTENTICADO, REDIRECIONA PARA LOGIN
-  if (!isAuthenticated) {
+  if (!allowed) {
     return <Navigate to="/" replace />;
   }
 
-  // 🟢 SE AUTENTICADO, PERMITE ACESSAR
   return <Outlet />;
 }

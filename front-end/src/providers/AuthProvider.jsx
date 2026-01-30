@@ -50,19 +50,25 @@ export default function AuthProvider({ children }) {
     [],
   );
 
-  // Verifica sessão existente (chamada UMA VEZ no início)
   const checkSession = useCallback(async () => {
     try {
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (session?.user) {
-        setUser(session.user);
-        await fetchFuncionarioData(session.user.email, false);
+      if (!session?.user) {
+        setUser(null);
+        setFuncionario(null);
+        setLoading(false);
+        return;
       }
+
+      setUser(session.user);
+      await fetchFuncionarioData(session.user.email, false);
     } catch (error) {
       console.error("Erro ao verificar sessão:", error);
+      setUser(null);
+      setFuncionario(null);
     } finally {
       setLoading(false);
     }
@@ -133,12 +139,10 @@ export default function AuthProvider({ children }) {
   const logout = async () => {
     setLoading(true); // 👈 Mostra loading durante logout
     await supabase.auth.signOut();
-    localStorage.clear();
-    sessionStorage.clear();
+
     setUser(null);
     setFuncionario(null);
     setLoading(false);
-    window.location.href = "/";
   };
 
   const value = {
