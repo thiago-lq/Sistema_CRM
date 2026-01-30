@@ -1,18 +1,60 @@
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/vendor
+# Laravel
+/vendor/
+/node_modules/
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+/storage/framework/cache/*
+!/storage/framework/cache/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+
+# Environment
 .env
 .env.backup
 .env.production
+.env.*.local
+
+# Build
+/public/build/
+/public/hot
+/public/storage
+/public/css/
+/public/js/
+/public/mix-manifest.json
+
+# Tests
+/coverage
 .phpunit.result.cache
-Homestead.json
-Homestead.yaml
-auth.json
-npm-debug.log
-yarn-error.log
-/.fleet
+
+# Database
+*.sqlite
+*.sqlite-journal
+
+# IDEs
 /.idea
 /.vscode
+/.vs
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies (frontend se houver)
+package-lock.json
+yarn.lock
+npm-debug.log*
+yarn-error.log
+
+# Deployment
+Homestead.yaml
+Homestead.json
+auth.json
