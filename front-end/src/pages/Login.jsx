@@ -1,48 +1,37 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../services/supabase";
+import  useAuth  from "../hooks/useAuth"; // ← IMPORTE AQUI
 
-// Página de Login
 export default function Login() {
-  // Constantes que serão utilizadas no componente
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  
+  // PEGUE O LOGIN DO CONTEXTO
+  const { login } = useAuth();
 
-  // Função que será chamada ao clicar no botão de login
   async function handleLogin(e) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    // Validação de dados
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password
-      });
-
-      if (error) {
-        setError(error.message);
-        return;
-      }
-
-      if (data.user) {
-        // Login bem-sucedido - redireciona para página inicial
-        navigate("/PaginaInicial");
-      }
+      // USE O LOGIN DO CONTEXTO
+      await login(email.trim(), password);
+      navigate("/PaginaInicial");
     } catch (err) {
-      setError("Erro inesperado. Tente novamente.");
+      setError(err.message || "Erro ao fazer login");
       console.error("Erro no login:", err);
     } finally {
       setLoading(false);
     }
   }
 
+  // O RESTANTE DO SEU CÓDIGO PERMANECE IGUAL...
+  // (mantenha todo o JSX que você já tem)
   return (
-    // Componente que será renderizada no componente principal
     <div>
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-300 via-white to-gray-400">
         <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
@@ -60,7 +49,7 @@ export default function Login() {
               {error}
             </div>
           )}
-          {/* Formulário de login */}
+          
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -4,10 +4,12 @@ import { DashboardSemana } from "../components/dashboardComponents";
 import { DashboardMensal } from "../components/dashboardComponents";
 import { DashboardAnual } from "../components/dashboardComponents";
 
+import useCargo from "../hooks/useCargo";
 
 export default function Dashboard() {
   const [abaAtiva, setAbaAtiva] = useState("semanal");
   const [loading, setLoading] = useState(false);
+  const { hasPermission } = useCargo();
 
   // tabClasses para a aba de cada aba
   const tabClasses = (tabName) =>
@@ -26,6 +28,7 @@ export default function Dashboard() {
   return (
     <div className="w-[85%] mx-auto bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] mt-30 mb-5">
       <div className="flex border-b border-gray-200 pt-5">
+        {hasPermission("operacional") && (
         <div
           className={tabClasses("semanal")}
           onClick={() => setAbaAtiva("semanal")}
@@ -33,6 +36,8 @@ export default function Dashboard() {
         >
           Semanal
         </div>
+        )}
+        {hasPermission("gerencial") && (
         <div
           className={tabClasses("mensal")}
           onClick={() => setAbaAtiva("mensal")}
@@ -40,6 +45,8 @@ export default function Dashboard() {
         >
           Mensal
         </div>
+        )}
+        {hasPermission("executivo") && (
         <div
           className={tabClasses("anual")}
           onClick={() => setAbaAtiva("anual")}
@@ -47,11 +54,18 @@ export default function Dashboard() {
         >
           Anual
         </div>
+        )}
       </div>
       <div className="p-4">
-        {abaAtiva === "semanal" && <DashboardSemana {...props} />}
-        {abaAtiva === "mensal" && <DashboardMensal {...props} />}
-        {abaAtiva === "anual" && <DashboardAnual {...props} />}
+        {abaAtiva === "semanal" && hasPermission("operacional") && (
+          <DashboardSemana {...props} />
+        )}
+        {abaAtiva === "mensal" && hasPermission("gerencial") && (
+          <DashboardMensal {...props} />
+        )}
+        {abaAtiva === "anual" && hasPermission("executivo") && (
+          <DashboardAnual {...props} />
+        )}
       </div>
     </div>
   );

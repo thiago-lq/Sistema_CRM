@@ -8,6 +8,7 @@ use App\Http\Controllers\RegistroController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\EnsureFuncionarioIsAuthenticated;
+use App\Http\Controllers\FuncionarioController;
 
 // Rota de autenticação do supabase
 Route::middleware('auth.funcionario')->group(function() {
@@ -50,4 +51,7 @@ Route::middleware('auth.funcionario')->group(function() {
     Route::get('/pedidosAnual', [DashboardController::class, 'pedidosAnual']);
     Route::get('/qualidadeDeServicoAnual', [DashboardController::class, 'qualidadeDeServicoAnual']);
     Route::get('/tendenciaDeInteracoes', [DashboardController::class, 'tendenciaDeInteracoes']);
+
+    // Nova rota para buscar dados do funcionário logado
+    Route::get('/funcionario', [FuncionarioController::class, 'buscarFuncionario']);
 });
