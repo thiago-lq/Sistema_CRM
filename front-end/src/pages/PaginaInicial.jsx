@@ -258,33 +258,33 @@ export default function PaginaInicial() {
           </div>
 
           {/* Quick Stats */}
-          <div className="w-full max-w-full sm:max-w-md lg:w-max mx-auto mt-8 sm:mt-12 lg:mt-16 px-2 sm:px-0">
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-white">
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 text-center">
+          <div className="w-full max-w-full px-3 xs:px-4 sm:px-6 mx-auto mt-6 xs:mt-8 sm:mt-12 lg:mt-16">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl xs:rounded-2xl p-4 xs:p-5 sm:p-6 lg:p-8 shadow-lg border border-white max-w-2xl mx-auto">
+              <h3 className="text-base xs:text-lg sm:text-xl font-semibold text-gray-800 mb-4 xs:mb-5 sm:mb-6 text-center">
                 Resumo da semana
               </h3>
-              <div className="grid grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+              <div className="grid grid-cols-3 gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
                 <div className="text-center">
-                  <div className="text-sm sm:text-base text-gray-600 mt-1">
+                  <div className="text-xs xs:text-sm sm:text-base text-gray-600 mt-0 xs:mt-1">
                     Novos clientes:
                   </div>
-                  <div className="text-2xl sm:text-3xl font-bold text-indigo-600">
+                  <div className="text-xl xs:text-2xl sm:text-3xl font-bold text-indigo-600 mt-1 xs:mt-2">
                     {clientes.length}
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm sm:text-base text-gray-600 mt-1">
+                  <div className="text-xs xs:text-sm sm:text-base text-gray-600 mt-0 xs:mt-1">
                     Novos pedidos:
                   </div>
-                  <div className="text-2xl sm:text-3xl font-bold text-emerald-600">
+                  <div className="text-xl xs:text-2xl sm:text-3xl font-bold text-emerald-600 mt-1 xs:mt-2">
                     {pedidos.length}
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm sm:text-base text-gray-600 mt-1">
+                  <div className="text-xs xs:text-sm sm:text-base text-gray-600 mt-0 xs:mt-1">
                     Pedidos atrasados:
                   </div>
-                  <div className="text-2xl sm:text-3xl font-bold text-red-600">
+                  <div className="text-xl xs:text-2xl sm:text-3xl font-bold text-red-600 mt-1 xs:mt-2">
                     {atrasados.length}
                   </div>
                 </div>

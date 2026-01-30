@@ -76,40 +76,41 @@ export default function ListaPedidos({
         titulo="Excluir pedido"
         descricao="Essa ação não poderá ser desfeita. Deseja continuar?"
       />
-      {/* Header com busca e recarregar */}
-      <div className="flex justify-between items-center p-4 border-b">
+
+      {/* Header responsivo */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border-b gap-4 sm:gap-0">
         <h2 className="text-xl font-bold text-gray-800">Pedidos</h2>
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full sm:w-auto">
+          {/* Botão recarregar */}
           <button
             onClick={handleRecarregar}
             disabled={loading}
-            className="p-2 mt-1 rounded-lg"
+            className="self-start sm:self-center p-2 rounded-lg"
           >
             <img
               src={recarregar}
               alt="Recarregar"
-              className={`h-8 w-8 transition-all duration-300 ${
+              className={`h-6 w-6 sm:h-8 sm:w-8 transition-all duration-300 ${
                 loading ? "animate-spin opacity-70" : "hover:opacity-70"
               }`}
             />
           </button>
-          <div className="relative w-64">
+
+          {/* Campo busca */}
+          <div className="relative w-full sm:w-48 lg:w-64">
             <input
               type="text"
               placeholder="Pesquisar pedido..."
               value={termoBusca}
               onChange={(e) => setTermoBusca(e.target.value)}
-              className="pl-5 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-full"
+              className="pl-3 pr-3 py-2 sm:pl-5 sm:pr-4 sm:py-2 border border-gray-300 rounded-lg text-sm w-full"
             />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-400"></span>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Tabela */}
-      <div className="overflow-hidden">
+      {/* Tabela - Desktop */}
+      <div className="hidden lg:block overflow-hidden">
         <div className="overflow-auto max-h-96">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -155,13 +156,13 @@ export default function ListaPedidos({
                     key={pedido.cod_pedido}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
-                    <td className="py-3 px-2 text-sm font-medium text-gray-900 text-center">
+                    <td className="py-3 px-4 text-sm font-medium text-gray-900 text-center">
                       #{pedido.cod_pedido}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-700 text-center">
                       Cliente {pedido.cod_cliente}
                     </td>
-                    <td className="text-sm text-center">
+                    <td className="py-3 px-4 text-sm text-center">
                       {renderizarTipos(pedido.tipos_pedido)}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-700 text-center">
@@ -185,7 +186,7 @@ export default function ListaPedidos({
                           : pedido.status_pagamento === false
                             ? "Pendente"
                             : "Em andamento"}
-                      </span>{" "}
+                      </span>
                     </td>
                     <td className="py-3 px-4 text-sm text-center">
                       <div className="flex gap-2 justify-center">
@@ -194,7 +195,7 @@ export default function ListaPedidos({
                             setPedidoSelecionado(pedido);
                             setAbaAtiva("detalhes");
                           }}
-                          className="bg-sky-500 hover:bg-sky-500 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md hover:cursor-pointer"
+                          className="bg-sky-500 hover:bg-sky-600 text-white text-xs px-3 py-1 rounded transition-all hover:shadow-md hover:cursor-pointer"
                         >
                           Ver
                         </button>
@@ -221,7 +222,6 @@ export default function ListaPedidos({
                 <tr>
                   <td colSpan="7" className="py-8 text-center">
                     <div className="flex flex-col items-center justify-center text-gray-400">
-                      <span className="text-4xl mb-2"></span>
                       <p className="text-lg font-medium text-gray-500">
                         Nenhum pedido encontrado
                       </p>
@@ -239,9 +239,117 @@ export default function ListaPedidos({
         </div>
       </div>
 
-      {/* Footer com contador */}
+      {/* Cards - Mobile/Tablet (substitui tabela) */}
+      <div className="lg:hidden">
+        <div className="overflow-auto max-h-96 p-4 sm:p-3">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+              <p className="mt-2 text-sm text-gray-500">
+                Carregando pedidos...
+              </p>
+            </div>
+          ) : pedidos?.length > 0 ? (
+            <div className="space-y-3">
+              {pedidos.map((pedido) => (
+                <div
+                  key={pedido.cod_pedido}
+                  className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="font-medium text-gray-800 text-base">
+                        Pedido #{pedido.cod_pedido}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Cliente: {pedido.cod_cliente}
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {formatarData(pedido.created_at)}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-sm">
+                      <span className="text-gray-600 w-16">Tipos:</span>
+                      <span className="text-gray-800">
+                        {renderizarTipos(pedido.tipos_pedido)}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <span className="text-gray-600 w-16">Valor:</span>
+                      <span className="font-semibold text-gray-900">
+                        {formatarMoeda(pedido.valor_total)}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <span className="text-gray-600 w-16">Status:</span>
+                      <span
+                        className={`font-medium ${
+                          pedido.status_pagamento === true
+                            ? "text-green-600"
+                            : pedido.status_pagamento === false
+                              ? "text-yellow-600"
+                              : "text-gray-900"
+                        }`}
+                      >
+                        {pedido.status_pagamento === true
+                          ? "Pago"
+                          : pedido.status_pagamento === false
+                            ? "Pendente"
+                            : "Em andamento"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setPedidoSelecionado(pedido);
+                        setAbaAtiva("detalhes");
+                      }}
+                      className="flex-1 bg-sky-500 hover:bg-sky-600 text-white text-xs px-3 py-2 rounded transition-all duration-300 hover:shadow-md"
+                    >
+                      Ver
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPedidoSelecionado(pedido);
+                        setAbaAtiva("editar");
+                      }}
+                      className="flex-1 bg-amber-400 hover:bg-amber-500 text-white text-xs px-3 py-2 rounded transition-all duration-300 hover:shadow-md"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => abrirModal(pedido)}
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded transition-all duration-300 hover:shadow-md"
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <p className="text-lg font-medium text-gray-500">
+                Nenhum pedido encontrado
+              </p>
+              <p className="text-sm text-gray-400 mt-1">
+                {termoBusca
+                  ? "Tente ajustar os termos da busca"
+                  : "Comece criando um novo pedido"}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer */}
       <div className="px-4 py-3 bg-gray-50 border-t text-xs text-gray-500 flex justify-between items-center">
-        Total de registros: {pedidos.length}
+        <span>Total de registros: {pedidos.length}</span>
       </div>
     </div>
   );

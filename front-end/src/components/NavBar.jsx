@@ -141,7 +141,7 @@ export default function NavBar() {
                 className="h-full w-full object-contain"
               />
             </div>
-            <span className="text-xs mt-1 pr-1 font-medium">SAIR</span>
+            <span className="text-xs mt-1 pr-1 font-medium text-red-600">SAIR</span>
           </button>
         </div>
 

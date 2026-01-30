@@ -14,7 +14,6 @@ export default function CadastroClientes({
   maxCamposEndereco,
   minCamposEndereco,
 }) {
-  
   // Constante que armazena o tipo de pessoa que está sendo cadastrado
   const [pessoa, setPessoa] = useState("");
   useEffect(() => {
@@ -41,26 +40,23 @@ export default function CadastroClientes({
       }));
     }
   }, [pessoa, setForm]);
+
   return (
-    <div className="p-2">
-      {/* Formulário de cadastro */}
+    <div className="p-2 sm:p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Componente que vai ser renderizado no componente principal */}
-        <div className="flex flex-row justify-between items-center">
+        {/* Cabeçalho - só empilha no mobile */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
           <button
             onClick={() => setModo("lista")}
-            className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-300 
-            hover:cursor-pointer"
+            className="mb-6 sm:mb-0 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:cursor-pointer w-full sm:w-auto"
           >
             Voltar
           </button>
-          {/* Select para o tipo de pessoa */}
-          <div>
+          <div className="w-full sm:w-auto">
             <select
               value={pessoa}
               onChange={(e) => setPessoa(e.target.value)}
-              className="form-select border border-gray-300 rounded-lg p-1 hover:cursor-pointer hover:bg-gray-100 transition-all 
-              duration-300 focus:ring-black focus:border-black"
+              className="form-select border border-gray-300 rounded-lg p-2 sm:p-1 hover:cursor-pointer hover:bg-gray-100 transition-all duration-300 focus:ring-black focus:border-black w-full"
               required
             >
               <option value="" disabled>
@@ -71,12 +67,20 @@ export default function CadastroClientes({
             </select>
           </div>
         </div>
+
+        {/* Título */}
         <div className="flex flex-col justify-between mb-10 items-center w-full">
-          <p className="font-semibold text-3xl ">Cadastrar cliente</p>
-          <p className="text-gray-500 mt-1">Preencha os dados abaixo</p>
+          <p className="font-semibold text-2xl sm:text-3xl">
+            Cadastrar cliente
+          </p>
+          <p className="text-gray-500 mt-1 text-sm sm:text-base">
+            Preencha os dados abaixo
+          </p>
         </div>
-        <div className="grid grid-cols-4 gap-4 px-5">
-          <div>
+
+        {/* Primeira linha de campos - 4 colunas no desktop, 1 no mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-2 sm:px-5">
+          <div className="sm:col-span-2 lg:col-span-1">
             <label className="block text-sm font-medium mb-1">Nome</label>
             <input
               type="text"
@@ -87,10 +91,10 @@ export default function CadastroClientes({
               required
             />
           </div>
-          <div>
+          <div className="sm:col-span-2 lg:col-span-1">
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
-              type=""
+              type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
@@ -99,7 +103,7 @@ export default function CadastroClientes({
             />
           </div>
           {pessoa === "fisica" && (
-            <div>
+            <div className="sm:col-span-2 lg:col-span-1">
               <label className="block text-sm font-medium mb-1">CPF</label>
               <input
                 type="text"
@@ -112,7 +116,7 @@ export default function CadastroClientes({
             </div>
           )}
           {pessoa === "juridica" && (
-            <div>
+            <div className="sm:col-span-2 lg:col-span-1">
               <label className="block text-sm font-medium mb-1">CNPJ</label>
               <input
                 type="text"
@@ -125,8 +129,8 @@ export default function CadastroClientes({
             </div>
           )}
           {pessoa === "fisica" && (
-            <div className="flex items-center justify-center">
-              <div className="relative ">
+            <div className="flex items-center justify-center sm:col-span-2 lg:col-span-1">
+              <div className="relative w-full">
                 <label className="block text-sm font-medium mb-1">
                   Data de nascimento
                 </label>
@@ -135,139 +139,153 @@ export default function CadastroClientes({
                   name="data_nascimento"
                   value={form.data_nascimento}
                   onChange={handleChange}
-                  className="p-2 border rounded-lg max-w hover:bg-gray-100 transition-all duration-300"
+                  className="w-full p-2 border rounded-lg hover:bg-gray-100 transition-all duration-300"
                   required
                 />
               </div>
             </div>
           )}
         </div>
-        <div className="flex px-5 flex-col w-max mt-10 gap-3">
-          <div className="space-x-3 mt-1.5">
-            {form.telefones.length < maxCamposTelefone && (
-              <button
-                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
-                duration-300"
-                type="button"
-                onClick={adicionarCampoTelefone}
-              >
-                <p className="text-lg px-2 mb-1">+</p>
-              </button>
-            )}
-            {form.telefones.length > minCamposTelefone && (
-              <button
-                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
-                duration-300"
-                type="button"
-                onClick={removerCampoTelefone}
-              >
-                <p className="text-lg px-2.5 mb-1">-</p>
-              </button>
-            )}
+
+        {/* Telefones - COM LABEL E NUMERAÇÃO */}
+        <div className="flex px-2 sm:px-5 flex-col w-full mt-10 gap-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-800">Telefones</h3>
+            <div className="space-x-3 mt-1.5">
+              {form.telefones.length < maxCamposTelefone && (
+                <button
+                  className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all duration-300"
+                  type="button"
+                  onClick={adicionarCampoTelefone}
+                >
+                  <p className="text-lg px-2 mb-1">+</p>
+                </button>
+              )}
+              {form.telefones.length > minCamposTelefone && (
+                <button
+                  className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all duration-300"
+                  type="button"
+                  onClick={removerCampoTelefone}
+                >
+                  <p className="text-lg px-2.5 mb-1">-</p>
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex flex-row space-x-10">
+          <div className="flex flex-col sm:flex-row sm:space-x-10 gap-4">
             {form.telefones.map((t, index) => (
-              <div key={index} className="flex flex-col w-full">
+              <div key={index} className="flex flex-col w-full sm:w-80">
                 <label className="block text-sm font-medium mb-1">
-                  Telefone
+                  Telefone {index + 1}
                 </label>
                 <input
                   type="text"
                   name="telefone"
                   value={t.telefone}
                   onChange={(e) => handleChange(e, index, "telefones")}
-                  className="w-80 p-2 border rounded-lg"
+                  className="w-full p-2 border rounded-lg"
                   required
                 />
               </div>
             ))}
           </div>
         </div>
-        <div className="flex px-5 flex-col w-full">
-          <div className="space-x-3 my-5">
-            {form.enderecos.length < maxCamposEndereco && (
-              <button
-                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
-                duration-300"
-                type="button"
-                onClick={adicionarCampoEndereco}
-              >
-                <p className="text-lg px-2 mb-1">+</p>
-              </button>
-            )}
-            {form.enderecos.length > minCamposEndereco && (
-              <button
-                className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all 
-                duration-300"
-                type="button"
-                onClick={removerCampoEndereco}
-              >
-                <p className="text-lg px-2.5 mb-1">-</p>
-              </button>
-            )}
+
+        {/* Endereços - COM LABEL E NUMERAÇÃO */}
+        <div className="flex px-2 sm:px-5 flex-col w-full">
+          <div className="flex items-center justify-between my-5">
+            <h3 className="text-lg font-semibold text-gray-800">Endereços</h3>
+            <div className="space-x-3">
+              {form.enderecos.length < maxCamposEndereco && (
+                <button
+                  className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all duration-300"
+                  type="button"
+                  onClick={adicionarCampoEndereco}
+                >
+                  <p className="text-lg px-2 mb-1">+</p>
+                </button>
+              )}
+              {form.enderecos.length > minCamposEndereco && (
+                <button
+                  className="bg-black text-white items-center mt-5.5 rounded-lg hover:opacity-60 hover:cursor-pointer transition-all duration-300"
+                  type="button"
+                  onClick={removerCampoEndereco}
+                >
+                  <p className="text-lg px-2.5 mb-1">-</p>
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-6">
             {form.enderecos.map((end, index) => (
-              <div key={index} className="grid grid-cols-4 space-x-3 w-full">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Rua e número
-                  </label>
-                  <input
-                    type="text"
-                    name="rua_numero"
-                    value={end.rua_numero}
-                    onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="w-full p-2 border rounded-lg"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Bairro
-                  </label>
-                  <input
-                    type="text"
-                    name="bairro"
-                    value={end.bairro}
-                    onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="w-full p-2 border rounded-lg"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">CEP</label>
-                  <input
-                    type="text"
-                    name="cep"
-                    value={end.cep}
-                    onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="w-full p-2 border rounded-lg"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Cidade
-                  </label>
-                  <input
-                    type="text"
-                    name="cidade"
-                    value={end.cidade}
-                    onChange={(e) => handleChange(e, index, "enderecos")}
-                    className="w-full p-2 border rounded-lg"
-                    required
-                  />
+              <div key={index}>
+                <h4 className="text-md font-medium text-gray-700 mb-3">
+                  Endereço {index + 1}
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Rua e número
+                    </label>
+                    <input
+                      type="text"
+                      name="rua_numero"
+                      value={end.rua_numero}
+                      onChange={(e) => handleChange(e, index, "enderecos")}
+                      className="w-full p-2 border rounded-lg"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Bairro
+                    </label>
+                    <input
+                      type="text"
+                      name="bairro"
+                      value={end.bairro}
+                      onChange={(e) => handleChange(e, index, "enderecos")}
+                      className="w-full p-2 border rounded-lg"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      CEP
+                    </label>
+                    <input
+                      type="text"
+                      name="cep"
+                      value={end.cep}
+                      onChange={(e) => handleChange(e, index, "enderecos")}
+                      className="w-full p-2 border rounded-lg"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Cidade
+                    </label>
+                    <input
+                      type="text"
+                      name="cidade"
+                      value={end.cidade}
+                      onChange={(e) => handleChange(e, index, "enderecos")}
+                      className="w-full p-2 border rounded-lg"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Botão final */}
         <div className="flex justify-center my-5 mt-10 items-center">
           <button
             type="submit"
-            className=" bg-indigo-600 hover:bg-indigo-700 text-white 
-                       font-semibold py-2 px-4 rounded-2xl transition-all hover:cursor-pointer"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-2xl transition-all hover:cursor-pointer"
           >
             Cadastrar cliente
           </button>
