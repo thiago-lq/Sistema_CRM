@@ -67,27 +67,27 @@ export default function PaginaInicial() {
 
   return (
     <div>
-      <div className="min-h-screen p-8">
-        <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+        <div className="max-w-full lg:max-w-4xl xl:max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16 mt-25">
-            <h1 className="text-5xl font-bold text-gray-800 mb-4">
+          <div className="text-center mb-8 sm:mb-12 lg:mb-16 mt-8 sm:mt-12 lg:mt-25">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-3 sm:mb-4">
               Painel do CRM
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-full sm:max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
               Gerencie seus clientes e ordens de serviço de forma eficiente com
               nossa plataforma intuitiva
             </p>
           </div>
 
           {/* Cards Grid - Agora com 4 cards */}
-          <div className="grid grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-full lg:max-w-4xl mx-auto px-2 sm:px-0">
             {/* Clientes Card */}
             <Link to="/Clientes">
-              <div className="group p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-gray-100">
-                <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="group p-4 sm:p-6 lg:p-8 bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-lg sm:shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2 border border-gray-100">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-5 lg:mb-6 group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-300">
                   <svg
-                    className="w-8 h-8 text-white"
+                    className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -100,13 +100,13 @@ export default function PaginaInicial() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2 sm:mb-3">
                   Clientes
                 </h3>
-                <p className="text-gray-600 mb-4 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
                   Gerencie seu banco de clientes e mantenha relacionamentos
                 </p>
-                <div className="flex items-center text-indigo-600 font-medium group-hover:text-indigo-700 transition-colors">
+                <div className="flex items-center text-indigo-600 font-medium group-hover:text-indigo-700 transition-colors text-sm sm:text-base">
                   Acessar clientes
                   <svg
                     className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
@@ -127,10 +127,10 @@ export default function PaginaInicial() {
 
             {/* Pedidos Card */}
             <Link to="/Pedidos">
-              <div className="group p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-gray-100">
-                <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="group p-4 sm:p-6 lg:p-8 bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-lg sm:shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2 border border-gray-100">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-5 lg:mb-6 group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-300">
                   <svg
-                    className="w-8 h-8 text-white"
+                    className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -143,13 +143,13 @@ export default function PaginaInicial() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2 sm:mb-3">
                   Pedidos
                 </h3>
-                <p className="text-gray-600 mb-4 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
                   Acompanhe todos os pedidos, status e histórico de vendas
                 </p>
-                <div className="flex items-center text-emerald-600 font-medium group-hover:text-emerald-700 transition-colors">
+                <div className="flex items-center text-emerald-600 font-medium group-hover:text-emerald-700 transition-colors text-sm sm:text-base">
                   Acessar pedidos
                   <svg
                     className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
@@ -170,10 +170,10 @@ export default function PaginaInicial() {
 
             {/* Registros Card */}
             <Link to="/Registros">
-              <div className="group p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-gray-100">
-                <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="group p-4 sm:p-6 lg:p-8 bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-lg sm:shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2 border border-gray-100">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-5 lg:mb-6 group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-300">
                   <svg
-                    className="w-8 h-8 text-white"
+                    className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -186,14 +186,14 @@ export default function PaginaInicial() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2 sm:mb-3">
                   Registros
                 </h3>
-                <p className="text-gray-600 mb-4 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
                   Gerencie cadastros, e documentos do sistema de forma
                   organizada
                 </p>
-                <div className="flex items-center text-orange-600 font-medium group-hover:text-orange-700 transition-colors">
+                <div className="flex items-center text-orange-600 font-medium group-hover:text-orange-700 transition-colors text-sm sm:text-base">
                   Acessar registros
                   <svg
                     className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
@@ -214,10 +214,10 @@ export default function PaginaInicial() {
 
             {/* Dashboard Card */}
             <Link to="/Dashboard">
-              <div className="group p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-gray-100">
-                <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="group p-4 sm:p-6 lg:p-8 bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-lg sm:shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 sm:hover:-translate-y-2 border border-gray-100">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-5 lg:mb-6 group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-300">
                   <svg
-                    className="w-8 h-8 text-white"
+                    className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -230,14 +230,14 @@ export default function PaginaInicial() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2 sm:mb-3">
                   Dashboard
                 </h3>
-                <p className="text-gray-600 mb-4 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
                   Visualize métricas, relatórios e indicadores de performance do
                   seu negócio
                 </p>
-                <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700 transition-colors">
+                <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700 transition-colors text-sm sm:text-base">
                   Acessar dashboard
                   <svg
                     className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
@@ -258,27 +258,33 @@ export default function PaginaInicial() {
           </div>
 
           {/* Quick Stats */}
-          <div className="w-max mx-auto mt-16">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
+          <div className="w-full max-w-full sm:max-w-md lg:w-max mx-auto mt-8 sm:mt-12 lg:mt-16 px-2 sm:px-0">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-white">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 text-center">
                 Resumo da semana
               </h3>
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                 <div className="text-center">
-                  <div className="text-gray-600 mt-1">Novos clientes:</div>
-                  <div className="text-3xl font-bold text-indigo-600">
+                  <div className="text-sm sm:text-base text-gray-600 mt-1">
+                    Novos clientes:
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-bold text-indigo-600">
                     {clientes.length}
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-gray-600 mt-1">Novos pedidos:</div>
-                  <div className="text-3xl font-bold text-emerald-600">
+                  <div className="text-sm sm:text-base text-gray-600 mt-1">
+                    Novos pedidos:
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-bold text-emerald-600">
                     {pedidos.length}
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-gray-600 mt-1">Pedidos atrasados:</div>
-                  <div className="text-3xl font-bold text-red-600">
+                  <div className="text-sm sm:text-base text-gray-600 mt-1">
+                    Pedidos atrasados:
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-bold text-red-600">
                     {atrasados.length}
                   </div>
                 </div>

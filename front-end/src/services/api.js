@@ -24,7 +24,6 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      console.log('Token inválido - limpando tudo...');
       
       // Limpa TUDO
       await supabase.auth.signOut();

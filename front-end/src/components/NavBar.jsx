@@ -6,7 +6,7 @@ import logout from "../assets/icone_logout.png";
 import registros from "../assets/icone_registros.png";
 import dashboard from "../assets/icone_dashboard.png";
 
-import { useNavigate } from "react-router-dom"; // ← importe Outlet aqui!
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 
 const LinkStyle =
@@ -15,8 +15,24 @@ const LinkStyle =
 export default function NavBar() {
   const navigate = useNavigate();
   const [showNavbar, setShowNavbar] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
   const timeoutRef = useRef(null);
+  const menuRef = useRef(null);
+
+  // Fechar menu ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     function handleScroll() {
@@ -24,6 +40,7 @@ export default function NavBar() {
 
       if (currentScroll > lastScrollY.current && currentScroll > 100) {
         setShowNavbar(false);
+        setMenuOpen(false); // Fecha menu também ao esconder navbar
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
       } else if (currentScroll < lastScrollY.current) {
         if (!showNavbar) {
@@ -48,21 +65,30 @@ export default function NavBar() {
     <div>
       {/* Navbar fixa */}
       <nav
-        className={`fixed top-0 left-0 right-0 bg-white shadow-lg flex items-center justify-around py-2 z-50
+        className={`fixed top-0 left-0 right-0 bg-white shadow-lg flex items-center justify-between px-4 sm:px-7 py-2 z-50
           transition-transform duration-300 ${
             showNavbar ? "translate-y-0" : "-translate-y-full"
           }`}
       >
-        <div className="flex items-center space-x-3 mr-auto pl-7">
+        {/* Logo/Botão Home */}
+        <div className="flex items-center space-x-3">
           <button
             className="flex items-center text-gray-700 hover:opacity-60 hover:cursor-pointer transition-all duration-300"
-            onClick={() => navigate("/PaginaInicial")} // ← adicionei / para ficar consistente
+            onClick={() => {
+              navigate("/PaginaInicial");
+              setMenuOpen(false);
+            }}
           >
-            <img src={empresa} alt="empresa" className="h-[3rem]" />
+            <img 
+              src={empresa} 
+              alt="empresa" 
+              className="h-10 sm:h-12 lg:h-[3rem]" 
+            />
           </button>
         </div>
 
-        <div className="flex gap-7 pr-7">
+        {/* Menu Desktop (telas médias/grandes) */}
+        <div className="hidden lg:flex gap-7">
           <button onClick={() => navigate("/Clientes")} className={LinkStyle}>
             <div className="flex items-center justify-center h-8 w-8">
               <img
@@ -110,7 +136,86 @@ export default function NavBar() {
             <span className="text-xs mt-1 pr-1 font-medium">SAIR</span>
           </button>
         </div>
+
+        {/* Botão Menu Mobile (3 pontos) */}
+        <div className="lg:hidden" ref={menuRef}>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="flex flex-col items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:cursor-pointer transition-all duration-300"
+          >
+            <div className="text-2xl font-bold">⋯</div>
+            <span className="text-xs mt-1 font-medium">MENU</span>
+          </button>
+
+          {/* Menu Dropdown Mobile */}
+          {menuOpen && (
+            <div className="absolute top-full right-4 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 py-3 min-w-[180px] z-50 animate-fadeIn">
+              <button 
+                onClick={() => { navigate("/Clientes"); setMenuOpen(false); }} 
+                className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center justify-center h-7 w-7 mr-3">
+                  <img src={clientes} alt="clientes" className="h-full w-full object-contain" />
+                </div>
+                <span className="text-sm font-medium text-gray-800">CLIENTES</span>
+              </button>
+              
+              <button 
+                onClick={() => { navigate("/Pedidos"); setMenuOpen(false); }} 
+                className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center justify-center h-7 w-7 mr-3">
+                  <img src={pedidos} alt="pedidos" className="h-full w-full object-contain" />
+                </div>
+                <span className="text-sm font-medium text-gray-800">PEDIDOS</span>
+              </button>
+              
+              <button 
+                onClick={() => { navigate("/Registros"); setMenuOpen(false); }} 
+                className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center justify-center h-7 w-7 mr-3">
+                  <img src={registros} alt="registros" className="h-5" />
+                </div>
+                <span className="text-sm font-medium text-gray-800">REGISTROS</span>
+              </button>
+              
+              <button 
+                onClick={() => { navigate("/Dashboard"); setMenuOpen(false); }} 
+                className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center justify-center h-7 w-7 mr-3">
+                  <img src={dashboard} alt="dashboard" className="h-full w-full object-contain" />
+                </div>
+                <span className="text-sm font-medium text-gray-800">DASHBOARD</span>
+              </button>
+              
+              <div className="border-t border-gray-200 my-2"></div>
+              
+              <button 
+                onClick={() => { navigate("/"); setMenuOpen(false); }} 
+                className="flex items-center w-full px-4 py-3 hover:bg-gray-50 transition-colors text-red-600"
+              >
+                <div className="flex items-center justify-center h-7 w-7 mr-3">
+                  <img src={logout} alt="logout" className="h-full w-full object-contain" />
+                </div>
+                <span className="text-sm font-medium">SAIR</span>
+              </button>
+            </div>
+          )}
+        </div>
       </nav>
+
+      {/* Adicionar animação fadeIn no CSS global ou Tailwind config */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
