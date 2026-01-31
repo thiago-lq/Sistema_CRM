@@ -10,6 +10,8 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 export default function GraficoColuna2Mes({ dados3Mensal, loading }) {
+  const isMobile = window.innerWidth < 640;
+
   const data = {
     labels: dados3Mensal?.map((item) => (item.nome)) || [],
     datasets: [
@@ -18,7 +20,7 @@ export default function GraficoColuna2Mes({ dados3Mensal, loading }) {
         data: dados3Mensal?.map((item) => item.total) || [],
         backgroundColor: "rgba(59, 130, 246, 0.7)",
         borderRadius: 10,
-        barThickness: 22,
+        barThickness: isMobile ? 15 : 22,
       },
     ],
   };

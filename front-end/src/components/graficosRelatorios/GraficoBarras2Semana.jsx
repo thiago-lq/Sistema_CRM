@@ -12,7 +12,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 export default function GraficoBarras2Semana({ dados3Semana, loading }) {
   const isMobile = window.innerWidth < 640;
 
-  const dadosFiltrados = isMobile ? dados3Semana.slice(0, 3) : dados3Semana;
+  const dadosFiltrados = isMobile ? dados3Semana.slice(0, 4) : dados3Semana;
 
   const abreviar = (texto) => {
     if (!texto) return "";

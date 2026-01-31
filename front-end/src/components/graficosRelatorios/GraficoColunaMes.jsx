@@ -10,15 +10,19 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 export default function GraficoColunaMes({ dados2Mensal, loading }) {
+  const isMobile = window.innerWidth < 640;
+
+  const dadosFiltrados = isMobile ? dados2Mensal.slice(0, 4) : dados2Mensal;
+
   const data = {
-    labels: dados2Mensal.map((item) => `Cliente: ${item.cliente}`),
+    labels: dadosFiltrados.map((item) => `Cliente: ${item.cliente}`),
     datasets: [
       {
         label: "Quantidade de contatos",
         data: dados2Mensal.map((item) => item.total),
         backgroundColor: "rgba(59, 130, 246, 0.7)",
         borderRadius: 10,
-        barThickness: 22,
+        barThickness: isMobile ? 15 : 22,
       },
     ],
   };

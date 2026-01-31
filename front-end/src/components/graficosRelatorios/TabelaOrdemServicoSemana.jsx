@@ -82,18 +82,36 @@ export default function TabelaOrdemServicoSemana({ dados2Semana, loading }) {
                     {/* Card Mobile */}
                     <tr className="sm:hidden">
                       <td colSpan="4">
-                        <div className="rounded-lg p-3 mb-3 bg-gray-50">
-                          <p className="font-medium">ID: #{item.cod_pedido}</p>
-                          <p>Prazo: {formatarData(item.prazo)}</p>
-                          <p>
-                            Data de status:{" "}
-                            {formatarData(item.data_hora_pagamento)}
-                          </p>
-                          <span
-                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ring-1 ${status.class}`}
-                          >
-                            {status.label}
-                          </span>
+                        <div className="mb-3 rounded-xl bg-gray-50 p-4 shadow-sm">
+                          {/* Topo */}
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="font-semibold text-gray-800">
+                              Pedido #{item.cod_pedido}
+                            </p>
+
+                            <span
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ring-1 ${status.class}`}
+                            >
+                              {status.label}
+                            </span>
+                          </div>
+
+                          {/* Infos */}
+                          <div className="space-y-2 text-sm text-gray-600">
+                            <div className="flex justify-between">
+                              <span>Prazo</span>
+                              <span className="font-medium text-gray-800">
+                                {formatarData(item.prazo)}
+                              </span>
+                            </div>
+
+                            <div className="flex justify-between">
+                              <span>Status em</span>
+                              <span className="font-medium text-gray-800">
+                                {formatarData(item.data_hora_pagamento)}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </td>
                     </tr>
