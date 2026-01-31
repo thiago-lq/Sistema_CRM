@@ -144,7 +144,7 @@ class DashboardController extends Controller
         $nomesMeses = [];
         
         for ($i = 5; $i >= 0; $i--) {
-            $data = $hoje->copy()->subMonths($i);
+            $data = $hoje->copy()->subMonthsNoOverflow($i)->startOfMonth(); // CORREÇÃO
             $mesesInfo[] = [
                 'mes_numero' => $data->month,
                 'mes_nome' => $data->locale('pt_BR')->translatedFormat('M'),
@@ -200,7 +200,7 @@ class DashboardController extends Controller
         $nomesMeses = [];
 
         for ($i = 11; $i >= 0; $i--) {
-            $data = $hoje->copy()->subMonths($i);
+            $data = $hoje->copy()->subMonthsNoOverflow($i)->startOfMonth(); // CORREÇÃO
             $mesesInfo[] = [
                 'mes_numero' => $data->month,
                 'mes_nome' => $data->locale('pt_BR')->translatedFormat('M'),
@@ -326,7 +326,7 @@ class DashboardController extends Controller
         $nomesMeses = [];
 
         for ($i = 11; $i >= 0; $i--) {
-            $data = $hoje->copy()->subMonths($i);
+            $data = $hoje->copy()->subMonthsNoOverflow($i)->startOfMonth(); // CORREÇÃO
             $mesesInfo[] = [
                 'mes_numero' => $data->month,
                 'mes_nome' => $data->locale('pt_BR')->translatedFormat('M'),
