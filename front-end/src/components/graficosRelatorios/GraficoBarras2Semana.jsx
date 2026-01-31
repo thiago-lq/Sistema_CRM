@@ -10,15 +10,31 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 export default function GraficoBarras2Semana({ dados3Semana, loading }) {
+  const isMobile = window.innerWidth < 640;
+
+  const dadosFiltrados = isMobile ? dados3Semana.slice(0, 3) : dados3Semana;
+
+  const abreviar = (texto) => {
+    if (!texto) return "";
+
+    return texto
+      .split(" ")
+      .filter((p) => p.length > 2) // ignora "de", "do", "em", etc
+      .map((p) => p[0].toUpperCase())
+      .join("");
+  };
+
+  const maxValor = Math.max(...dadosFiltrados.map((i) => i.total));
+
   const data = {
-    labels: dados3Semana.map((item) => item.motivo),
+    labels: dadosFiltrados.map((item) => item.motivo),
     datasets: [
       {
         label: "Quantidade de pedidos",
-        data: dados3Semana.map((item) => item.total),
+        data: dadosFiltrados.map((item) => item.total),
         backgroundColor: "rgba(59, 130, 246, 0.7)",
         borderRadius: 10,
-        barThickness: 22,
+        barThickness: isMobile ? 15 : 22, // 👈 AQUI
       },
     ],
   };
@@ -33,6 +49,10 @@ export default function GraficoBarras2Semana({ dados3Semana, loading }) {
       tooltip: {
         callbacks: {
           label: (ctx) => ` ${ctx.raw} pedidos`,
+          title: (items) => {
+            const index = items[0].dataIndex;
+            return dadosFiltrados[index]?.motivo || "";
+          },
         },
       },
     },
@@ -44,10 +64,18 @@ export default function GraficoBarras2Semana({ dados3Semana, loading }) {
         ticks: {
           precision: 0,
         },
+        // 🔽 isso impede a barra de ir longe demais no mobile
+        suggestedMax: isMobile ? maxValor * 1 : maxValor,
       },
       y: {
         grid: {
           display: false,
+        },
+        ticks: {
+          callback: function (value) {
+            const label = this.getLabelForValue(value);
+            return isMobile ? abreviar(label) : label;
+          },
         },
       },
     },

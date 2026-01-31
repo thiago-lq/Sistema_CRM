@@ -1,5 +1,4 @@
 export default function TabelaOrdemServicoSemana({ dados2Semana, loading }) {
-  // Função para formatar data
   const formatarData = (dataString) => {
     if (!dataString) return "-";
     return new Date(dataString).toLocaleDateString("pt-BR");
@@ -22,18 +21,16 @@ export default function TabelaOrdemServicoSemana({ dados2Semana, loading }) {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      {/* Header */}
       <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-800">
           Pedidos da semana
         </h2>
       </div>
 
-      {/* Tabela */}
-      <div className="overflow-auto max-h-[420px]">
-        <table className="min-w-full text-sm">
+      <div className="overflow-x-auto max-h-[420px]">
+        <table className="min-w-full text-sm table-auto">
           <thead className="sticky top-0 bg-gray-50 z-10">
-            <tr className="text-gray-500 uppercase text-xs tracking-wider">
+            <tr className="text-gray-500 uppercase text-xs tracking-wider hidden sm:table-row">
               <th className="px-4 py-3 text-center">ID</th>
               <th className="px-4 py-3 text-center">Prazo</th>
               <th className="px-4 py-3 text-center">Data de status</th>
@@ -61,27 +58,46 @@ export default function TabelaOrdemServicoSemana({ dados2Semana, loading }) {
                   statusConfig[item.status] || statusConfig.default;
 
                 return (
-                  <tr
-                    key={item.cod_pedido}
-                    className="hover:bg-gray-50 transition"
-                  >
-                    <td className="px-4 py-3 text-center font-medium text-gray-800">
-                      #{item.cod_pedido}
-                    </td>
-                    <td className="px-4 py-3 text-center text-gray-600">
-                      {formatarData(item.prazo)}
-                    </td>
-                    <td className="px-4 py-3 text-center text-gray-600">
-                      {formatarData(item.data_hora_pagamento)}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ring-1 ${status.class}`}
-                      >
-                        {status.label}
-                      </span>
-                    </td>
-                  </tr>
+                  <>
+                    {/* Linha Desktop */}
+                    <tr className="hidden sm:table-row hover:bg-gray-50 transition">
+                      <td className="px-4 py-3 text-center font-medium text-gray-800">
+                        #{item.cod_pedido}
+                      </td>
+                      <td className="px-4 py-3 text-center text-gray-600">
+                        {formatarData(item.prazo)}
+                      </td>
+                      <td className="px-4 py-3 text-center text-gray-600">
+                        {formatarData(item.data_hora_pagamento)}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ring-1 ${status.class}`}
+                        >
+                          {status.label}
+                        </span>
+                      </td>
+                    </tr>
+
+                    {/* Card Mobile */}
+                    <tr className="sm:hidden">
+                      <td colSpan="4">
+                        <div className="rounded-lg p-3 mb-3 bg-gray-50">
+                          <p className="font-medium">ID: #{item.cod_pedido}</p>
+                          <p>Prazo: {formatarData(item.prazo)}</p>
+                          <p>
+                            Data de status:{" "}
+                            {formatarData(item.data_hora_pagamento)}
+                          </p>
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ring-1 ${status.class}`}
+                          >
+                            {status.label}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  </>
                 );
               })
             ) : (
