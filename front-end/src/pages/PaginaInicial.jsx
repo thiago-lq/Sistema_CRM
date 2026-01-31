@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { novosClientes } from "../services/cliente/novosClientes";
 import { novosPedidos } from "../services/pedido/novosPedidos";
 import { pedidosAtrasados } from "../services/pedido/pedidosAtrasados";
-import  useCargo  from "../hooks/useCargo";
 import { notify } from "../utils/notify";
 
 // Página inicial do sistema, com a navbar
@@ -11,15 +10,6 @@ export default function PaginaInicial() {
   const [clientes, setClientes] = useState([]);
   const [pedidos, setPedidos] = useState([]);
   const [atrasados, setAtrasados] = useState([]);
-  const funcionario = useCargo();
-
-  useEffect(() => {
-    if (funcionario?.nome) {
-      notify.success("Bem vindo, " + funcionario.nome, {
-        position: "top-right",
-      });
-    }
-  }, [funcionario?.nome]);
 
   useEffect(() => {
     async function fetchDadosCliente() {

@@ -133,71 +133,70 @@ export default function FormularioCadastro({
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-white px-4 sm:px-10">
       <div className="flex flex-col justify-between mb-10 items-center w-full">
-        <p className="text-gray-500 mt-1">Preencha os dados abaixo</p>
+        <p className="text-gray-500 mt-1 text-center">
+          Preencha os dados abaixo
+        </p>
       </div>
+
       <form onSubmit={handleSubmitComCartao} className="space-y-6">
-        {/* Tipo de pedido */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tipo de pedido
-          </label>
-          <div className="flex justify-between">
-            <div className="flex gap-10">
-              {[
-                { value: "INSTALACAO", label: "Instalação" },
-                { value: "MANUTENCAO", label: "Manutenção" },
-                { value: "PRODUTO", label: "Venda de Produto" },
-              ].map((item) => (
-                <label key={item.value} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="pedidoTipos"
-                    value={item.value}
-                    checked={form.pedidoTipos.includes(item.value)}
-                    onChange={handleChange}
-                    className="w-4 h-4 hover:cursor-pointer transition-all duration-300"
-                  />
-                  {item.label}
-                </label>
-              ))}
-            </div>
-            {/* Prazo */}
-            <div className="flex items-center justify-center mx-25">
-              <div className="relative">
-                <label className="block text-sm font-medium mb-1">Prazo</label>
+        {/* Tipo de pedido e Prazo */}
+        <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-0">
+          <div className="flex flex-wrap gap-4 md:gap-10">
+            {[
+              { value: "INSTALACAO", label: "Instalação" },
+              { value: "MANUTENCAO", label: "Manutenção" },
+              { value: "PRODUTO", label: "Venda de Produto" },
+            ].map((item) => (
+              <label key={item.value} className="flex items-center gap-2">
                 <input
-                  type="date"
-                  name="prazo"
-                  value={form.prazo}
+                  type="checkbox"
+                  name="pedidoTipos"
+                  value={item.value}
+                  checked={form.pedidoTipos.includes(item.value)}
                   onChange={handleChange}
-                  className="p-2 border rounded w-max hover:bg-gray-100 transition-all duration-300"
-                  required
+                  className="w-4 h-4 hover:cursor-pointer transition-all duration-300"
                 />
-              </div>
+                {item.label}
+              </label>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-start md:justify-center">
+            <div className="relative">
+              <label className="block text-sm font-medium mb-1">Prazo</label>
+              <input
+                type="date"
+                name="prazo"
+                value={form.prazo}
+                onChange={handleChange}
+                className="p-2 border rounded w-full md:w-max hover:bg-gray-100 transition-all duration-300"
+                required
+              />
             </div>
           </div>
         </div>
 
-        {/* CPF ou CNPJ do cliente */}
+        {/* CPF ou CNPJ */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             CPF ou CNPJ
           </label>
-          <div className="flex justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:gap-4">
             <input
               type="number"
               name="busca"
               placeholder="Digite o CPF ou CNPJ"
               value={buscaCliente}
               onChange={(e) => setBuscaCliente(e.target.value)}
-              className="w-75 p-2 border border-gray-300 rounded-md
-                       appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="w-full md:w-max p-2 border border-gray-300 rounded-md
+                     appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
+
             {cliente && cliente.cod_cliente && (
-              <div>
-                <label className="text-lg text-gray-700 mx-10">
+              <div className="flex flex-col md:flex-row md:items-center md:gap-2 mt-2 md:mt-0">
+                <label className="text-lg text-gray-700">
                   Código do cliente:
                 </label>
                 <input
@@ -205,7 +204,7 @@ export default function FormularioCadastro({
                   value={cliente.cod_cliente}
                   placeholder="Digite o código do cliente"
                   onChange={handleChange}
-                  className="w-75 p-2 border border-gray-300 rounded-md bg-gray-100"
+                  className="w-full md:w-max p-2 border border-gray-300 rounded-md bg-gray-100"
                   disabled
                 />
               </div>
@@ -213,6 +212,7 @@ export default function FormularioCadastro({
           </div>
         </div>
 
+        {/* Endereço de entrega */}
         {cliente && form.pedidoTipos.includes("PRODUTO") && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -222,8 +222,8 @@ export default function FormularioCadastro({
               name="codEnderecoCliente"
               value={form.codEnderecoCliente ?? ""}
               onChange={handleChange}
-              className="w-max p-2 border border-gray-300 rounded-md 
-                          focus:ring-black focus:border-black hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
+              className="w-full md:w-max p-2 border border-gray-300 rounded-md 
+                       focus:ring-black focus:border-black hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
               required
             >
               <option disabled value="">
@@ -241,15 +241,18 @@ export default function FormularioCadastro({
           </div>
         )}
 
-        {/* Produtos (somente se selecionou PRODUTO) */}
+        {/* Produtos */}
         {form.pedidoTipos.includes("PRODUTO") && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Produtos (Seleção múltipla)
             </label>
-            <div className="grid grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {produtos.map((p) => (
-                <div key={p.cod_produto} className="flex gap-5 items-center">
+                <div
+                  key={p.cod_produto}
+                  className="flex flex-col sm:flex-row gap-2 sm:gap-5 items-start sm:items-center"
+                >
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -268,12 +271,22 @@ export default function FormularioCadastro({
                       name="quantidade"
                       data-cod={p.cod_produto}
                       value={form.quantidade[p.cod_produto]}
-                      onChange={handleChange}
-                      min="1"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        // Permite apagar o valor, mas se tiver algo, força no mínimo 1
+                        setForm((prev) => ({
+                          ...prev,
+                          quantidade: {
+                            ...prev.quantidade,
+                            [p.cod_produto]:
+                              val === "" ? "" : Math.max(1, Number(val)),
+                          },
+                        }));
+                      }}
                       step="1"
                       required
-                      onKeyDown={(e) => e.preventDefault()}
-                      className="w-15 p-2 border border-gray-300 rounded-md"
+                      className="w-15 p-2 border border-gray-300 rounded-md
+             appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     />
                   )}
                 </div>
@@ -282,14 +295,14 @@ export default function FormularioCadastro({
           </div>
         )}
 
-        {/* Endereço de Instalação ou Manutenção */}
+        {/* Endereço de serviço */}
         {(form.pedidoTipos.includes("INSTALACAO") ||
           form.pedidoTipos.includes("MANUTENCAO")) && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Endereço de serviço
             </label>
-            <div className="grid grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               <input
                 type="text"
                 name="rua_numero"
@@ -330,8 +343,8 @@ export default function FormularioCadastro({
           </div>
         )}
 
-        {/* Valor adicional */}
-        <div className="flex justify-between">
+        {/* Valor adicional e total */}
+        <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-10">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Valor adicional (R$)
@@ -344,10 +357,11 @@ export default function FormularioCadastro({
               value={form.valor_adicional}
               min="0"
               step="0.01"
-              className="w-75 p-2 border border-gray-300 rounded-md 
-                appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="w-full md:w-max p-2 border border-gray-300 rounded-md 
+              appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Valor total (R$)
@@ -356,25 +370,25 @@ export default function FormularioCadastro({
               type="number"
               name="valorTotal"
               value={form.valorTotal || "0.00"}
-              className="w-75 p-2 border border-gray-300 rounded-md bg-gray-100"
+              className="w-full md:w-max p-2 border border-gray-300 rounded-md bg-gray-100"
               disabled
               readOnly
             />
           </div>
         </div>
 
-        <div className="flex justify-between">
-          {/* Método de Pagamento */}
+        {/* Método de pagamento */}
+        <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-10">
           <div>
             <select
               value={form.metodoPagamento}
               onChange={handleChange}
               name="metodoPagamento"
-              className="form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2
+              className="w-full md:w-max form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2
               hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
             >
               <option value="" disabled>
-                Selecione um método de pagamento
+                Selecione um método de pagamento...
               </option>
               <option value="CREDITO">Crédito</option>
               <option value="DEBITO">Débito</option>
@@ -384,50 +398,36 @@ export default function FormularioCadastro({
             </select>
           </div>
 
-          {/* Parcelas - mantido compatibilidade */}
           {form.valorTotal > 0 && form.metodoPagamento === "CREDITO" && (
             <div>
               <select
                 value={form.parcelas}
                 onChange={handleChange}
                 name={"parcelas"}
-                className="form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 
-                hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
+                className="w-full md:w-max form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 
+              hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
               >
                 <option value="0" disabled>
-                  Selecione a quantidade de parcelas
+                  Selecione a quantidade de parcelas...
                 </option>
-                <option value="1">
-                  1x de R$ {(form.valorTotal / 1).toFixed(2)} sem juros
-                </option>
-                <option value="2">
-                  2x de R$ {(form.valorTotal / 2).toFixed(2)} sem juros
-                </option>
-                <option value="3">
-                  3x de R$ {(form.valorTotal / 3).toFixed(2)} sem juros
-                </option>
-                <option value="4">
-                  4x de R$ {(form.valorTotal / 4).toFixed(2)} sem juros
-                </option>
-                <option value="5">
-                  5x de R$ {(form.valorTotal / 5).toFixed(2)} sem juros
-                </option>
-                <option value="6">
-                  6x de R$ {(form.valorTotal / 6).toFixed(2)} sem juros
-                </option>
+                {[...Array(6)].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}x de R$ {(form.valorTotal / (i + 1)).toFixed(2)} sem
+                    juros
+                  </option>
+                ))}
               </select>
             </div>
           )}
         </div>
 
-        {/* Formulário de Cartão de Crédito (Apenas se selecionar CREDITO) */}
+        {/* Formulário do cartão */}
         {form.metodoPagamento === "CREDITO" && (
           <div className="mt-4 p-4 border rounded-lg">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center">
-                <span className="mr-2"></span>
-                <h3 className="font-medium">Informações do cartão</h3>
-              </div>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
+              <h3 className="font-medium mb-2 sm:mb-0">
+                Informações do cartão
+              </h3>
               <button
                 type="button"
                 onClick={() => setMostrarCartao(!mostrarCartao)}
@@ -439,23 +439,17 @@ export default function FormularioCadastro({
 
             {mostrarCartao ? (
               <div className="space-y-4">
-                {/* Aviso de demonstração */}
                 <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
-                  <div className="flex items-start">
-                    <div>
-                      <p className="font-medium text-yellow-800">
-                        Ambiente de demonstração
-                      </p>
-                      <p className="text-sm text-yellow-700">
-                        Este formulário é apenas simbólico. Nenhuma transação
-                        real será processada.
-                      </p>
-                    </div>
-                  </div>
+                  <p className="font-medium text-yellow-800">
+                    Ambiente de demonstração
+                  </p>
+                  <p className="text-sm text-yellow-700">
+                    Este formulário é apenas simbólico. Nenhuma transação real
+                    será processada.
+                  </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Número do Cartão */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       Número do cartão
@@ -470,8 +464,6 @@ export default function FormularioCadastro({
                       maxLength="19"
                     />
                   </div>
-
-                  {/* Nome no Cartão */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       Nome no cartão
@@ -485,8 +477,6 @@ export default function FormularioCadastro({
                       className="w-full p-2 border rounded"
                     />
                   </div>
-
-                  {/* Validade */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       Validade (MM/AA)
@@ -501,8 +491,6 @@ export default function FormularioCadastro({
                       maxLength="5"
                     />
                   </div>
-
-                  {/* CVV */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       CVV
@@ -537,8 +525,7 @@ export default function FormularioCadastro({
             value={form.descricao}
             onChange={handleChange}
             maxLength={500}
-            className="w-full p-2 border border-gray-300 rounded-md
-                       focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             rows={4}
             placeholder="Descreva o pedido (máx. 500 palavras)"
           />
@@ -547,12 +534,11 @@ export default function FormularioCadastro({
           </p>
         </div>
 
-        {/* Botão salvar */}
+        {/* Botão de enviar */}
         <div className="flex justify-center my-5 items-center">
           <button
             type="submit"
-            className=" bg-indigo-600 hover:bg-indigo-700 text-white 
-                       font-semibold py-2 px-4 rounded-2xl transition-all hover:cursor-pointer"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-2xl transition-all hover:cursor-pointer"
           >
             Cadastrar pedido
           </button>
