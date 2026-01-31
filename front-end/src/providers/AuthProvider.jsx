@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import AuthContext from "../contexts/AuthContext";
 import { supabase } from "../services/supabase";
 import api from "../services/api";
-import { notify } from "../utils/notify";
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -12,7 +11,7 @@ export default function AuthProvider({ children }) {
 
   // 🔹 Busca dados do funcionário (NUNCA bloqueia loading)
   const fetchFuncionarioData = useCallback(
-    async (email, mostrarToast = false) => {
+    async (email) => {
       if (buscandoFuncionarioRef.current) return;
 
       try {
@@ -22,20 +21,8 @@ export default function AuthProvider({ children }) {
 
         if (response.data && !response.data.error) {
           setFuncionario(response.data);
-
-          if (mostrarToast && response.data.nome_funcionario) {
-            notify.success(
-              `Bem-vindo, ${response.data.nome_funcionario}!`,
-              { position: "top-right" }
-            );
-          }
         }
-      } catch (error) {
-        if (error.response?.status === 404) {
-          notify.error("Funcionário não encontrado no sistema", {
-            position: "top-right",
-          });
-        }
+      } catch {
         setFuncionario(null);
       } finally {
         buscandoFuncionarioRef.current = false;
@@ -63,8 +50,7 @@ export default function AuthProvider({ children }) {
 
       // 🔸 Busca funcionário em background
       fetchFuncionarioData(session.user.email, false);
-    } catch (error) {
-      console.error("Erro ao verificar sessão:", error);
+    } catch  {
       setUser(null);
       setFuncionario(null);
       setLoading(false);

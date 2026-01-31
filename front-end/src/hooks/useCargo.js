@@ -21,7 +21,7 @@ export default function useCargo() {
 
   return {
     cargo: funcionario?.cargo,
-    nome: funcionario?.nome,
+    nome: funcionario?.nome_funcionario,
     hasPermission,
     isOperacional: funcionario?.cargo?.toLowerCase() === 'operacional',
     isGerencial: funcionario?.cargo?.toLowerCase() === 'gerencial',
