@@ -71,10 +71,45 @@ export default function FormularioCadastro({
 
   // Quando o método de pagamento muda, esconde o formulário de cartão
   useEffect(() => {
-    if (form.metodoPagamento !== "CREDITO") {
+    if (
+      form.metodoPagamento !== "CREDITO" &&
+      form.metodoPagamento !== "DEBITO"
+    ) {
       setMostrarCartao(false);
     }
   }, [form.metodoPagamento]);
+
+  // Quando o método de pagamento muda, esconde o formulário de cartão
+  useEffect(() => {
+    if (
+      form.metodoPagamento !== "CREDITO" &&
+      form.metodoPagamento !== "BOLETO"
+    ) {
+      form.parcelas = 0;
+    }
+  }, [form.metodoPagamento, form.parcelas, form]);
+
+  useEffect(() => {
+    if (!form.pedidoTipos.includes("PRODUTO")) {
+      form.codProdutos = [];
+      form.quantidade = {};
+      form.codEnderecoCliente = "";
+    }
+  }, [form.pedidoTipos, form]);
+
+  useEffect(() => {
+    if (
+      !form.pedidoTipos.includes("INSTALACAO") &&
+      !form.pedidoTipos.includes("MANUTENCAO")
+    ) {
+      form.enderecoInstManu = {
+        cidade: "",
+        cep: "",
+        bairro: "",
+        rua_numero: "",
+      };
+    }
+  }, [form.pedidoTipos, form]);
 
   useEffect(() => {
     if (!buscaCliente) {
@@ -124,7 +159,9 @@ export default function FormularioCadastro({
 
     // Se for crédito, só valida parcelas
     if (form.metodoPagamento === "CREDITO" && !form.parcelas) {
-      alert("Selecione a quantidade de parcelas");
+      notify.error("Selecione a quantidade de parcelas", {
+        position: "top-right",
+      });
       return;
     }
 
@@ -355,10 +392,11 @@ export default function FormularioCadastro({
               onChange={handleChange}
               placeholder="Valor Adicional (R$)"
               value={form.valor_adicional}
-              min="0"
+              min="150"
               step="0.01"
               className="w-full md:w-max p-2 border border-gray-300 rounded-md 
               appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              required
             />
           </div>
 
@@ -406,6 +444,7 @@ export default function FormularioCadastro({
                 name={"parcelas"}
                 className="w-full md:w-max form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 
               hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
+                required
               >
                 <option value="0" disabled>
                   Selecione a quantidade de parcelas...
@@ -419,10 +458,34 @@ export default function FormularioCadastro({
               </select>
             </div>
           )}
+
+          {form.valorTotal > 0 && form.metodoPagamento === "BOLETO" && (
+            <div>
+              <select
+                value={form.parcelas}
+                onChange={handleChange}
+                name={"parcelas"}
+                className="w-full md:w-max form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 
+              hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
+                required
+              >
+                <option value="0" disabled>
+                  Selecione a quantidade de boletos...
+                </option>
+                {[...Array(6)].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}x de R$ {(form.valorTotal / (i + 1)).toFixed(2)} sem
+                    juros
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Formulário do cartão */}
-        {form.metodoPagamento === "CREDITO" && (
+        {(form.metodoPagamento === "CREDITO" ||
+          form.metodoPagamento === "DEBITO") && (
           <div className="mt-4 p-4 border rounded-lg">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
               <h3 className="font-medium mb-2 sm:mb-0">

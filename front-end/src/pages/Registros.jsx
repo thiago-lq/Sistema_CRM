@@ -81,6 +81,7 @@ export default function Registros() {
       });
       setForm({ codCliente: "", motivo: [], tipoInteracao: "", descricao: "" });
       handleRecarregar();
+      setAbaAtiva("lista")
     } catch (error) {
       if (error.response?.status === 422) {
         notify.error("Erro, dados enviados inválidos", {

@@ -475,6 +475,38 @@ export default function EditarPedidos({
     return () => clearTimeout(timeout);
   }, [buscaClienteEditar]);
 
+  // Quando o método de pagamento muda, esconde o formulário de cartão
+  useEffect(() => {
+    if (
+      formEditar.metodoPagamento !== "CREDITO" &&
+      formEditar.metodoPagamento !== "BOLETO"
+    ) {
+      formEditar.parcelas = 0;
+    }
+  }, [formEditar.metodoPagamento, formEditar.parcelas, formEditar]);
+
+  useEffect(() => {
+    if (!formEditar.pedidoTipos.includes("PRODUTO")) {
+      formEditar.codProdutos = [];
+      formEditar.quantidade = {};
+      formEditar.codEnderecoCliente = "";
+    }
+  }, [formEditar.pedidoTipos, formEditar]);
+
+  useEffect(() => {
+    if (
+      !formEditar.pedidoTipos.includes("INSTALACAO") &&
+      !formEditar.pedidoTipos.includes("MANUTENCAO")
+    ) {
+      formEditar.enderecoInstManu = {
+        cidade: "",
+        cep: "",
+        bairro: "",
+        rua_numero: "",
+      };
+    }
+  }, [formEditar.pedidoTipos, formEditar]);
+
   // Se está carregando
   if (loading) {
     return (
@@ -712,10 +744,11 @@ export default function EditarPedidos({
               onChange={handleChangeEditar}
               placeholder="Valor Adicional (R$)"
               value={formEditar.valor_adicional}
-              min="0"
+              min="150"
               step="0.01"
               className="w-full md:w-max p-2 border border-gray-300 rounded-md 
               appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              required
             />
           </div>
 
@@ -764,6 +797,7 @@ export default function EditarPedidos({
                   name={"parcelas"}
                   className="w-full md:w-max form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 
               hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
+                  required
                 >
                   <option value="0" disabled>
                     Selecione a quantidade de parcelas...
@@ -777,101 +811,126 @@ export default function EditarPedidos({
                 </select>
               </div>
             )}
+
+          {formEditar.valorTotal > 0 &&
+            formEditar.metodoPagamento === "BOLETO" && (
+              <div>
+                <select
+                  value={formEditar.parcelas}
+                  onChange={handleChangeEditar}
+                  name={"parcelas"}
+                  className="w-full md:w-max form-select border border-gray-300 rounded-md focus:ring-black focus:border-black p-2 
+              hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
+                  required
+                >
+                  <option value="0" disabled>
+                    Selecione a quantidade de boletos...
+                  </option>
+                  {[...Array(6)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1}x de R${" "}
+                      {(formEditar.valorTotal / (i + 1)).toFixed(2)} sem juros
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
         </div>
 
         {/* Formulário do cartão */}
-        {formEditar.metodoPagamento === "CREDITO" && (
-          <div className="mt-4 p-4 border rounded-lg">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
-              <h3 className="font-medium mb-2 sm:mb-0">
-                Informações do cartão
-              </h3>
-              <button
-                type="button"
-                onClick={() => setMostrarCartao(!mostrarCartao)}
-                className="text-sm text-blue-600 hover:text-blue-800 hover:cursor-pointer transition-all duration-300"
-              >
-                {mostrarCartao ? "Ocultar" : "Mostrar formulário"}
-              </button>
-            </div>
-
-            {mostrarCartao ? (
-              <div className="space-y-4">
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
-                  <p className="font-medium text-yellow-800">
-                    Ambiente de demonstração
-                  </p>
-                  <p className="text-sm text-yellow-700">
-                    Este formulário é apenas simbólico. Nenhuma transação real
-                    será processada.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Número do cartão
-                    </label>
-                    <input
-                      type="text"
-                      name="numero"
-                      value={dadosCartao.numero}
-                      onChange={handleChangeCartao}
-                      placeholder="1234 5678 9012 3456"
-                      className="w-full p-2 border rounded"
-                      maxLength="19"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Nome no cartão
-                    </label>
-                    <input
-                      type="text"
-                      name="nome"
-                      value={dadosCartao.nome}
-                      onChange={handleChangeCartao}
-                      placeholder="Como está no cartão"
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Validade (MM/AA)
-                    </label>
-                    <input
-                      type="text"
-                      name="validade"
-                      value={dadosCartao.validade}
-                      onChange={handleChangeCartao}
-                      placeholder="MM/AA"
-                      className="w-full p-2 border rounded"
-                      maxLength="5"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      CVV
-                    </label>
-                    <input
-                      type="text"
-                      name="cvv"
-                      value={dadosCartao.cvv}
-                      onChange={handleChangeCartao}
-                      placeholder="123"
-                      className="w-full p-2 border rounded"
-                      maxLength="3"
-                    />
-                  </div>
-                </div>
+        {formEditar.metodoPagamento === "CREDITO" ||
+          (formEditar.metodoPagamento === "DEBITO" && (
+            <div className="mt-4 p-4 border rounded-lg">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
+                <h3 className="font-medium mb-2 sm:mb-0">
+                  Informações do cartão
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setMostrarCartao(!mostrarCartao)}
+                  className="text-sm text-blue-600 hover:text-blue-800 hover:cursor-pointer transition-all duration-300"
+                >
+                  {mostrarCartao ? "Ocultar" : "Mostrar formulário"}
+                </button>
               </div>
-            ) : (
-              <p className="text-sm text-gray-600">
-                Clique em Mostrar formulário para simular os dados do cartão.
-              </p>
-            )}
-          </div>
-        )}
+
+              {mostrarCartao ? (
+                <div className="space-y-4">
+                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
+                    <p className="font-medium text-yellow-800">
+                      Ambiente de demonstração
+                    </p>
+                    <p className="text-sm text-yellow-700">
+                      Este formulário é apenas simbólico. Nenhuma transação real
+                      será processada.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Número do cartão
+                      </label>
+                      <input
+                        type="text"
+                        name="numero"
+                        value={dadosCartao.numero}
+                        onChange={handleChangeCartao}
+                        placeholder="1234 5678 9012 3456"
+                        className="w-full p-2 border rounded"
+                        maxLength="19"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Nome no cartão
+                      </label>
+                      <input
+                        type="text"
+                        name="nome"
+                        value={dadosCartao.nome}
+                        onChange={handleChangeCartao}
+                        placeholder="Como está no cartão"
+                        className="w-full p-2 border rounded"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Validade (MM/AA)
+                      </label>
+                      <input
+                        type="text"
+                        name="validade"
+                        value={dadosCartao.validade}
+                        onChange={handleChangeCartao}
+                        placeholder="MM/AA"
+                        className="w-full p-2 border rounded"
+                        maxLength="5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        CVV
+                      </label>
+                      <input
+                        type="text"
+                        name="cvv"
+                        value={dadosCartao.cvv}
+                        onChange={handleChangeCartao}
+                        placeholder="123"
+                        className="w-full p-2 border rounded"
+                        maxLength="3"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600">
+                  Clique em Mostrar formulário para simular os dados do cartão.
+                </p>
+              )}
+            </div>
+          ))}
 
         {/* Descrição */}
         <div>
