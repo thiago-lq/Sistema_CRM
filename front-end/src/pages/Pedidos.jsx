@@ -355,7 +355,6 @@ export default function Pedidos() {
 
   const propsDetalhes = {
     pedidoSelecionado,
-    setAbaAtiva,
   };
 
   const propsEditar = {

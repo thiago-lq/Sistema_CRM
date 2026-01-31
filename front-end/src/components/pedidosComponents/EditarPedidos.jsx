@@ -580,7 +580,7 @@ export default function EditarPedidos({
               name="codEnderecoCliente"
               value={formEditar.codEnderecoCliente ?? ""}
               onChange={handleChangeEditar}
-              className="w-full p-2 border border-gray-300 rounded-md 
+              className="w-max p-2 border border-gray-300 rounded-md 
                          focus:ring-indigo-500 focus:border-indigo-500 hover:cursor-pointer"
               required
             >

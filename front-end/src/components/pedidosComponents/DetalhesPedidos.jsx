@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { pedidosShow } from "../../services/pedido/pedidosShow";
 import { notify } from "../../utils/notify";
 
-export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
+export default function DetalhesPedido({ pedidoSelecionado }) {
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -96,92 +96,118 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
   const subtotalItens = calcularSubtotalItens();
 
   return (
-    <div className="bg-white p-6 mt-4">
-      <div className="w-full flex justify-between items-center mb-15">
+    <div className="bg-white p-4 xs:p-5 sm:p-6 mt-3 xs:mt-4">
+      <div className="w-full flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 xs:gap-5 mb-10 xs:mb-12 sm:mb-15">
         <div>
-          <h2 className="text-xl font-semibold mb-4">
+          <h2 className="text-lg xs:text-xl font-semibold mb-3 xs:mb-4">
             Detalhes do pedido #{pedido.cod_pedido}
           </h2>
         </div>
-        <div className="grid grid-cols-2 gap-4 text-lg">
-          <div className="flex flex-wrap gap-2">
-            <p className="font-semibold text-gray-700">Data de criação:</p>
-            <p>{formatoBrasileiro(pedido.created_at)}</p>
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 xs:gap-4 text-base xs:text-lg w-full lg:w-auto">
+          <div className="flex flex-wrap gap-1 xs:gap-2">
+            <p className="font-semibold text-gray-700 text-sm xs:text-base">
+              Data de criação:
+            </p>
+            <p className="text-sm xs:text-base">
+              {formatoBrasileiro(pedido.created_at)}
+            </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <p className="font-semibold text-gray-700">Data de atualização:</p>
-            <p>{formatoBrasileiro(pedido.updated_at)}</p>
+          <div className="flex flex-wrap gap-1 xs:gap-2">
+            <p className="font-semibold text-gray-700 text-sm xs:text-base">
+              Data de atualização:
+            </p>
+            <p className="text-sm xs:text-base">
+              {formatoBrasileiro(pedido.updated_at)}
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-6 text-lg">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 xs:gap-6 mb-5 xs:mb-6 text-base xs:text-lg">
         {/* Dados Básicos do Pedido */}
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-wrap gap-2">
-              <p className="text-gray-700 font-semibold">Cliente:</p>
-              <p>
+        <div className="space-y-3 xs:space-y-4">
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 xs:gap-4">
+            <div className="flex flex-wrap gap-1 xs:gap-2">
+              <p className="text-gray-700 font-semibold text-sm xs:text-base">
+                Cliente:
+              </p>
+              <p className="text-sm xs:text-base">
                 #{pedido.cod_cliente} — {pedido.cliente_nome || "-"}
               </p>
             </div>
             {pedido.cliente_cpf && (
-              <div className="flex flex-wrap gap-2">
-                <p className="text-gray-700 font-semibold">CPF:</p>
-                <p>#{pedido.cliente_cpf}</p>
+              <div className="flex flex-wrap gap-1 xs:gap-2">
+                <p className="text-gray-700 font-semibold text-sm xs:text-base">
+                  CPF:
+                </p>
+                <p className="text-sm xs:text-base">#{pedido.cliente_cpf}</p>
               </div>
             )}
             {pedido.cliente_cnpj && (
-              <div className="flex flex-wrap gap-2">
-                <p className="text-gray-700 font-semibold">CNPJ:</p>
-                <p>#{pedido.cliente_cnpj}</p>
+              <div className="flex flex-wrap gap-1 xs:gap-2">
+                <p className="text-gray-700 font-semibold text-sm xs:text-base">
+                  CNPJ:
+                </p>
+                <p className="text-sm xs:text-base">#{pedido.cliente_cnpj}</p>
               </div>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-wrap gap-2">
-              <p className="font-semibold text-gray-700">Valor total:</p>
-              <p>{formatarMoeda(pedido.valor_total)}</p>
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 xs:gap-4">
+            <div className="flex flex-wrap gap-1 xs:gap-2">
+              <p className="font-semibold text-gray-700 text-sm xs:text-base">
+                Valor total:
+              </p>
+              <p className="text-sm xs:text-base">
+                {formatarMoeda(pedido.valor_total)}
+              </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <p className="font-semibold text-gray-700">Valor adicional:</p>
-              <p>{formatarMoeda(pedido.valor_adicional)}</p>
+            <div className="flex flex-wrap gap-1 xs:gap-2">
+              <p className="font-semibold text-gray-700 text-sm xs:text-base">
+                Valor adicional:
+              </p>
+              <p className="text-sm xs:text-base">
+                {formatarMoeda(pedido.valor_adicional)}
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-wrap gap-2">
-              <p className="font-semibold text-gray-700">
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 xs:gap-4">
+            <div className="flex flex-wrap gap-1 xs:gap-2">
+              <p className="font-semibold text-gray-700 text-sm xs:text-base">
                 Método de pagamento:
               </p>
-              <p>{pedido.metodo_pagamento}</p>
+              <p className="text-sm xs:text-base">{pedido.metodo_pagamento}</p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <p className="font-semibold text-gray-700">Parcelas:</p>
-              <p>{pedido.parcelas}</p>
+            <div className="flex flex-wrap gap-1 xs:gap-2">
+              <p className="font-semibold text-gray-700 text-sm xs:text-base">
+                Parcelas:
+              </p>
+              <p className="text-sm xs:text-base">{pedido.parcelas}</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <p className="font-semibold text-gray-700">
+          <div className="flex flex-wrap gap-1 xs:gap-2">
+            <p className="font-semibold text-gray-700 text-sm xs:text-base">
               Funcionário responsável:
             </p>
-            <p>
+            <p className="text-sm xs:text-base">
               #{pedido.cod_funcionario} — {pedido.funcionario_nome}
             </p>
           </div>
         </div>
 
         {/* Status e Tipos */}
-        <div className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <p className="font-semibold text-gray-700">Tipos do pedido:</p>
-            <div className="flex gap-2 flex-wrap">
+        <div className="space-y-3 xs:space-y-4">
+          <div className="flex flex-col xs:flex-row xs:flex-wrap gap-1 xs:gap-2">
+            <p className="font-semibold text-gray-700 text-sm xs:text-base">
+              Tipos do pedido:
+            </p>
+            <div className="flex gap-1 xs:gap-2 flex-wrap">
               {pedido.tipos_pedido ? (
                 pedido.tipos_pedido.split(", ").map((tipo, idx) => (
                   <span
                     key={idx}
-                    className={`p-1 text-sm rounded-full font-medium ${
+                    className={`p-1 text-xs xs:text-sm rounded-full font-medium ${
                       tipo === "PRODUTO"
                         ? "bg-blue-100 text-blue-800"
                         : tipo === "INSTALACAO"
@@ -193,20 +219,26 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
                   </span>
                 ))
               ) : (
-                <span className="text-gray-500">Nenhum tipo definido</span>
+                <span className="text-gray-500 text-sm xs:text-base">
+                  Nenhum tipo definido
+                </span>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-wrap gap-2">
-              <p className="font-semibold text-gray-700">Prazo</p>
-              <p>{pedido.prazo}</p>
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 xs:gap-4">
+            <div className="flex flex-wrap gap-1 xs:gap-2">
+              <p className="font-semibold text-gray-700 text-sm xs:text-base">
+                Prazo
+              </p>
+              <p className="text-sm xs:text-base">{pedido.prazo}</p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <p className="font-semibold text-gray-700">Status pagamento:</p>
+            <div className="flex flex-wrap gap-1 xs:gap-2">
+              <p className="font-semibold text-gray-700 text-sm xs:text-base">
+                Status pagamento:
+              </p>
               <span
-                className={`font-medium rounded-full p-0.5 ${
+                className={`font-medium rounded-full px-2 py-0.5 text-xs xs:text-sm ${
                   pedido.status_pagamento === true
                     ? "text-green-900 bg-green-100"
                     : pedido.status_pagamento === false
@@ -224,27 +256,29 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
           </div>
         </div>
 
-        {/* Itens do Pedido - AGORA FUNCIONANDO */}
-        <div className="col-span-2 mt-4">
-          <h3 className="font-semibold text-gray-700 mb-3">Itens do pedido</h3>
+        {/* Itens do Pedido */}
+        <div className="col-span-1 lg:col-span-2 mt-3 xs:mt-4">
+          <h3 className="font-semibold text-gray-700 mb-2 xs:mb-3 text-base xs:text-lg">
+            Itens do pedido
+          </h3>
           {itens && itens.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white border border-gray-200">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="py-2 px-3 border-b text-left text-sm font-medium text-gray-500 uppercase">
+                    <th className="py-1 xs:py-2 px-2 xs:px-3 border-b text-left text-xs xs:text-sm font-medium text-gray-500 uppercase">
                       Código
                     </th>
-                    <th className="py-2 px-3 border-b text-left text-sm font-medium text-gray-500 uppercase">
+                    <th className="py-1 xs:py-2 px-2 xs:px-3 border-b text-left text-xs xs:text-sm font-medium text-gray-500 uppercase">
                       Produto
                     </th>
-                    <th className="py-2 px-3 border-b text-center text-sm font-medium text-gray-500 uppercase">
+                    <th className="py-1 xs:py-2 px-2 xs:px-3 border-b text-center text-xs xs:text-sm font-medium text-gray-500 uppercase">
                       Quantidade
                     </th>
-                    <th className="py-2 px-3 border-b text-right text-sm font-medium text-gray-500 uppercase">
+                    <th className="py-1 xs:py-2 px-2 xs:px-3 border-b text-right text-xs xs:text-sm font-medium text-gray-500 uppercase">
                       Preço unitário
                     </th>
-                    <th className="py-2 px-3 border-b text-right text-sm font-medium text-gray-500 uppercase">
+                    <th className="py-1 xs:py-2 px-2 xs:px-3 border-b text-right text-xs xs:text-sm font-medium text-gray-500 uppercase">
                       Subtotal
                     </th>
                   </tr>
@@ -252,19 +286,19 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
                 <tbody>
                   {itens.map((item, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td className="py-2 px-3 border-b text-sm text-gray-600">
+                      <td className="py-1 xs:py-2 px-2 xs:px-3 border-b text-xs xs:text-sm text-gray-600">
                         #{item.cod_produto}
                       </td>
-                      <td className="py-2 px-3 border-b text-sm">
+                      <td className="py-1 xs:py-2 px-2 xs:px-3 border-b text-xs xs:text-sm">
                         {item.nome_produto || `Produto #${item.cod_produto}`}
                       </td>
-                      <td className="py-2 px-3 border-b text-center text-sm">
+                      <td className="py-1 xs:py-2 px-2 xs:px-3 border-b text-center text-xs xs:text-sm">
                         {item.quantidade}x
                       </td>
-                      <td className="py-2 px-3 border-b text-right text-sm">
+                      <td className="py-1 xs:py-2 px-2 xs:px-3 border-b text-right text-xs xs:text-sm">
                         {formatarMoeda(item.preco_unitario)}
                       </td>
-                      <td className="py-2 px-3 border-b text-right text-sm font-medium">
+                      <td className="py-1 xs:py-2 px-2 xs:px-3 border-b text-right text-xs xs:text-sm font-medium">
                         {formatarMoeda(
                           item.quantidade * (item.preco_unitario || 0),
                         )}
@@ -276,11 +310,11 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
                   <tr className="bg-gray-50 font-semibold">
                     <td
                       colSpan="4"
-                      className="py-2 px-3 border-b text-right text-sm"
+                      className="py-1 xs:py-2 px-2 xs:px-3 border-b text-right text-xs xs:text-sm"
                     >
                       Subtotal dos itens:
                     </td>
-                    <td className="py-2 px-3 border-b text-right text-sm">
+                    <td className="py-1 xs:py-2 px-2 xs:px-3 border-b text-right text-xs xs:text-sm">
                       {formatarMoeda(subtotalItens)}
                     </td>
                   </tr>
@@ -288,8 +322,8 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
               </table>
             </div>
           ) : (
-            <div className="bg-gray-50 p-4 rounded text-center">
-              <p className="text-gray-500 text-sm">
+            <div className="bg-gray-50 p-3 xs:p-4 rounded text-center">
+              <p className="text-gray-500 text-xs xs:text-sm">
                 Nenhum item encontrado para este pedido.
               </p>
               <p className="text-gray-400 text-xs mt-1">
@@ -300,26 +334,26 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
         </div>
 
         {/* Endereços */}
-        <div className="col-span-2 grid grid-cols-2 gap-4 mt-4 border-2 border-gray-200 rounded-lg">
+        <div className="col-span-1 lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-3 xs:gap-4 mt-3 xs:mt-4 border-2 border-gray-200 rounded-lg p-3 xs:p-4">
           {/* Endereço da Instalação/Manutenção */}
           <div className="bg-gray-50 p-3 rounded">
-            <h3 className="font-semibold text-gray-700 mb-2">
+            <h3 className="font-semibold text-gray-700 mb-2 text-sm xs:text-base">
               Endereço da instalação/manutenção
             </h3>
-            <div className="text-lg space-y-1">
-              <div className="flex flex-wrap gap-2">
+            <div className="space-y-1 text-sm xs:text-base">
+              <div className="flex flex-wrap gap-1 xs:gap-2">
                 <span className="font-medium">Cidade:</span>{" "}
                 <p>{pedido.manu_inst_cidade || "-"}</p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1 xs:gap-2">
                 <span className="font-medium">CEP:</span>{" "}
                 <p>{pedido.manu_inst_cep || "-"}</p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1 xs:gap-2">
                 <span className="font-medium">Bairro:</span>{" "}
                 <p>{pedido.manu_inst_bairro || "-"}</p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1 xs:gap-2">
                 <span className="font-medium">Rua/Número:</span>{" "}
                 <p>{pedido.manu_inst_rua || "-"}</p>
               </div>
@@ -327,44 +361,38 @@ export default function DetalhesPedido({ pedidoSelecionado, setAbaAtiva }) {
           </div>
 
           {/* Endereço do entrega */}
-          <div className="bg-gray-50 p-3">
-            <h3 className="font-semibold text-gray-700 mb-2">
+          <div className="bg-gray-50 p-3 rounded">
+            <h3 className="font-semibold text-gray-700 mb-2 text-sm xs:text-base">
               Endereço de entrega
             </h3>
-            <div className="text-lg space-y-1">
-              <p>
+            <div className="space-y-1 text-sm xs:text-base">
+              <div className="flex flex-wrap gap-1 xs:gap-2">
                 <span className="font-medium">Cidade:</span>{" "}
-                {pedido.cli_cidade || "-"}
-              </p>
-              <p>
+                <p>{pedido.cli_cidade || "-"}</p>
+              </div>
+              <div className="flex flex-wrap gap-1 xs:gap-2">
                 <span className="font-medium">CEP:</span>{" "}
-                {pedido.cli_cep || "-"}
-              </p>
-              <p>
+                <p>{pedido.cli_cep || "-"}</p>
+              </div>
+              <div className="flex flex-wrap gap-1 xs:gap-2">
                 <span className="font-medium">Bairro:</span>{" "}
-                {pedido.cli_bairro || "-"}
-              </p>
-              <p>
+                <p>{pedido.cli_bairro || "-"}</p>
+              </div>
+              <div className="flex flex-wrap gap-1 xs:gap-2">
                 <span className="font-medium">Rua/Número:</span>{" "}
-                {pedido.cli_rua || "-"}
-              </p>
+                <p>{pedido.cli_rua || "-"}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="border-2 border-gray-200 rounded-lg p-4 mt-5 text-lg">
+
+      <div className="border-2 border-gray-200 rounded-lg p-3 xs:p-4 mt-4 xs:mt-5 text-sm xs:text-base">
         <span className="font-semibold text-gray-700">Descrição: </span>
-        <p className="w-full break-words whitespace-pre-wrap">
+        <p className="w-full break-words whitespace-pre-wrap mt-1">
           {pedido.descricao || "-"}
         </p>
       </div>
-
-      <button
-        className="mt-6 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-        onClick={() => setAbaAtiva("lista")}
-      >
-        Voltar para lista
-      </button>
     </div>
   );
 }

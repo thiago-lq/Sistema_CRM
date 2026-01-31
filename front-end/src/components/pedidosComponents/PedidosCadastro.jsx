@@ -222,12 +222,12 @@ export default function FormularioCadastro({
               name="codEnderecoCliente"
               value={form.codEnderecoCliente ?? ""}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md 
+              className="w-max p-2 border border-gray-300 rounded-md 
                           focus:ring-black focus:border-black hover:cursor-pointer hover:bg-gray-100 transition-all duration-300"
               required
             >
               <option disabled value="">
-                Selecione um endereço
+                Selecione um endereço...
               </option>
               {cliente.enderecos?.map((e) => (
                 <option
