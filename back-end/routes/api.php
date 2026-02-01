@@ -11,7 +11,7 @@ use App\Http\Middleware\EnsureFuncionarioIsAuthenticated;
 use App\Http\Controllers\FuncionarioController;
 
 // Rota de autenticação do supabase
-Route::middleware('auth.funcionario')->group(function() {
+//Route::middleware('auth.funcionario')->group(function() {
     // Rotas de Clientes e telefones de clientes
     Route::get('/clientes', [ClienteController::class, 'index']);
     Route::get('/clientes/{id}', [ClienteController::class, 'show']);
@@ -53,4 +53,4 @@ Route::middleware('auth.funcionario')->group(function() {
 
     // Nova rota para buscar dados do funcionário logado
     Route::get('/funcionario', [FuncionarioController::class, 'buscarFuncionario']);
-});
+//});
