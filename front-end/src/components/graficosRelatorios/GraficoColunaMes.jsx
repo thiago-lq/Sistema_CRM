@@ -36,7 +36,26 @@ export default function GraficoColunaMes({ dados2Mensal, loading }) {
       },
       tooltip: {
         callbacks: {
-          label: (ctx) => ` ${ctx.raw} contatos`,
+          label: (context) => {
+            // Encontra o item original pelo índice
+            const dataItem = dados2Mensal[context.dataIndex];
+            
+            // Verifica se o item existe e tem os dados necessários
+            if (!dataItem) return ` ${context.raw} contatos`;
+            
+            // Obtém o CPF ou CNPJ (o que estiver preenchido)
+            const documento = dataItem.cpf || dataItem.cnpj || 'Não informado';
+            
+            // Verifica qual tipo de documento é
+            const tipoDocumento = dataItem.cpf ? 'CPF' : 
+                                 dataItem.cnpj ? 'CNPJ' : 'Documento';
+            
+            return [
+              `Cliente: ${dataItem.cliente}`,
+              `${tipoDocumento}: ${documento}`,
+              `Contatos: ${context.raw}`
+            ];
+          },
         },
       },
     },

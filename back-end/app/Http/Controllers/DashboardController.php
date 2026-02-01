@@ -105,12 +105,16 @@ class DashboardController extends Controller
         $result = DB::select("
             SELECT
                 r.COD_CLIENTE AS cliente,
-                COUNT(*) AS total
-                FROM REGISTROS r
-                WHERE r.CREATED_AT >= NOW() - INTERVAL '30 DAYS'
-                GROUP BY r.COD_CLIENTE
-                ORDER BY total DESC
-                LIMIT 10
+                COUNT(*) AS total,
+                c.CPF_CLIENTE AS cpf,
+                c.CNPJ_CLIENTE AS cnpj
+            FROM REGISTROS r
+            LEFT JOIN CLIENTES c
+                ON r.COD_CLIENTE = c.COD_CLIENTE
+            WHERE r.CREATED_AT >= NOW() - INTERVAL '30 DAYS'
+            GROUP BY r.COD_CLIENTE, c.CPF_CLIENTE, c.CNPJ_CLIENTE
+            ORDER BY total DESC
+            LIMIT 10
         ");
         return response()->json($result, 200);
     }
