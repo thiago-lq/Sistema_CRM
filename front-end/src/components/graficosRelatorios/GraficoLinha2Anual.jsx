@@ -23,19 +23,26 @@ ChartJS.register(
 );
 
 export default function GraficoLinha2Anual({ dadosQualidade, loading }) {
+  const isMobile = window.innerWidth < 640;
 
-  // Extrair dados
-  const dados = dadosQualidade.dados || [];
-  const metricas = dadosQualidade.metricas || {};
-  const mesesNomes = dadosQualidade.meses_nomes || [];
+  const dados = isMobile
+    ? dadosQualidade?.dados?.slice(5, 12) || []
+    : dadosQualidade?.dados || [];
+
+  const mesesNomes = isMobile
+    ? dadosQualidade?.meses_nomes?.slice(5, 12) || []
+    : dadosQualidade?.meses_nomes || [];
+
+  const metricas = dadosQualidade?.metricas || {};
 
   // Labels (nomes dos meses)
-  const labels = mesesNomes.length > 0 
-    ? mesesNomes 
-    : dados.map(item => item.mes_nome || `Mês ${item.mes}`);
+  const labels =
+    mesesNomes.length > 0
+      ? mesesNomes
+      : dados.map((item) => item.mes_nome || `Mês ${item.mes}`);
 
   // Valores percentuais
-  const valores = dados.map(item => item.percentual || 0);
+  const valores = dados.map((item) => item.percentual || 0);
 
   // Dados do gráfico
   const data = {
@@ -92,12 +99,12 @@ export default function GraficoLinha2Anual({ dadosQualidade, loading }) {
               const total = mesData?.total_os || 0;
               const dentro = mesData?.dentro_sla || 0;
               const fora = mesData?.fora_sla || 0;
-              
+
               return [
-                `${label.split('(')[0]}: ${value}%`,
+                `${label.split("(")[0]}: ${value}%`,
                 `Concluído no prazo: ${dentro}/${total}`,
                 `Não concluído no prazo: ${fora}`,
-                `Total finalizados: ${total}`
+                `Total finalizados: ${total}`,
               ];
             }
             return `${label}: ${value}%`;
@@ -111,9 +118,9 @@ export default function GraficoLinha2Anual({ dadosQualidade, loading }) {
         min: 0,
         max: 100,
         ticks: {
-          callback: function(value) {
-            return value + '%';
-          }
+          callback: function (value) {
+            return value + "%";
+          },
         },
         grid: {
           color: "rgba(0, 0, 0, 0.05)",
@@ -160,19 +167,23 @@ export default function GraficoLinha2Anual({ dadosQualidade, loading }) {
         <p className="text-gray-600 text-sm mb-4">
           Percentual de pagamentos realizados dentro do prazo estabelecido
         </p>
-        
+
         {/* Cards de resumo simples */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
             <p className="text-sm text-gray-600">Média Anual</p>
-            <p className="text-xl font-bold text-green-700">{metricas.media_anual || 0}%</p>
+            <p className="text-xl font-bold text-green-700">
+              {metricas.media_anual || 0}%
+            </p>
           </div>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-sm text-gray-600">Total Analisado</p>
-            <p className="text-xl font-bold text-blue-700">{metricas.total_os || 0}</p>
+            <p className="text-xl font-bold text-blue-700">
+              {metricas.total_os || 0}
+            </p>
           </div>
         </div>
-        
+
         {/* Gráfico */}
         <div className="h-[350px]">
           <Line data={data} options={options} />

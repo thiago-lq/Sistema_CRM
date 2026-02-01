@@ -23,13 +23,22 @@ ChartJS.register(
 );
 
 export default function GraficoLinha3Anual({ dados3Anual, loading }) {
+  const isMobile = window.innerWidth < 640;
 
-  // Extrair dados
-  const atual = dados3Anual.interacoes_atual || [];
-  const anterior = dados3Anual.interacoes_anterior || [];
-  const mesesNomes = dados3Anual.meses_nomes || [];
-  const metricas = dados3Anual.metricas || {};
-  const canalMaisCresceu = dados3Anual.canal_mais_cresceu || null;
+  const atual = isMobile
+    ? dados3Anual?.interacoes_atual?.slice(5, 12) || []
+    : dados3Anual?.interacoes_atual || [];
+
+  const anterior = isMobile
+    ? dados3Anual?.interacoes_anterior?.slice(5, 12) || []
+    : dados3Anual?.interacoes_anterior || [];
+
+  const mesesNomes = isMobile
+    ? dados3Anual?.meses_nomes?.slice(5, 12) || []
+    : dados3Anual?.meses_nomes || [];
+
+  const metricas = dados3Anual?.metricas || {};
+  const canalMaisCresceu = dados3Anual?.canal_mais_cresceu || null;
 
   // Labels (nomes dos meses)
   const labels =
