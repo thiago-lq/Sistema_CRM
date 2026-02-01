@@ -285,6 +285,7 @@ export default function Registros() {
     handleChangeEditar,
     formEditar,
     setFormEditar,
+    loading,
   };
 
   return (

@@ -8,6 +8,7 @@ export default function EditarRegistros({
   handleChangeEditar,
   formEditar,
   setFormEditar,
+  loading,
 }) {
   const [buscaClienteEditar, setBuscaClienteEditar] = useState("");
   const [cliente, setCliente] = useState({});
@@ -55,6 +56,18 @@ export default function EditarRegistros({
     }, 1000);
     return () => clearTimeout(timeout);
   }, [buscaClienteEditar, setFormEditar]);
+
+  // Se está carregando
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-3 text-gray-600">Carregando dados do cliente...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white">
@@ -220,7 +233,7 @@ export default function EditarRegistros({
                        font-semibold py-2 px-6 md:py-2 md:px-4 rounded-2xl transition-all hover:cursor-pointer
                        text-sm md:text-base w-full sm:w-auto"
               >
-                 Editar registro
+                Editar registro
               </button>
             </div>
           </div>
