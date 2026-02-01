@@ -14,7 +14,7 @@ use App\Http\Controllers\FuncionarioController;
 Route::get('/funcionario', [FuncionarioController::class, 'buscarFuncionario']);
 
 // Rota de autenticação do supabase
-//Route::middleware('auth.funcionario')->group(function() {
+Route::middleware('auth.funcionario')->group(function() {
     // Rotas de Clientes e telefones de clientes
     Route::get('/clientes', [ClienteController::class, 'index']);
     Route::get('/clientes/{id}', [ClienteController::class, 'show']);
@@ -54,4 +54,4 @@ Route::get('/funcionario', [FuncionarioController::class, 'buscarFuncionario']);
     Route::get('/qualidadeDeServicoAnual', [DashboardController::class, 'qualidadeDeServicoAnual']);
     Route::get('/tendenciaDeInteracoes', [DashboardController::class, 'tendenciaDeInteracoes']);
 
-//});
+});
