@@ -12,14 +12,16 @@ export default function PaginaInicial() {
 
   useEffect(() => {
     setLoading(true);
-    async function fetchDadosCliente() {
+    async function fetchDados() {
       try {
         const dadosClientes = await novosClientes();
+        const dadosPedidos = await novosPedidos();
         setClientes(dadosClientes);
+        setPedidos(dadosPedidos);
         setLoading(false);
       } catch (error) {
         if (error.response?.status === 500) {
-          notify.error("Erro ao buscar clientes");
+          notify.error("Erro ao buscar dados");
         } else {
           notify.error("Erro inesperado", {
             description: "Tente novamente mais tarde.",
@@ -28,27 +30,7 @@ export default function PaginaInicial() {
       }
       setLoading(false);
     }
-    fetchDadosCliente();
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    async function fetchDadosPedido() {
-      try {
-        const dadosPedidos = await novosPedidos();
-        setPedidos(dadosPedidos);
-      } catch (error) {
-        if (error.response?.status === 500) {
-          notify.error("Erro ao buscar pedidos");
-        } else {
-          notify.error("Erro inesperado", {
-            description: "Tente novamente mais tarde.",
-          });
-        }
-      }
-      setLoading(false);
-    }
-    fetchDadosPedido();
+    fetchDados();
   }, []);
 
   return (
