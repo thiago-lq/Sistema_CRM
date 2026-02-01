@@ -467,7 +467,6 @@ class DashboardController extends Controller
             'interacoes_anterior' => $interacoesAnterior,
             'meses_nomes' => $nomesMeses,
             'crescimento_mensal' => $crescimentoMensal, // <-- CORRIGIDO: $crescimentoMensal
-            'canais_crescimento' => $crescimentoCanais,
             'canal_mais_cresceu' => $canalMaisCresceu,
             'metricas' => [
                 'total_ultimo_mes' => $totalUltimoMes,

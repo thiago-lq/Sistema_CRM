@@ -150,6 +150,7 @@ export default function EditarRegistros({
                     className="w-full p-2 border border-gray-300 rounded-md
                        appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
                        text-sm md:text-base"
+                    required
                   />
                 </div>
                 {cliente && cliente.cod_cliente && (

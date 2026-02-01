@@ -29,7 +29,6 @@ export default function GraficoLinha3Anual({ dados3Anual, loading }) {
   const anterior = dados3Anual.interacoes_anterior || [];
   const mesesNomes = dados3Anual.meses_nomes || [];
   const metricas = dados3Anual.metricas || {};
-  const canais = dados3Anual.canais_crescimento || [];
   const canalMaisCresceu = dados3Anual.canal_mais_cresceu || null;
 
   // Labels (nomes dos meses)
@@ -153,7 +152,7 @@ export default function GraficoLinha3Anual({ dados3Anual, loading }) {
           <div className="text-center">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto"></div>
             <p className="mt-3 text-gray-600 text-sm">
-              Carregando dados
+              Carregando dados do gráfico...
             </p>
           </div>
         </div>
@@ -236,74 +235,6 @@ export default function GraficoLinha3Anual({ dados3Anual, loading }) {
         <div className="h-[350px] mb-6">
           <Line data={data} options={options} />
         </div>
-
-        {/* Tabela de canais (apenas top 3) */}
-        {canais.length > 0 && (
-          <div className="mt-6">
-            <h3 className="font-medium text-gray-700 mb-3">
-              Desempenho por Canal (últimos 6 meses)
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Canal
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Período Atual
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Período Anterior
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Crescimento
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {canais.slice(0, 3).map((canal, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <span className="font-medium text-gray-900">
-                            {canal.canal}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="font-medium">{canal.total_atual}</span>
-                        <span className="text-gray-500 text-sm ml-1">
-                          interações
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-gray-600">
-                          {canal.total_anterior}
-                        </span>
-                        <span className="text-gray-500 text-sm ml-1">
-                          interações
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span
-                          className={`font-medium ${
-                            canal.crescimento >= 0
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {canal.crescimento >= 0 ? "+" : ""}
-                          {canal.crescimento}%
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -248,15 +248,6 @@ class PedidoController extends Controller
         }
     }
 
-    public function pedidosAtrasados() {
-        try {
-            $pedidosAtrasados = DB::select("SELECT COD_PEDIDO FROM PEDIDOS WHERE PRAZO < NOW()");
-            return response()->json($pedidosAtrasados, 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Erro ao buscar pedidos atrasados'], 500);
-        }
-    }
-
     // Controlador que atualiza um pedido
     public function update(Request $request, $id) {
         $request->validate([

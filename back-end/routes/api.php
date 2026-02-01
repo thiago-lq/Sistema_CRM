@@ -25,7 +25,6 @@ Route::middleware('auth.funcionario')->group(function() {
     Route::get('/pedidos', [PedidoController::class, 'index']);
     Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
     Route::get('/novosPedidos', [PedidoController::class, 'novosPedidos']);
-    Route::get('/pedidosAtrasados', [PedidoController::class, 'pedidosAtrasados']);
     Route::post('/pedidos', [PedidoController::class, 'store']);
     Route::put('/pedidos/{id}', [PedidoController::class, 'update']);
     Route::delete('/pedidos/{id}', [PedidoController::class, 'destroy']);

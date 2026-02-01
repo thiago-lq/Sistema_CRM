@@ -392,7 +392,7 @@ export default function FormularioCadastro({
               onChange={handleChange}
               placeholder="Valor Adicional (R$)"
               value={form.valor_adicional}
-              min="150"
+              min="25"
               step="0.01"
               className="w-full md:w-max p-2 border border-gray-300 rounded-md 
               appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"

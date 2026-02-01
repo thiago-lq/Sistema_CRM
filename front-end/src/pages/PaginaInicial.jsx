@@ -2,14 +2,12 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { novosClientes } from "../services/cliente/novosClientes";
 import { novosPedidos } from "../services/pedido/novosPedidos";
-import { pedidosAtrasados } from "../services/pedido/pedidosAtrasados";
 import { notify } from "../utils/notify";
 
 // Página inicial do sistema, com a navbar
 export default function PaginaInicial() {
   const [clientes, setClientes] = useState([]);
   const [pedidos, setPedidos] = useState([]);
-  const [atrasados, setAtrasados] = useState([]);
 
   useEffect(() => {
     async function fetchDadosCliente() {
@@ -45,24 +43,6 @@ export default function PaginaInicial() {
       }
     }
     fetchDadosPedido();
-  }, []);
-
-  useEffect(() => {
-    async function fetchDadosPedidoAtrasado() {
-      try {
-        const dadosPedidosAtrasados = await pedidosAtrasados();
-        setAtrasados(dadosPedidosAtrasados);
-      } catch (error) {
-        if (error.response?.status === 500) {
-          notify.error("Erro ao buscar pedidos atrasado");
-        } else {
-          notify.error("Erro inesperado", {
-            description: "Tente novamente mais tarde.",
-          });
-        }
-      }
-    }
-    fetchDadosPedidoAtrasado();
   }, []);
 
   return (
@@ -263,7 +243,7 @@ export default function PaginaInicial() {
               <h3 className="text-base xs:text-lg sm:text-xl font-semibold text-gray-800 mb-4 xs:mb-5 sm:mb-6 text-center">
                 Resumo da semana
               </h3>
-              <div className="grid grid-cols-3 gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
+              <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
                 <div className="text-center">
                   <div className="text-xs xs:text-sm sm:text-base text-gray-600 mt-0 xs:mt-1">
                     Novos clientes:
@@ -278,14 +258,6 @@ export default function PaginaInicial() {
                   </div>
                   <div className="text-xl xs:text-2xl sm:text-3xl font-bold text-emerald-600 mt-1 xs:mt-2">
                     {pedidos.length}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xs xs:text-sm sm:text-base text-gray-600 mt-0 xs:mt-1">
-                    Pedidos atrasados:
-                  </div>
-                  <div className="text-xl xs:text-2xl sm:text-3xl font-bold text-red-600 mt-1 xs:mt-2">
-                    {atrasados.length}
                   </div>
                 </div>
               </div>
