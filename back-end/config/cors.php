@@ -21,8 +21,7 @@ return [
 
     // Domínios específicos do seu projeto Vercel
     'allowed_origins' => [
-        'http://localhost:5173',
-        'https://sistema-crm-ten.vercel.app',
+        env('FRONTEND_URL'),
     ],
 
     'allowed_origins_patterns' => [],
