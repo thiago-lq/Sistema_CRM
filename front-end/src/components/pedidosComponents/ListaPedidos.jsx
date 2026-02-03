@@ -97,10 +97,10 @@ export default function ListaPedidos({
           </button>
 
           {/* Campo busca */}
-          <div className="relative w-full sm:w-48 lg:w-64">
+          <div className="relative w-full sm:w-68 lg:w-74">
             <input
               type="text"
-              placeholder="Pesquisar pedido..."
+              placeholder="Pesquise pelo ID cliente ou ID pedido..."
               value={termoBusca}
               onChange={(e) => setTermoBusca(e.target.value)}
               className="pl-3 pr-3 py-2 sm:pl-5 sm:pr-4 sm:py-2 border border-gray-300 rounded-lg text-sm w-full"
