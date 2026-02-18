@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { registrosShow } from "../../services/registro/registrosShow";
+import { pdfRegistro } from "../../services/pdf/pdfRegistro";
 import { notify } from "../../utils/notify";
 
 export default function DetalhesRegistros({
@@ -19,6 +20,10 @@ export default function DetalhesRegistros({
       timeStyle: "short",
     });
   }
+
+  const onDownload = () => {
+    pdfRegistro(registro.cod_registro);
+  };
 
   useEffect(() => {
     const fetchRegistro = async () => {
@@ -67,12 +72,12 @@ export default function DetalhesRegistros({
   return (
     <div className="bg-white p-3 xs:p-4 sm:p-5">
       <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0">
-      <button
-        onClick={() => setAbaAtiva("lista")}
-        className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:cursor-pointer w-full sm:w-auto"
-      >
-        Voltar
-      </button>
+        <button
+          onClick={() => setAbaAtiva("lista")}
+          className="mb-6 bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:cursor-pointer w-full sm:w-auto"
+        >
+          Voltar
+        </button>
         <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 order-1 sm:order-2 w-full sm:w-auto">
           <div className="flex flex-wrap gap-1 xs:gap-2">
             <p className="font-semibold text-gray-700 text-sm xs:text-base">
@@ -126,7 +131,7 @@ export default function DetalhesRegistros({
             </div>
             <div className="flex flex-wrap gap-1 xs:gap-2">
               <p className="font-semibold text-gray-700 text-sm xs:text-base">
-                Funcionário:
+                ID do funcionário:
               </p>
               <p className="text-sm xs:text-base">
                 {registro.cod_funcionario || "-"}
@@ -134,7 +139,7 @@ export default function DetalhesRegistros({
             </div>
             <div className="flex flex-wrap gap-1 xs:gap-2">
               <p className="font-semibold text-gray-700 text-sm xs:text-base">
-                Nome:
+                Funcionário:
               </p>
               <p className="text-sm xs:text-base">
                 {registro.nome_funcionario || "-"}
@@ -176,6 +181,16 @@ export default function DetalhesRegistros({
           </p>
         </div>
       )}
+
+      <div className="w-full flex justify-center mt-10 items-center">
+        <button
+          className=" bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 
+        rounded-lg transition-all duration-300 hover:cursor-pointer w-full sm:w-auto"
+          onClick={onDownload}
+        >
+          Exportar como PDF
+        </button>
+      </div>
     </div>
   );
 }

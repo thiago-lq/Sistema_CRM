@@ -9,6 +9,7 @@ use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\EnsureFuncionarioIsAuthenticated;
 use App\Http\Controllers\FuncionarioController;
+use App\Http\Controllers\PdfController;
 
 // Nova rota para buscar dados do funcionário logado
 Route::get('/funcionario', [FuncionarioController::class, 'buscarFuncionario']);
@@ -53,5 +54,10 @@ Route::middleware('auth.funcionario')->group(function() {
     Route::get('/pedidosAnual', [DashboardController::class, 'pedidosAnual']);
     Route::get('/qualidadeDeServicoAnual', [DashboardController::class, 'qualidadeDeServicoAnual']);
     Route::get('/tendenciaDeInteracoes', [DashboardController::class, 'tendenciaDeInteracoes']);
+
+    // Rotas de PDFs
+    Route::get('/pdfRegistro/{id}', [PdfController::class, 'pdfRegistro']);
+    Route::get('/pdfCliente/{id}', [PdfController::class, 'pdfCliente']);
+    Route::get('/pdfPedido/{id}', [PdfController::class, 'pdfPedido']);
 
 });

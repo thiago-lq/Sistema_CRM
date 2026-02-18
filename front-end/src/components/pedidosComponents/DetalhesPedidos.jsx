@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import { pedidosShow } from "../../services/pedido/pedidosShow";
+import { pdfPedido } from "../../services/pdf/pdfPedido";
 import { notify } from "../../utils/notify";
 
 export default function DetalhesPedido({ pedidoSelecionado }) {
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const onDownload = () => {
+    pdfPedido(pedido.cod_pedido);
+  };
 
   useEffect(() => {
     const fetchPedido = async () => {
@@ -332,10 +337,11 @@ export default function DetalhesPedido({ pedidoSelecionado }) {
             </div>
           )}
         </div>
-
+        
         {/* Endereços */}
         <div className="col-span-1 lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-3 xs:gap-4 mt-3 xs:mt-4 border-2 border-gray-200 rounded-lg p-3 xs:p-4">
           {/* Endereço da Instalação/Manutenção */}
+          {(pedido.manu_inst_cidade || pedido.manu_inst_rua) && (
           <div className="bg-gray-50 p-3 rounded">
             <h3 className="font-semibold text-gray-700 mb-2 text-sm xs:text-base">
               Endereço da instalação/manutenção
@@ -359,8 +365,10 @@ export default function DetalhesPedido({ pedidoSelecionado }) {
               </div>
             </div>
           </div>
+          )}
 
           {/* Endereço do entrega */}
+          {(pedido.cli_cidade || pedido.cli_rua) && (
           <div className="bg-gray-50 p-3 rounded">
             <h3 className="font-semibold text-gray-700 mb-2 text-sm xs:text-base">
               Endereço de entrega
@@ -384,6 +392,7 @@ export default function DetalhesPedido({ pedidoSelecionado }) {
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
 
@@ -392,6 +401,15 @@ export default function DetalhesPedido({ pedidoSelecionado }) {
         <p className="w-full break-words whitespace-pre-wrap mt-1">
           {pedido.descricao || "-"}
         </p>
+      </div>
+      <div className="w-full flex justify-center mt-10 items-center">
+        <button
+          className=" bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 
+        rounded-lg transition-all duration-300 hover:cursor-pointer w-full sm:w-auto"
+          onClick={onDownload}
+        >
+          Exportar como PDF
+        </button>
       </div>
     </div>
   );

@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import { dadosCliente } from "../../services/cliente/dadosCliente";
+import { pdfCliente } from "../../services/pdf/pdfCliente";
 import { notify } from "../../utils/notify";
 
 export default function DetalhesClientes({ clienteSelecionado, setModo }) {
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const onDownload = () => {
+    pdfCliente(cliente.cod_cliente);
+  };
 
   useEffect(() => {
     const fetchDados = async () => {
@@ -160,6 +165,15 @@ export default function DetalhesClientes({ clienteSelecionado, setModo }) {
             )}
           </div>
         </div>
+      </div>
+      <div className="w-full flex justify-center mt-10 items-center">
+        <button
+          className=" bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 
+        rounded-lg transition-all duration-300 hover:cursor-pointer w-full sm:w-auto"
+          onClick={onDownload}
+        >
+          Exportar como PDF
+        </button>
       </div>
     </div>
   );
