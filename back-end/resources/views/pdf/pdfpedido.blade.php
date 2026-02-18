@@ -198,6 +198,11 @@
         </div>
         @endif
 
+        <div class="linha">
+            <span class="label">Descrição:</span>
+            {{ $pedido->descricao }}
+        </div>
+
     </div>
 </body>
 </html>
