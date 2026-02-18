@@ -22,6 +22,11 @@
             margin-bottom: 8px;
         }
 
+        .linha2 {
+            margin-bottom: 8px;
+            margin-top: 8px;
+        }
+
         .label {
             font-weight: bold;
         }
@@ -198,7 +203,7 @@
         </div>
         @endif
 
-        <div class="linha">
+        <div class="linha2">
             <span class="label">Descrição:</span>
             {{ $pedido->descricao }}
         </div>
