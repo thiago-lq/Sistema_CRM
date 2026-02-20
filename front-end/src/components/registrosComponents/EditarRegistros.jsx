@@ -80,7 +80,7 @@ export default function EditarRegistros({
       </button>
       <div className="flex flex-col justify-between mb-6 md:mb-10 items-center w-full">
         <p className="font-semibold text-xl md:text-2xl lg:text-3xl text-center">
-          Cadastrar registro
+          Editar registro
         </p>
         <p className="text-gray-500 mt-1 text-sm md:text-base text-center">
           Preencha os dados abaixo
@@ -233,7 +233,7 @@ export default function EditarRegistros({
                        font-semibold py-2 px-6 md:py-2 md:px-4 rounded-2xl transition-all hover:cursor-pointer
                        text-sm md:text-base w-full sm:w-auto"
               >
-                Editar registro
+                Salvar registro
               </button>
             </div>
           </div>
